@@ -11,6 +11,7 @@ spring.datasource.password=CHANGE_ME
 spring.sql.init.mode=always
 spring.sql.init.schema-locations=classpath:schema.sql
 spring.sql.init.data-locations=classpath:data.sql
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
 # Avoid a crash if data don't exist
 spring.sql.init.continue-on-error=false
