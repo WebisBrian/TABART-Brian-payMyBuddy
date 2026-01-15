@@ -7,15 +7,18 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserContactRepository extends JpaRepository<UserContact, Long> {
 
     boolean existsByUser_IdAndContact_Id(Long userId, Long contactId);
+
+    Optional<UserContact> findByUser_IdAndContact_Id(Long userId, Long contactId);
 
     List<UserContact> findAllByUser_Id(Long userId);
 
     @Query("select uc.contact from UserContact uc where uc.user.id = :userId")
     List<User> findContactsByUserId(@Param("userId") Long userId);
 
-    void deleteByUser_IdAndContact_Id(Long userId, Long contactId);
+    long deleteByUser_IdAndContact_Id(Long userId, Long contactId);
 }
