@@ -17,5 +17,5 @@ public interface UserContactRepository extends JpaRepository<UserContact, Long> 
     @Query("select uc.contact from UserContact uc where uc.user.id = :userId")
     List<User> findContactsByUserId(@Param("userId") Long userId);
 
-    void deletedByUser_IdAndContact_Id(Long userId, Long contactId);
+    void deleteByUser_IdAndContact_Id(Long userId, Long contactId);
 }
