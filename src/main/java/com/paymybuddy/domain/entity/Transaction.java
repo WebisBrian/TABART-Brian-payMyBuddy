@@ -31,9 +31,6 @@ public class Transaction {
 
     private String description;
 
-    @Column(nullable = false)
-    private Long senderAccountId;
-
     // FK : sender_account_id -> accounts.id
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "sender_account_id", nullable = false)
