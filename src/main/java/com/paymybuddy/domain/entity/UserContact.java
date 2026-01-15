@@ -7,7 +7,12 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Entity
-@Table(name = "user_contacts")
+@Table(
+        name = "user_contacts",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_user_contacts", columnNames = {"user_id", "contact_id"})
+        }
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(exclude = {"user", "contact"})
