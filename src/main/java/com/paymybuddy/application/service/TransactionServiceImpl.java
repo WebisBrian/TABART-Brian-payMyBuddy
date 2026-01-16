@@ -32,6 +32,10 @@ public class TransactionServiceImpl implements TransactionService {
             throw new IllegalArgumentException("Sender and receiver IDs must not be null.");
         }
 
+        if (senderId.equals(receiverId)) {
+            throw new IllegalArgumentException("Sender and receiver must be different users.");
+        }
+
         if (amount == null || amount.signum() <= 0) {
             throw new IllegalArgumentException("Amount must be positive.");
         }
