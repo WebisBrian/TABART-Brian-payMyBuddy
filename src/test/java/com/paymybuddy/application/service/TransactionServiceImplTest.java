@@ -58,8 +58,8 @@ class TransactionServiceImplTest {
         BigDecimal amount = new BigDecimal("100.00");
         String description = "Dinner";
 
-        when(accountRepository.findById(senderUserId)).thenReturn(Optional.of(senderAccount));
-        when(accountRepository.findById(receiverUserId)).thenReturn(Optional.of(receiverAccount));
+        when(accountRepository.findByUserId(senderUserId)).thenReturn(Optional.of(senderAccount));
+        when(accountRepository.findByUserId(receiverUserId)).thenReturn(Optional.of(receiverAccount));
         when(userContactRepository.existsByUser_IdAndContact_Id(senderUserId, receiverUserId)).thenReturn(true);
         // Mock the save method to return the transaction passed to it
         when(transactionRepository.save(any(Transaction.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -129,12 +129,12 @@ class TransactionServiceImplTest {
         long senderUserId = 1L;
         long receiverUserId = 2L;
 
-        when(accountRepository.findById(senderUserId)).thenReturn(Optional.empty());
+        when(accountRepository.findByUserId(senderUserId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> transactionService.transfer(senderUserId, receiverUserId, new BigDecimal("5.00"), "Dinner"))
                 .isInstanceOf(RuntimeException.class);
 
-        verify(accountRepository).findById(senderUserId);
+        verify(accountRepository).findByUserId(senderUserId);
         verifyNoInteractions(transactionRepository, userContactRepository);
         verify(accountRepository, never()).findByUserId(receiverUserId);
     }
@@ -145,13 +145,13 @@ class TransactionServiceImplTest {
         long receiverUserId = 2L;
 
         when(accountRepository.findByUserId(senderUserId)).thenReturn(Optional.of(senderAccount));
-        when(accountRepository.findById(receiverUserId)).thenReturn(Optional.empty());
+        when(accountRepository.findByUserId(receiverUserId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> transactionService.transfer(senderUserId, receiverUserId, new BigDecimal("5.00"), "Dinner"))
                 .isInstanceOf(RuntimeException.class);
 
         verify(accountRepository).findByUserId(senderUserId);
-        verify(accountRepository).findById(receiverUserId);
+        verify(accountRepository).findByUserId(receiverUserId);
         verifyNoInteractions(transactionRepository, userContactRepository);
     }
 
@@ -160,8 +160,8 @@ class TransactionServiceImplTest {
         long senderUserId = 1L;
         long receiverUserId = 2L;
 
-        when(accountRepository.findById(senderUserId)).thenReturn(Optional.of(senderAccount));
-        when(accountRepository.findById(receiverUserId)).thenReturn(Optional.of(receiverAccount));
+        when(accountRepository.findByUserId(senderUserId)).thenReturn(Optional.of(senderAccount));
+        when(accountRepository.findByUserId(receiverUserId)).thenReturn(Optional.of(receiverAccount));
         when(userContactRepository.existsByUser_IdAndContact_Id(senderUserId, receiverUserId)).thenReturn(false);
 
         assertThatThrownBy(() -> transactionService.transfer(senderUserId, receiverUserId, new BigDecimal("5.00"), "Dinner"))
@@ -179,9 +179,9 @@ class TransactionServiceImplTest {
         // Balance after withdrawal is 0.50
         senderAccount.withdraw(new BigDecimal("199.50"));
 
-        when(accountRepository.findById(senderUserId)).thenReturn(Optional.of(senderAccount));
-        when(accountRepository.findById(receiverUserId)).thenReturn(Optional.of(receiverAccount));
-        when(userContactRepository.existsByUser_IdAndContact_Id(senderUserId, receiverUserId)).thenReturn(false);
+        when(accountRepository.findByUserId(senderUserId)).thenReturn(Optional.of(senderAccount));
+        when(accountRepository.findByUserId(receiverUserId)).thenReturn(Optional.of(receiverAccount));
+        when(userContactRepository.existsByUser_IdAndContact_Id(senderUserId, receiverUserId)).thenReturn(true);
 
         assertThatThrownBy(() -> transactionService.transfer(senderUserId, receiverUserId, new BigDecimal("10.00"), "Dinner"))
                 .isInstanceOf(RuntimeException.class);
