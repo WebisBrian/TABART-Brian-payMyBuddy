@@ -36,16 +36,13 @@ class TransactionServiceImplTest {
     @InjectMocks
     private TransactionServiceImpl transactionService;
 
-    private User senderUser;
-    private User receiverUser;
-
     private Account senderAccount;
     private Account receiverAccount;
 
     @BeforeEach
     void setUp() {
-        senderUser = User.create("Sender", "sender@email.com", "password");
-        receiverUser = User.create("Receiver", "receiver@email.com", "password");
+        User senderUser = User.create("Sender", "sender@email.com", "password");
+        User receiverUser = User.create("Receiver", "receiver@email.com", "password");
 
         senderAccount = Account.create(senderUser);
         receiverAccount = Account.create(receiverUser);
