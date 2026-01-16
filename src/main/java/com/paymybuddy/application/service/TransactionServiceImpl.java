@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @Service
 public class TransactionServiceImpl implements TransactionService {
 
+//    TODO : implements constant for fee
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
     private final UserContactRepository userContactRepository;
