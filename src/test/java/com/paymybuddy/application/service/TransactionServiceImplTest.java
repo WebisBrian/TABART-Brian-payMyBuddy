@@ -50,7 +50,7 @@ class TransactionServiceImplTest {
         senderAccount.deposit(new BigDecimal("200.00"));
     }
 
-/* Tests pour la méthode transfer */
+/* Tests for transfer method */
     @Test
     void transfer_shouldDebitSenderCredit_AndSaveTransaction() {
         long senderUserId = 1L;
