@@ -156,6 +156,17 @@ class TransactionServiceImplTest {
     }
 
     @Test
+    void transfer_shouldThrow_whenSenderAndContactAreSame() {
+        long senderUserId = 1L;
+        long receiverUserId = 1L;
+
+        assertThatThrownBy(() -> transactionService.transfer(senderUserId, receiverUserId, new BigDecimal("5.00"), "Dinner"))
+                .isInstanceOf(RuntimeException.class);
+
+        verifyNoInteractions(accountRepository, transactionRepository, userContactRepository);
+    }
+
+    @Test
     void transfer_shouldThrow_WhenReceiverIsNotAContact() {
         long senderUserId = 1L;
         long receiverUserId = 2L;
