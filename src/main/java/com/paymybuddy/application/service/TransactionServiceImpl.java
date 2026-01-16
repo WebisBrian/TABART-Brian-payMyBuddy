@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Clock;
 import java.time.LocalDateTime;
 
 @Service
@@ -19,11 +20,16 @@ public class TransactionServiceImpl implements TransactionService {
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
     private final UserContactRepository userContactRepository;
+    private final Clock clock;
 
-    public TransactionServiceImpl(AccountRepository accountRepository, TransactionRepository transactionRepository, UserContactRepository userContactRepository) {
+    public TransactionServiceImpl(AccountRepository accountRepository,
+                                  TransactionRepository transactionRepository,
+                                  UserContactRepository userContactRepository,
+                                  Clock clock) {
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
         this.userContactRepository = userContactRepository;
+        this.clock = clock;
     }
 
     @Transactional
@@ -62,12 +68,13 @@ public class TransactionServiceImpl implements TransactionService {
         senderAccount.withdraw(totalDebit);
         receiverAccount.deposit(amount);
 
+        LocalDateTime now = LocalDateTime.now(clock);
         Transaction transaction = Transaction.create(
                 senderAccount,
                 receiverAccount,
                 amount,
                 fee,
-                LocalDateTime.now(),
+                now,
                 description
         );
 
