@@ -10,12 +10,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -26,18 +29,15 @@ class TransactionServiceImplTest {
 
     @Mock
     private AccountRepository accountRepository;
-
     @Mock
     private TransactionRepository transactionRepository;
-
     @Mock
     private UserContactRepository userContactRepository;
-
-    @InjectMocks
     private TransactionServiceImpl transactionService;
 
     private Account senderAccount;
     private Account receiverAccount;
+    private Clock fixedClock;
 
     @BeforeEach
     void setUp() {
@@ -48,9 +48,21 @@ class TransactionServiceImplTest {
         receiverAccount = Account.create(receiverUser);
 
         senderAccount.deposit(new BigDecimal("200.00"));
+
+        fixedClock = Clock.fixed(
+                Instant.parse("2026-01-16T10:15:30Z"),
+                ZoneId.of("UTC")
+        );
+
+        transactionService = new TransactionServiceImpl(
+                accountRepository,
+                transactionRepository,
+                userContactRepository,
+                fixedClock
+        );
     }
 
-/* Tests for transfer method */
+    /* Tests for transfer method */
     @Test
     void transfer_shouldDebitSenderCredit_AndSaveTransaction() {
         long senderUserId = 1L;
@@ -81,6 +93,7 @@ class TransactionServiceImplTest {
                 .isEqualByComparingTo(receiverBalanceBefore.add(amount));
 
         // Assert (transaction saved)
+        LocalDateTime expectedNow = LocalDateTime.ofInstant(fixedClock.instant(), fixedClock.getZone());
         ArgumentCaptor<Transaction> captor = ArgumentCaptor.forClass(Transaction.class);
         verify(transactionRepository).save(captor.capture());
 
@@ -90,7 +103,7 @@ class TransactionServiceImplTest {
         assertThat(saved.getAmount()).isEqualByComparingTo(amount);
         assertThat(saved.getFee()).isEqualByComparingTo(expectedFee);
         assertThat(saved.getDescription()).isEqualTo(description);
-        assertThat(saved.getDate()).isNotNull();
+        assertThat(saved.getDate()).isEqualTo(expectedNow);
 
         // Assert (repository interactions)
         verify(accountRepository).findByUserId(senderUserId);
