@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -167,5 +168,58 @@ class UserServiceImplTest {
                 .isInstanceOf(RuntimeException.class);
 
         verifyNoInteractions(userRepository, userContactRepository);
+    }
+
+    /* ---------- listContacts() ---------- */
+    @Test
+    void listContacts_shouldReturnContactUsers() {
+        long userId = 1L;
+
+        User contact1 = User.create("contact1", "contact1@email.com", "pwd");
+        User contact2 = User.create("contact2", "contact2@email.com", "pwd");
+
+        when(userRepository.existsById(userId)).thenReturn(true);
+        when(userContactRepository.findContactsByUserId(userId)).thenReturn(List.of(contact1, contact2));
+
+        // Act
+        List<User> result = userService.listContacts(userId);
+
+        // Assert
+        assertThat(result).containsExactly(contact1, contact2);
+
+        verify(userRepository).existsById(userId);
+        verify(userContactRepository).findContactsByUserId(userId);
+        verifyNoMoreInteractions(userRepository, userContactRepository);
+    }
+
+    @Test
+    void listContacts_shouldReturnEmptyList_whenNoContacts() {
+        long userId = 1L;
+
+        when(userRepository.existsById(userId)).thenReturn(true);
+        when(userContactRepository.findContactsByUserId(userId)).thenReturn(List.of());
+
+        // Act
+        List<User> result = userService.listContacts(userId);
+
+        assertThat(result).isEmpty();
+
+        verify(userRepository).existsById(userId);
+        verify(userContactRepository).findContactsByUserId(userId);
+        verifyNoMoreInteractions(userRepository, userContactRepository);
+    }
+
+    @Test
+    void listContacts_shouldThrow_whenUserNotFound() {
+        long userId = 1L;
+
+        when(userRepository.existsById(userId)).thenReturn(false);
+
+        assertThatThrownBy(() -> userService.listContacts(userId))
+                .isInstanceOf(RuntimeException.class);
+
+        verify(userRepository).existsById(userId);
+        verifyNoInteractions(userContactRepository);
+        verifyNoMoreInteractions(userRepository);
     }
 }
