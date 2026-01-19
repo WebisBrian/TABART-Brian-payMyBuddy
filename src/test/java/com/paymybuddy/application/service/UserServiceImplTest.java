@@ -31,8 +31,8 @@ class UserServiceImplTest {
     /* ---------- addContact() ---------- */
     @Test
     void addContact_shouldCreateContact_whenValidUsers() {
-        Long userId = 1L;
-        Long contactId = 2L;
+        long userId = 1L;
+        long contactId = 2L;
 
         User user = User.create("user", "user@email.com", "password");
         User contact = User.create("contact", "contact@email.com", "password");
@@ -63,8 +63,8 @@ class UserServiceImplTest {
 
     @Test
     void addContact_shouldThrow_whenUserNotFound() {
-        Long userId = 1L;
-        Long contactId = 2L;
+        long userId = 1L;
+        long contactId = 2L;
 
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
@@ -78,8 +78,8 @@ class UserServiceImplTest {
 
     @Test
     void addContact_shouldThrow_whenContactNotFound() {
-        Long userId = 1L;
-        Long contactId = 2L;
+        long userId = 1L;
+        long contactId = 2L;
 
         User user = User.create("user", "user@email.com", "password");
 
@@ -96,7 +96,7 @@ class UserServiceImplTest {
 
     @Test
     void addContact_shouldThrow_whenUserAndContactAreSame() {
-        Long sameId = 1L;
+        long sameId = 1L;
 
         assertThatThrownBy(() -> userService.addContact(sameId, sameId))
                 .isInstanceOf(RuntimeException.class);
@@ -106,8 +106,8 @@ class UserServiceImplTest {
 
     @Test
     void addContact_shouldThrow_whenContactAlreadyExists() {
-        Long userId = 1L;
-        Long contactId = 2L;
+        long userId = 1L;
+        long contactId = 2L;
 
         User user = User.create("user", "user@email.com", "password");
         User contact = User.create("contact", "contact@email.com", "password");
@@ -126,5 +126,46 @@ class UserServiceImplTest {
 
         verify(userContactRepository, never()).save(any(UserContact.class));
         verifyNoMoreInteractions(userRepository, userContactRepository);
+    }
+
+    /* ---------- removeContact() ---------- */
+    @Test
+    void removeContact_shouldDeleteContact_whenExists() {
+        long userId = 1L;
+        long contactId = 2L;
+
+        when(userContactRepository.deleteByUser_IdAndContact_Id(userId, contactId)).thenReturn(1L);
+
+        // Act
+        userService.removeContact(userId, contactId);
+
+        verify(userContactRepository).deleteByUser_IdAndContact_Id(userId, contactId);
+        verifyNoMoreInteractions(userContactRepository);
+        verifyNoInteractions(userRepository);
+    }
+
+    @Test
+    void removeContact_shouldThrow_whenContactDoesNotExist() {
+        long userId = 1L;
+        long contactId = 2L;
+
+        when(userContactRepository.deleteByUser_IdAndContact_Id(userId, contactId)).thenReturn(0L);
+
+        assertThatThrownBy(() -> userService.removeContact(userId, contactId))
+                .isInstanceOf(RuntimeException.class);
+
+        verify(userContactRepository).deleteByUser_IdAndContact_Id(userId, contactId);
+        verifyNoMoreInteractions(userContactRepository);
+        verifyNoInteractions(userRepository);
+    }
+
+    @Test
+    void removeContact_shouldThrow_whenUserAndContactAreSame() {
+        long sameId = 1L;
+
+        assertThatThrownBy(() -> userService.removeContact(sameId, sameId))
+                .isInstanceOf(RuntimeException.class);
+
+        verifyNoInteractions(userRepository, userContactRepository);
     }
 }
