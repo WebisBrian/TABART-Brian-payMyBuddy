@@ -42,6 +42,18 @@ public class UserServiceImpl implements UserService {
     }
 
     public void removeContact(Long userId, Long contactId) {
+        if (userId == null || contactId == null) {
+            throw new IllegalArgumentException("User and contact IDs must not be null.");
+        }
+
+        if (userId.equals(contactId)) {
+            throw new IllegalArgumentException("Cannot remove self as contact.");
+        }
+
+        long deleted = userContactRepository.deleteByUser_IdAndContact_Id(userId, contactId);
+        if (deleted == 0) {
+            throw new IllegalArgumentException("User does not have this contact.");
+        }
     }
 
     public List<User> listContacts(Long userId) {
