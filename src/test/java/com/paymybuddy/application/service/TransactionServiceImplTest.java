@@ -304,6 +304,12 @@ class TransactionServiceImplTest {
                 "Received"
         );
 
+        Page<Transaction> page = new PageImpl<>(
+                List.of(sent, received),
+                pageable,
+                2
+        );
+
         when(accountRepository.findByUserId(userId)).thenReturn(Optional.of(account));
         when(transactionRepository.findTransactionHistory(account.getId(), pageable)).thenReturn(page);
 
