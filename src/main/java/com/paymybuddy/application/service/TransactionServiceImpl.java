@@ -35,35 +35,17 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional
     public void transfer(Long senderId, Long receiverId, BigDecimal amount, String description) {
 
-        if (senderId == null || receiverId == null) {
-            throw new IllegalArgumentException("Sender and receiver IDs must not be null.");
-        }
+        validateInput(senderId, receiverId, amount);
 
-        if (senderId.equals(receiverId)) {
-            throw new IllegalArgumentException("Sender and receiver must be different users.");
-        }
+        Account senderAccount = loadAccountByUserId(senderId, "Sender account not found.");
+        Account receiverAccount = loadAccountByUserId(receiverId, "Receiver account not found.");
 
-        if (amount == null || amount.signum() <= 0) {
-            throw new IllegalArgumentException("Amount must be positive.");
-        }
-
-        Account senderAccount = accountRepository.findByUserId(senderId)
-                .orElseThrow(() -> new IllegalArgumentException("Sender account not found."));
-
-        Account receiverAccount = accountRepository.findByUserId(receiverId)
-                .orElseThrow(() -> new IllegalArgumentException("Receiver account not found."));
-
-        boolean isContact = userContactRepository.existsByUser_IdAndContact_Id(senderId, receiverId);
-        if (!isContact) {
-            throw new IllegalArgumentException("Sender and receiver must be contacts.");
-        }
+        ensureUsersAreContacts(senderId, receiverId);
 
         BigDecimal fee = feeOf(amount);
         BigDecimal totalDebit = amount.add(fee);
 
-        if (senderAccount.getBalance().compareTo(totalDebit) < 0) {
-            throw new IllegalArgumentException("Insufficient balance in sender account.");
-        }
+        ensureSufficientBalance(senderAccount, totalDebit);
 
         senderAccount.withdraw(totalDebit);
         receiverAccount.deposit(amount);
@@ -79,6 +61,38 @@ public class TransactionServiceImpl implements TransactionService {
         );
 
         transactionRepository.save(transaction);
+    }
+
+    private void validateInput(Long senderId, Long receiverId, BigDecimal amount) {
+        if (senderId == null || receiverId == null) {
+            throw new IllegalArgumentException("Sender and receiver IDs must not be null.");
+        }
+
+        if (senderId.equals(receiverId)) {
+            throw new IllegalArgumentException("Sender and receiver must be different users.");
+        }
+
+        if (amount == null || amount.signum() <= 0) {
+            throw new IllegalArgumentException("Amount must be positive.");
+        }
+    }
+
+    private Account loadAccountByUserId(Long userId, String errorMessage) {
+        return accountRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException(errorMessage));
+    }
+
+    private void ensureUsersAreContacts(Long senderId, Long receiverId) {
+        boolean isContact = userContactRepository.existsByUser_IdAndContact_Id(senderId, receiverId);
+        if (!isContact) {
+            throw new IllegalArgumentException("Sender and receiver must be contacts.");
+        }
+    }
+
+    private static void ensureSufficientBalance(Account senderAccount, BigDecimal totalDebit) {
+        if (senderAccount.getBalance().compareTo(totalDebit) < 0) {
+            throw new IllegalArgumentException("Insufficient balance in sender account.");
+        }
     }
 
     /**
