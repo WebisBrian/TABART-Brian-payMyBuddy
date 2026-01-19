@@ -5,6 +5,8 @@ import com.paymybuddy.domain.entity.Transaction;
 import com.paymybuddy.infrastructure.repository.AccountRepository;
 import com.paymybuddy.infrastructure.repository.TransactionRepository;
 import com.paymybuddy.infrastructure.repository.UserContactRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,7 @@ public class TransactionServiceImpl implements TransactionService {
         this.clock = clock;
     }
 
+    /* ---------- transfer() ---------- */
     @Transactional
     public void transfer(Long senderId, Long receiverId, BigDecimal amount, String description) {
 
@@ -103,5 +106,20 @@ public class TransactionServiceImpl implements TransactionService {
         return amount
                 .multiply(new BigDecimal("0.005"))
                 .setScale(2, RoundingMode.HALF_UP);
+    }
+
+    /* ---------- getTransaction() ---------- */
+    public Page<Transaction> getTransactionHistory(Long userId, Pageable pageable) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID must not be null.");
+        }
+
+        if (pageable == null) {
+            throw new IllegalArgumentException("Pageable must not be null.");
+        }
+
+        Account account = loadAccountByUserId(userId, "Account not found.");
+
+        return transactionRepository.findTransactionHistory(account.getId(), pageable);
     }
 }
