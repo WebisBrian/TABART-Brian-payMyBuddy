@@ -12,6 +12,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -19,6 +23,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -62,7 +67,7 @@ class TransactionServiceImplTest {
         );
     }
 
-    /* Tests for transfer method */
+    /* ---------- transfer() ---------- */
     @Test
     void transfer_shouldDebitSenderCredit_AndSaveTransaction() {
         long senderUserId = 1L;
@@ -221,5 +226,143 @@ class TransactionServiceImplTest {
         return amount
                 .multiply(new BigDecimal("0.005"))
                 .setScale(2, RoundingMode.HALF_UP);
+    }
+
+    /* ---------- getTransaction() ---------- */
+    @Test
+    void getTransactionHistory_shouldReturnPagesTransactionsOrderedByDateDesc() {
+        long userId = 1L;
+
+        User user = User.create("User", "user@email.com", "password");
+        Account account = Account.create(user);
+
+        Transaction t1 = Transaction.create(
+                account,
+                account,
+                new BigDecimal("10.00"),
+                new BigDecimal("0.05"),
+                LocalDateTime.of(2026, 1, 10, 10, 0),
+                "Old transaction"
+        );
+
+        Transaction t2 = Transaction.create(
+                account,
+                account,
+                new BigDecimal("20.00"),
+                new BigDecimal("0.10"),
+                LocalDateTime.of(2026, 1, 15, 12, 0),
+                "Recent transaction"
+        );
+
+        Page<Transaction> page = new PageImpl<>(
+                List.of(t2, t1),
+                PageRequest.of(0, 10),
+                2
+        );
+
+        when(accountRepository.findByUserId(userId))
+                .thenReturn(Optional.of(account));
+
+        when(transactionRepository.findTransactionHistory(account.getId(), PageRequest.of(0, 10)))
+                .thenReturn(page);
+
+        // Act
+        Page<Transaction> result = transactionService.getTransactionHistory(userId, PageRequest.of(0, 10));
+
+        // Assert
+        assertThat(result).hasSize(2);
+        assertThat(result.getContent().get(0).getDescription()).isEqualTo("Recent transaction");
+        assertThat(result.getContent().get(1).getDescription()).isEqualTo("Old transaction");
+
+        verify(accountRepository).findByUserId(userId);
+        verify(transactionRepository).findTransactionHistory(account.getId(), PageRequest.of(0, 10));
+    }
+
+    @Test
+    void getTransactionHistory_shouldIncludeSentAndReceivedTransactions() {
+        long userId = 1L;
+        Pageable pageable = PageRequest.of(0, 10);
+
+        User user = User.create("User", "user@email.com", "password");
+        Account account = Account.create(user);
+
+        Transaction sent = Transaction.create(
+                account,
+                account,
+                new BigDecimal("10.00"),
+                new BigDecimal("0.05"),
+                LocalDateTime.now(),
+                "Sent"
+        );
+
+        Transaction received = Transaction.create(
+                account,
+                account,
+                new BigDecimal("20.00"),
+                new BigDecimal("0.10"),
+                LocalDateTime.now(),
+                "Received"
+        );
+
+        when(accountRepository.findByUserId(userId)).thenReturn(Optional.of(account));
+        when(transactionRepository.findTransactionHistory(account.getId(), pageable)).thenReturn(page);
+
+        Page<Transaction> result = transactionService.getTransactionHistory(userId, pageable);
+
+        assertThat(result.getContent()).containsExactlyInAnyOrder(sent, received);
+    }
+
+    @Test
+    void getTransactionHistory_shouldReturnEmptyPage_whenNoTransactions() {
+        long userId = 1L;
+        Pageable pageable = PageRequest.of(0, 10);
+
+        User user = User.create("User", "user@mail.com", "pwd");
+        Account account = Account.create(user);
+
+        when(accountRepository.findByUserId(userId)).thenReturn(Optional.of(account));
+        when(transactionRepository.findTransactionHistory(account.getId(), pageable))
+                .thenReturn(Page.empty(pageable));
+
+        Page<Transaction> result = transactionService.getTransactionHistory(userId, pageable);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void getTransactionHistory_shouldThrow_whenUserAccountNotFound() {
+        long userId = 1L;
+        Pageable pageable = PageRequest.of(0, 10);
+
+        when(accountRepository.findByUserId(userId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() ->
+                transactionService.getTransactionHistory(userId, pageable)
+        ).isInstanceOf(RuntimeException.class);
+
+        verifyNoInteractions(transactionRepository);
+    }
+
+    @Test
+    void getTransactionHistory_shouldRespectPaginationParameters() {
+        long userId = 1L;
+        Pageable pageable = PageRequest.of(1, 5);
+
+        User user = User.create("User", "user@mail.com", "pwd");
+        Account account = Account.create(user);
+
+        Page<Transaction> page = new PageImpl<>(
+                List.of(),
+                pageable,
+                20
+        );
+
+        when(accountRepository.findByUserId(userId)).thenReturn(Optional.of(account));
+        when(transactionRepository.findTransactionHistory(account.getId(), pageable)).thenReturn(page);
+
+        Page<Transaction> result = transactionService.getTransactionHistory(userId, pageable);
+
+        assertThat(result.getNumber()).isEqualTo(1);
+        assertThat(result.getSize()).isEqualTo(5);
     }
 }

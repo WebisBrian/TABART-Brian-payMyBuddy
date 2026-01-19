@@ -10,4 +10,5 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     Page<Transaction> findBySenderAccount_IdOrderByDateDesc(Long accountId, Pageable pageable);
 
     Page<Transaction> findByReceiverAccount_IdOrderByDateDesc(Long accountId, Pageable pageable);
+
 }
