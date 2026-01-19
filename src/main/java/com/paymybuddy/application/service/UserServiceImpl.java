@@ -4,9 +4,12 @@ import com.paymybuddy.domain.entity.User;
 import com.paymybuddy.domain.entity.UserContact;
 import com.paymybuddy.infrastructure.repository.UserContactRepository;
 import com.paymybuddy.infrastructure.repository.UserRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -18,6 +21,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void addContact(Long userId, Long contactId) {
         if (userId == null || contactId == null) {
             throw new IllegalArgumentException("User and contact IDs must not be null.");
@@ -42,6 +46,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void removeContact(Long userId, Long contactId) {
         if (userId == null || contactId == null) {
             throw new IllegalArgumentException("User and contact IDs must not be null.");
@@ -58,6 +63,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<User> listContacts(Long userId) {
         if (userId == null) {
             throw new IllegalArgumentException("User ID must not be null.");

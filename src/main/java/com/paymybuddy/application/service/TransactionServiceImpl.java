@@ -109,6 +109,8 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     /* ---------- getTransaction() ---------- */
+    @Override
+    @Transactional(readOnly = true)
     public Page<Transaction> getTransactionHistory(Long userId, Pageable pageable) {
         if (userId == null) {
             throw new IllegalArgumentException("User ID must not be null.");
