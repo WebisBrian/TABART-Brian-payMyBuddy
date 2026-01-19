@@ -41,6 +41,7 @@ public class UserServiceImpl implements UserService {
         userContactRepository.save(newContact);
     }
 
+    @Override
     public void removeContact(Long userId, Long contactId) {
         if (userId == null || contactId == null) {
             throw new IllegalArgumentException("User and contact IDs must not be null.");
@@ -56,7 +57,16 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
     public List<User> listContacts(Long userId) {
-        return List.of();
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID must not be null.");
+        }
+
+        if (!userRepository.existsById(userId)) {
+            throw new IllegalArgumentException("User not found.");
+        }
+
+        return userContactRepository.findContactsByUserId(userId);
     }
 }
