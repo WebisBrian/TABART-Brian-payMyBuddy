@@ -63,6 +63,22 @@ class UserServiceImplTest {
     }
 
     @Test
+    void addContact_shouldThrow_whenUserIdIsNull() {
+        assertThatThrownBy(() -> userService.addContact(null, 2L))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verifyNoInteractions(userRepository, userContactRepository);
+    }
+
+    @Test
+    void addContact_shouldThrow_whenContactIdIsNull() {
+        assertThatThrownBy(() -> userService.addContact(1L, null))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verifyNoInteractions(userRepository, userContactRepository);
+    }
+
+    @Test
     void addContact_shouldThrow_whenUserNotFound() {
         long userId = 1L;
         long contactId = 2L;
@@ -146,6 +162,22 @@ class UserServiceImplTest {
     }
 
     @Test
+    void removeContact_shouldThrow_whenUserIdIsNull() {
+        assertThatThrownBy(() -> userService.removeContact(null, 2L))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verifyNoInteractions(userRepository, userContactRepository);
+    }
+
+    @Test
+    void removeContact_shouldThrow_whenContactIdIsNull() {
+        assertThatThrownBy(() -> userService.removeContact(1L, null))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verifyNoInteractions(userRepository, userContactRepository);
+    }
+
+    @Test
     void removeContact_shouldThrow_whenContactDoesNotExist() {
         long userId = 1L;
         long contactId = 2L;
@@ -207,6 +239,14 @@ class UserServiceImplTest {
         verify(userRepository).existsById(userId);
         verify(userContactRepository).findContactsByUserId(userId);
         verifyNoMoreInteractions(userRepository, userContactRepository);
+    }
+
+    @Test
+    void listContacts_shouldThrow_whenUserIdIsNull() {
+        assertThatThrownBy(() -> userService.listContacts(null))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verifyNoInteractions(userRepository, userContactRepository);
     }
 
     @Test
