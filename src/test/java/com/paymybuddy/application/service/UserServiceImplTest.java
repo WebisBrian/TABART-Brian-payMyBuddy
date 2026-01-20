@@ -42,8 +42,6 @@ class UserServiceImplTest {
         when(userRepository.findById(contactId)).thenReturn(Optional.of(contact));
         when(userContactRepository.existsByUser_IdAndContact_Id(userId, contactId)).thenReturn(false);
 
-        when(userContactRepository.save(any(UserContact.class))).thenAnswer(inv -> inv.getArgument(0));
-
         // Act
         userService.addContact(userId, contactId);
 
@@ -86,7 +84,7 @@ class UserServiceImplTest {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> userService.addContact(userId, contactId))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         verify(userRepository).findById(userId);
         verify(userRepository, never()).findById(contactId);
@@ -104,7 +102,7 @@ class UserServiceImplTest {
         when(userRepository.findById(contactId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> userService.addContact(userId, contactId))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         verify(userRepository).findById(userId);
         verify(userRepository).findById(contactId);
@@ -116,7 +114,7 @@ class UserServiceImplTest {
         long sameId = 1L;
 
         assertThatThrownBy(() -> userService.addContact(sameId, sameId))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         verifyNoInteractions(userRepository, userContactRepository);
     }
@@ -135,7 +133,7 @@ class UserServiceImplTest {
 
         // Act + Assert
         assertThatThrownBy(() -> userService.addContact(userId, contactId))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         verify(userRepository).findById(userId);
         verify(userRepository).findById(contactId);
@@ -185,7 +183,7 @@ class UserServiceImplTest {
         when(userContactRepository.deleteByUser_IdAndContact_Id(userId, contactId)).thenReturn(0L);
 
         assertThatThrownBy(() -> userService.removeContact(userId, contactId))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         verify(userContactRepository).deleteByUser_IdAndContact_Id(userId, contactId);
         verifyNoMoreInteractions(userContactRepository);
@@ -197,7 +195,7 @@ class UserServiceImplTest {
         long sameId = 1L;
 
         assertThatThrownBy(() -> userService.removeContact(sameId, sameId))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         verifyNoInteractions(userRepository, userContactRepository);
     }
@@ -207,10 +205,11 @@ class UserServiceImplTest {
     void listContacts_shouldReturnContactUsers() {
         long userId = 1L;
 
+        User user = User.create("user", "user@email.com", "pwd");
         User contact1 = User.create("contact1", "contact1@email.com", "pwd");
         User contact2 = User.create("contact2", "contact2@email.com", "pwd");
 
-        when(userRepository.existsById(userId)).thenReturn(true);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(userContactRepository.findContactsByUserId(userId)).thenReturn(List.of(contact1, contact2));
 
         // Act
@@ -219,7 +218,7 @@ class UserServiceImplTest {
         // Assert
         assertThat(result).containsExactly(contact1, contact2);
 
-        verify(userRepository).existsById(userId);
+        verify(userRepository).findById(userId);
         verify(userContactRepository).findContactsByUserId(userId);
         verifyNoMoreInteractions(userRepository, userContactRepository);
     }
@@ -227,8 +226,9 @@ class UserServiceImplTest {
     @Test
     void listContacts_shouldReturnEmptyList_whenNoContacts() {
         long userId = 1L;
+        User user = User.create("user", "user@email.com", "pwd");
 
-        when(userRepository.existsById(userId)).thenReturn(true);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(userContactRepository.findContactsByUserId(userId)).thenReturn(List.of());
 
         // Act
@@ -236,7 +236,7 @@ class UserServiceImplTest {
 
         assertThat(result).isEmpty();
 
-        verify(userRepository).existsById(userId);
+        verify(userRepository).findById(userId);
         verify(userContactRepository).findContactsByUserId(userId);
         verifyNoMoreInteractions(userRepository, userContactRepository);
     }
@@ -253,12 +253,12 @@ class UserServiceImplTest {
     void listContacts_shouldThrow_whenUserNotFound() {
         long userId = 1L;
 
-        when(userRepository.existsById(userId)).thenReturn(false);
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> userService.listContacts(userId))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
-        verify(userRepository).existsById(userId);
+        verify(userRepository).findById(userId);
         verifyNoInteractions(userContactRepository);
         verifyNoMoreInteractions(userRepository);
     }

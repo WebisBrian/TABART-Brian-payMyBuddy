@@ -69,9 +69,8 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("User ID must not be null.");
         }
 
-        if (!userRepository.existsById(userId)) {
-            throw new IllegalArgumentException("User not found.");
-        }
+        userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found."));
 
         return userContactRepository.findContactsByUserId(userId);
     }
