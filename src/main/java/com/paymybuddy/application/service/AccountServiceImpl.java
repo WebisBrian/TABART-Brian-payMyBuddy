@@ -44,6 +44,19 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public void withdraw(Long userId, BigDecimal amount) {
+        if (userId == null || amount == null) {
+            throw new IllegalArgumentException("User ID and amount must not be null.");
+        }
 
+        Account account = accountRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Account not found."));
+
+        // Check for sufficient balance, today an account can't be negative, tomorrow
+        // maybe we'll have negative balance, that's why we don't check this in entity.
+        if (account.getBalance().compareTo(amount) < 0) {
+            throw new IllegalArgumentException("Insufficient balance.");
+        }
+
+        account.withdraw(amount);
     }
 }
