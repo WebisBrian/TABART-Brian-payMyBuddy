@@ -213,6 +213,9 @@ class TransactionServiceImplTest {
                 .isInstanceOf(IllegalArgumentException.class);
 
         verify(userContactRepository).existsByUser_IdAndContact_Id(senderUserId, receiverUserId);
+        verify(accountRepository).findByUserId(senderUserId);
+        verify(accountRepository).findByUserId(receiverUserId);
+        verifyNoMoreInteractions(accountRepository, userContactRepository);
         verifyNoInteractions(transactionRepository);
     }
 
