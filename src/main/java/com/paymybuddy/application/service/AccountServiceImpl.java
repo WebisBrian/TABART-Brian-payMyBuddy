@@ -16,6 +16,7 @@ public class AccountServiceImpl implements AccountService {
         this.accountRepository = accountRepository;
     }
 
+    @Override
     @Transactional(readOnly = true)
     public BigDecimal getBalance(Long userId) {
         if (userId == null) {
@@ -28,11 +29,19 @@ public class AccountServiceImpl implements AccountService {
         return account.getBalance();
     }
 
+    @Override
     @Transactional
     public void deposit(Long userId, BigDecimal amount) {
+        if (userId == null || amount == null) {
+            throw new IllegalArgumentException("User ID and amount must not be null.");
+        }
 
+        accountRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Account not found."))
+                .deposit(amount);
     }
 
+    @Override
     @Transactional
     public void withdraw(Long userId, BigDecimal amount) {
 
