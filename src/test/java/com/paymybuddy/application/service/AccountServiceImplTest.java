@@ -26,7 +26,6 @@ class AccountServiceImplTest {
     @Test
     void getBalance_shouldReturnBalance_whenAccountExists() {
         long userId = 1L;
-
         User user = User.create("user", "user@email.com", "password");
         Account account = Account.create(user);
         account.deposit(new BigDecimal("150.00"));
@@ -56,7 +55,33 @@ class AccountServiceImplTest {
 
     @Test
     void deposit_shouldIncreaseBalance_whenValidAmount() {
+        long userId = 1L;
+        User user = User.create("user", "user@email.com", "password");
+        Account account = Account.create(user);
 
+        when(accountRepository.findByUserId(userId)).thenReturn(Optional.of(account));
+
+        accountService.deposit(userId, new BigDecimal("95.00"));
+
+        assertThat(account.getBalance()).isEqualByComparingTo("95.00");
+        verify(accountRepository).findByUserId(userId);
+        verifyNoMoreInteractions(accountRepository);
+    }
+
+    @Test
+    void deposit_shouldThrow_whenInvalidAmount() {
+        long userId = 1L;
+        User user = User.create("user", "user@email.com", "password");
+        Account account = Account.create(user);
+
+        when(accountRepository.findByUserId(userId)).thenReturn(Optional.of(account));
+
+        assertThatThrownBy(() -> accountService.deposit(userId, new BigDecimal("-95.00")))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(account.getBalance()).isEqualByComparingTo("0.00");
+        verify(accountRepository).findByUserId(userId);
+        verifyNoMoreInteractions(accountRepository);
     }
 
     @Test
