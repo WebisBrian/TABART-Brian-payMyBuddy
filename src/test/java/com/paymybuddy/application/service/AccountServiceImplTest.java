@@ -55,6 +55,7 @@ class AccountServiceImplTest {
         verifyNoMoreInteractions(accountRepository);
     }
 
+    /* ---------- deposit() ---------- */
     @Test
     void deposit_shouldIncreaseBalance_whenValidAmount() {
         long userId = 1L;
@@ -86,13 +87,36 @@ class AccountServiceImplTest {
         verifyNoMoreInteractions(accountRepository);
     }
 
+    /* ---------- withdraw() ---------- */
     @Test
     void withdraw_shouldDecreaseBalance_whenSufficientBalance() {
+        long userId = 1L;
+        User user = User.create("user", "user@email.com", "password");
+        Account account = Account.create(user);
+        account.deposit(new BigDecimal("150.00"));
 
+        when(accountRepository.findByUserId(userId)).thenReturn(Optional.of(account));
+
+        accountService.withdraw(userId, new BigDecimal("50.00"));
+
+        assertThat(account.getBalance()).isEqualByComparingTo("100.00");
+        verify(accountRepository).findByUserId(userId);
+        verifyNoMoreInteractions(accountRepository);
     }
 
     @Test
     void withdraw_shouldThrow_whenInsufficientBalance() {
+        long userId = 1L;
+        User user = User.create("user", "user@email.com", "password");
+        Account account = Account.create(user);
 
+        when(accountRepository.findByUserId(userId)).thenReturn(Optional.of(account));
+
+        assertThatThrownBy(() -> accountService.withdraw(userId, new BigDecimal("50.00")))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(account.getBalance()).isEqualByComparingTo("0.00");
+        verify(accountRepository).findByUserId(userId);
+        verifyNoMoreInteractions(accountRepository);
     }
 }
