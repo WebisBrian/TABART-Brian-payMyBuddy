@@ -78,7 +78,7 @@ class TransactionServiceImplTest {
         when(accountRepository.findByUserId(senderUserId)).thenReturn(Optional.of(senderAccount));
         when(accountRepository.findByUserId(receiverUserId)).thenReturn(Optional.of(receiverAccount));
         when(userContactRepository.existsByUser_IdAndContact_Id(senderUserId, receiverUserId)).thenReturn(true);
-        // Mock the save method to return the transaction passed to it
+
         when(transactionRepository.save(any(Transaction.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         BigDecimal senderBalanceBefore = senderAccount.getBalance();
@@ -118,12 +118,28 @@ class TransactionServiceImplTest {
     }
 
     @Test
+    void transfer_shouldThrow_whenSenderIdIsNull() {
+        assertThatThrownBy(() -> transactionService.transfer(null, 2L, new BigDecimal("100.00"), "Dinner"))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verifyNoInteractions(accountRepository, transactionRepository, userContactRepository);
+    }
+
+    @Test
+    void transfer_shouldThrow_whenReceiverIdIsNull() {
+        assertThatThrownBy(() -> transactionService.transfer(1L, null, new BigDecimal("100.00"), "Dinner"))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verifyNoInteractions(accountRepository, transactionRepository, userContactRepository);
+    }
+
+    @Test
     void transfer_shouldThrow_whenAmountIsNull() {
         long senderUserId = 1L;
         long receiverUserId = 2L;
 
         assertThatThrownBy(() -> transactionService.transfer(senderUserId, receiverUserId, null, "Dinner"))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         verifyNoInteractions(accountRepository, transactionRepository, userContactRepository);
     }
@@ -134,10 +150,10 @@ class TransactionServiceImplTest {
         long receiverUserId = 2L;
 
         assertThatThrownBy(() -> transactionService.transfer(senderUserId, receiverUserId, new BigDecimal("0.00"), "Dinner"))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         assertThatThrownBy(() -> transactionService.transfer(senderUserId, receiverUserId, new BigDecimal("-1.00"), "Dinner"))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         verifyNoInteractions(accountRepository, transactionRepository, userContactRepository);
     }
@@ -150,7 +166,7 @@ class TransactionServiceImplTest {
         when(accountRepository.findByUserId(senderUserId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> transactionService.transfer(senderUserId, receiverUserId, new BigDecimal("5.00"), "Dinner"))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         verify(accountRepository).findByUserId(senderUserId);
         verifyNoInteractions(transactionRepository, userContactRepository);
@@ -166,7 +182,7 @@ class TransactionServiceImplTest {
         when(accountRepository.findByUserId(receiverUserId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> transactionService.transfer(senderUserId, receiverUserId, new BigDecimal("5.00"), "Dinner"))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         verify(accountRepository).findByUserId(senderUserId);
         verify(accountRepository).findByUserId(receiverUserId);
@@ -179,7 +195,7 @@ class TransactionServiceImplTest {
         long receiverUserId = 1L;
 
         assertThatThrownBy(() -> transactionService.transfer(senderUserId, receiverUserId, new BigDecimal("5.00"), "Dinner"))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         verifyNoInteractions(accountRepository, transactionRepository, userContactRepository);
     }
@@ -194,7 +210,7 @@ class TransactionServiceImplTest {
         when(userContactRepository.existsByUser_IdAndContact_Id(senderUserId, receiverUserId)).thenReturn(false);
 
         assertThatThrownBy(() -> transactionService.transfer(senderUserId, receiverUserId, new BigDecimal("5.00"), "Dinner"))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         verify(userContactRepository).existsByUser_IdAndContact_Id(senderUserId, receiverUserId);
         verifyNoInteractions(transactionRepository);
@@ -213,7 +229,7 @@ class TransactionServiceImplTest {
         when(userContactRepository.existsByUser_IdAndContact_Id(senderUserId, receiverUserId)).thenReturn(true);
 
         assertThatThrownBy(() -> transactionService.transfer(senderUserId, receiverUserId, new BigDecimal("10.00"), "Dinner"))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         verifyNoInteractions(transactionRepository);
     }
@@ -336,6 +352,22 @@ class TransactionServiceImplTest {
     }
 
     @Test
+    void getTransactionHistory_shouldThrow_whenUserIdIsNull() {
+        assertThatThrownBy(() -> transactionService.getTransactionHistory(null, PageRequest.of(0, 10)))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verifyNoInteractions(accountRepository, transactionRepository);
+    }
+
+    @Test
+    void getTransactionHistory_shouldThrow_whenPageableIsNull() {
+        assertThatThrownBy(() -> transactionService.getTransactionHistory(1L, null))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verifyNoInteractions(accountRepository, transactionRepository);
+    }
+
+    @Test
     void getTransactionHistory_shouldThrow_whenUserAccountNotFound() {
         long userId = 1L;
         Pageable pageable = PageRequest.of(0, 10);
@@ -344,7 +376,7 @@ class TransactionServiceImplTest {
 
         assertThatThrownBy(() ->
                 transactionService.getTransactionHistory(userId, pageable)
-        ).isInstanceOf(RuntimeException.class);
+        ).isInstanceOf(IllegalArgumentException.class);
 
         verifyNoInteractions(transactionRepository);
     }
