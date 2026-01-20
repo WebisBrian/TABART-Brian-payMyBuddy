@@ -4,16 +4,18 @@ import com.paymybuddy.domain.entity.Account;
 import com.paymybuddy.domain.entity.User;
 import com.paymybuddy.infrastructure.repository.AccountRepository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class AccountServiceImplTest {
 
     @Mock
