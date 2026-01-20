@@ -69,7 +69,7 @@ class TransactionServiceImplTest {
 
     /* ---------- transfer() ---------- */
     @Test
-    void transfer_shouldDebitSenderCredit_AndSaveTransaction() {
+    void transfer_shouldDebitSenderCredit_andSaveTransaction() {
         long senderUserId = 1L;
         long receiverUserId = 2L;
         BigDecimal amount = new BigDecimal("100.00");
@@ -118,7 +118,7 @@ class TransactionServiceImplTest {
     }
 
     @Test
-    void transfer_shouldThrow_WhenAmountIsNull() {
+    void transfer_shouldThrow_whenAmountIsNull() {
         long senderUserId = 1L;
         long receiverUserId = 2L;
 
@@ -129,7 +129,7 @@ class TransactionServiceImplTest {
     }
 
     @Test
-    void transfer_shouldThrow_WhenAmountIsNegativeOrZero() {
+    void transfer_shouldThrow_whenAmountIsNegativeOrZero() {
         long senderUserId = 1L;
         long receiverUserId = 2L;
 
@@ -143,7 +143,7 @@ class TransactionServiceImplTest {
     }
 
     @Test
-    void transfer_shouldThrow_WhenSenderAccountNotFound() {
+    void transfer_shouldThrow_whenSenderAccountNotFound() {
         long senderUserId = 1L;
         long receiverUserId = 2L;
 
@@ -158,7 +158,7 @@ class TransactionServiceImplTest {
     }
 
     @Test
-    void transfer_shouldThrow_WhenReceiverAccountNotFound() {
+    void transfer_shouldThrow_whenReceiverAccountNotFound() {
         long senderUserId = 1L;
         long receiverUserId = 2L;
 
@@ -185,7 +185,7 @@ class TransactionServiceImplTest {
     }
 
     @Test
-    void transfer_shouldThrow_WhenReceiverIsNotAContact() {
+    void transfer_shouldThrow_whenReceiverIsNotAContact() {
         long senderUserId = 1L;
         long receiverUserId = 2L;
 
