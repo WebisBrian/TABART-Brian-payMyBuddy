@@ -9,7 +9,10 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.math.BigDecimal;
 
 @Controller
 public class TransactionController {
@@ -34,5 +37,16 @@ public class TransactionController {
         model.addAttribute("transactionHistory", transactionService.getTransactionHistory(userId, pageable));
 
         return "transactions";
+    }
+
+    @PostMapping("/transactions/transfer")
+    public String transfer(@RequestParam("userId") Long userId,
+                           @RequestParam("receiverId") Long receiverId,
+                           @RequestParam("amount") BigDecimal amount,
+                           @RequestParam(value = "description", required = false) String description) {
+
+        transactionService.transfer(userId, receiverId, amount, description);
+
+        return "redirect:/transactions?userId=" + userId;
     }
 }
