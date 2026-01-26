@@ -17,15 +17,17 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             value = """
             select t
             from Transaction t
-            where t.senderAccount.id = :accountId
-               or t.receiverAccount.id = :accountId
+            join fetch t.senderAccount sa
+            join fetch sa.user
+            join fetch t.receiverAccount ra
+            join fetch ra.user
+            where sa.id = :accountId or ra.id = :accountId
             order by t.date desc
         """,
             countQuery = """
             select count(t)
             from Transaction t
-            where t.senderAccount.id = :accountId
-               or t.receiverAccount.id = :accountId
+            where t.senderAccount.id = :accountId or t.receiverAccount.id = :accountId
         """
     )
     Page<Transaction> findTransactionHistory(@Param("accountId") Long accountId, Pageable pageable);
