@@ -101,4 +101,28 @@ class TransactionControllerTest {
 
         verify(transactionService, never()).transfer(any(), any(), any(), any());
     }
+
+    @Test
+    void postTransfer_shouldReturnTransactionsView_withErrorMessage_whenServiceThrows() throws Exception {
+        when(userService.listContacts(eq(1L))).thenReturn(List.of());
+        when(transactionService.getTransactionHistory(eq(1L), any())).thenReturn(Page.empty());
+
+        doThrow(new IllegalArgumentException("Insufficient balance in sender account."))
+                .when(transactionService)
+                .transfer(eq(1L), eq(2L), eq(new BigDecimal("5.00")), eq("Dinner"));
+
+        // Act + Assert
+        mockMvc.perform(post("/transactions/transfer")
+                .param("userId", "1")
+                .param("receiverId", "2")
+                .param("amount", "5.00")
+                .param("description", "Dinner")
+                )
+                .andExpect(status().isOk())
+                .andExpect(view().name("transactions"))
+                .andExpect(model().attributeExists("transferForm"))
+                .andExpect(model().attributeExists("contacts"))
+                .andExpect(model().attributeExists("transactionHistory"))
+                .andExpect(model().attribute("transferError", "Insufficient balance in sender account."));
+    }
 }
