@@ -33,10 +33,9 @@
         <div>
             <label for="receiverId">Sélectionner une relation</label>
             <select id="receiverId" th:field="*{receiverId}">
-                <option value="" disabled selected>-- Choisir --</option>
                 <option th:each="c : ${contacts}"
                         th:value="${c.id}"
-                        th:text="${c.userName} + ' (' + ${c.email} + ')'">
+                        th:text="|${c.userName} (${c.email})|">
                 </option>
             </select>
 
@@ -78,40 +77,51 @@
             <thead>
             <tr>
                 <th>Date</th>
+                <th>Relation</th>
+                <th>Type</th>
                 <th>Description</th>
                 <th>Montant</th>
                 <th>Frais</th>
             </tr>
             </thead>
+
             <tbody>
-            <tr th:if="${transactionHistory == null || transactionHistory.content == null || transactionHistory.content.isEmpty()}">
-                <td colspan="4">Aucune transaction</td>
+            <tr th:if="${transactionRows == null || transactionRows.content == null || transactionRows.content.isEmpty()}">
+                <td colspan="6">Aucune transaction</td>
             </tr>
 
-            <tr th:each="t : ${transactionHistory.content}">
-                <td th:text="${t.date}">2026-01-01T12:00</td>
-                <td th:text="${t.description}">Description</td>
-                <td th:text="${t.amount}">0.00</td>
-                <td th:text="${t.fee}">0.00</td>
+            <tr th:each="row : ${transactionRows.content}">
+                <td th:text="${row.date}">2026-01-01T12:00</td>
+                <td th:text="${row.counterpartyLabel}">Alice (alice@mail.com)</td>
+                <td th:text="${row.direction}">SENT</td>
+                <td th:text="${row.description}">Description</td>
+
+
+                <td th:text="${row.amount}">0.00</td>
+
+                <td th:text="${row.direction.name() == 'SENT' ? row.fee : '—'}">0.00</td>
             </tr>
             </tbody>
         </table>
 
-        <!-- PAGINATION (simple) -->
-        <div style="margin-top: 10px;" th:if="${transactionHistory != null}">
-            <a th:if="${transactionHistory.hasPrevious()}"
-               th:href="@{/transactions(userId=${param.userId}, page=${transactionHistory.number - 1}, size=${transactionHistory.size})}">
+        <!-- Pagination -->
+        <div style="margin-top: 10px;" th:if="${transactionRows != null}">
+            <a th:if="${transactionRows.hasPrevious()}"
+               th:href="@{/transactions(userId=${param.userId}, page=${transactionRows.number - 1}, size=${transactionRows.size})}">
                 Précédent
             </a>
 
-            <span th:text="${transactionHistory.number + 1} + ' / ' + ${transactionHistory.totalPages}">1 / 1</span>
+            <span th:text="${transactionRows.totalPages == 0 ? '0 / 0' : (transactionRows.number + 1) + ' / ' + transactionRows.totalPages}">
+            1 / 1
+        </span>
 
-            <a th:if="${transactionHistory.hasNext()}"
-               th:href="@{/transactions(userId=${param.userId}, page=${transactionHistory.number + 1}, size=${transactionHistory.size})}">
+            <a th:if="${transactionRows.hasNext()}"
+               th:href="@{/transactions(userId=${param.userId}, page=${transactionRows.number + 1}, size=${transactionRows.size})}">
                 Suivant
             </a>
         </div>
     </section>
+
 
 </main>
 
