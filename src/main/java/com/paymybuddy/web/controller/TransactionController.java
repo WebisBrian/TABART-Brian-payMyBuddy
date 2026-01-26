@@ -4,11 +4,14 @@ import com.paymybuddy.application.service.TransactionService;
 import com.paymybuddy.application.service.UserService;
 import com.paymybuddy.web.dto.TransferFormDto;
 import com.paymybuddy.web.mapper.TransactionMapper;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -41,11 +44,23 @@ public class TransactionController {
 
     @PostMapping("/transactions/transfer")
     public String transfer(@RequestParam("userId") Long userId,
-                           @RequestParam("receiverId") Long receiverId,
-                           @RequestParam("amount") BigDecimal amount,
-                           @RequestParam(value = "description", required = false) String description) {
+                           @Valid @ModelAttribute("transferForm") TransferFormDto transferFormDto,
+                           BindingResult bindingResult,
+                           @PageableDefault(size = 10, sort = "date") Pageable pageable,
+                           Model model) {
 
-        transactionService.transfer(userId, receiverId, amount, description);
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("contacts", userService.listContacts(userId));
+            model.addAttribute("transactionHistory", transactionService.getTransactionHistory(userId, pageable));
+            return "transactions";
+        }
+
+        transactionService.transfer(
+                userId,
+                transferFormDto.getReceiverId(),
+                transferFormDto.getAmount(),
+                transferFormDto.getDescription()
+        );
 
         return "redirect:/transactions?userId=" + userId;
     }
