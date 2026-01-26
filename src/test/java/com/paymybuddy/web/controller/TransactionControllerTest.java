@@ -2,7 +2,7 @@ package com.paymybuddy.web.controller;
 
 import com.paymybuddy.application.service.TransactionService;
 import com.paymybuddy.application.service.UserService;
-import com.paymybuddy.web.mapper.TransactionMapper;
+import com.paymybuddy.web.mapper.TransactionRowMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -18,7 +18,6 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -38,7 +37,7 @@ class TransactionControllerTest {
     private UserService userService;
 
     @MockitoBean
-    private TransactionMapper transactionMapper;
+    private TransactionRowMapper transactionRowMapper;
 
     @Test
     @WithMockUser
@@ -55,7 +54,7 @@ class TransactionControllerTest {
                 .andExpect(view().name("transactions"))
                 .andExpect(model().attributeExists("transferForm"))
                 .andExpect(model().attributeExists("contacts"))
-                .andExpect(model().attributeExists("transactionHistory"));
+                .andExpect(model().attributeExists("transactionRows"));
     }
 
     @Test
@@ -97,7 +96,7 @@ class TransactionControllerTest {
                 .andExpect(view().name("transactions"))
                 .andExpect(model().attributeHasFieldErrors("transferForm", "amount"))
                 .andExpect(model().attributeExists("contacts"))
-                .andExpect(model().attributeExists("transactionHistory"));
+                .andExpect(model().attributeExists("transactionRows"));
 
         verify(transactionService, never()).transfer(any(), any(), any(), any());
     }
@@ -122,7 +121,7 @@ class TransactionControllerTest {
                 .andExpect(view().name("transactions"))
                 .andExpect(model().attributeExists("transferForm"))
                 .andExpect(model().attributeExists("contacts"))
-                .andExpect(model().attributeExists("transactionHistory"))
+                .andExpect(model().attributeExists("transactionRows"))
                 .andExpect(model().attribute("transferError", "Insufficient balance in sender account."));
     }
 }
