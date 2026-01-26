@@ -55,12 +55,19 @@ public class TransactionController {
             return "transactions";
         }
 
-        transactionService.transfer(
-                userId,
-                transferFormDto.getReceiverId(),
-                transferFormDto.getAmount(),
-                transferFormDto.getDescription()
-        );
+        try {
+            transactionService.transfer(
+                    userId,
+                    transferFormDto.getReceiverId(),
+                    transferFormDto.getAmount(),
+                    transferFormDto.getDescription()
+            );
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("transferError", e.getMessage());
+            model.addAttribute("contacts", userService.listContacts(userId));
+            model.addAttribute("transactionHistory", transactionService.getTransactionHistory(userId, pageable));
+            return "transactions";
+        }
 
         return "redirect:/transactions?userId=" + userId;
     }
