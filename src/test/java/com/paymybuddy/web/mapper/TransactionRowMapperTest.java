@@ -7,6 +7,8 @@ import com.paymybuddy.web.dto.TransactionRowDto;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -27,6 +29,7 @@ class TransactionRowMapperTest {
 
         when(transaction.getSenderAccount()).thenReturn(senderAccount);
         when(transaction.getReceiverAccount()).thenReturn(receiverAccount);
+        when(transaction.getAmount()).thenReturn(new BigDecimal("10.00"));
 
         when(senderAccount.getUser()).thenReturn(sender);
         when(receiverAccount.getUser()).thenReturn(receiver);
@@ -34,15 +37,17 @@ class TransactionRowMapperTest {
         when(sender.getId()).thenReturn(1L);
         when(receiver.getId()).thenReturn(2L);
 
-        when(receiver.getUserName()).thenReturn("Alice");
-        when(receiver.getEmail()).thenReturn("alice@mail.com");
+        when(receiver.getUserName()).thenReturn("Jason");
+        when(receiver.getEmail()).thenReturn("jason@email.com");
 
         // Act
         TransactionRowDto dto = mapper.toRowDto(transaction, 1L);
 
         // Assert
         assertEquals(TransactionRowDto.Direction.SENT, dto.direction());
-        assertEquals("Alice (alice@mail.com)", dto.counterpartyLabel());
+        assertEquals("Envoyé", dto.directionLabel());
+        assertEquals("Jason (jason@email.com)", dto.counterpartyLabel());
+        assertEquals(new BigDecimal("-10.00"), dto.signedAmount());
     }
 
     @Test
@@ -57,6 +62,7 @@ class TransactionRowMapperTest {
 
         when(transaction.getSenderAccount()).thenReturn(senderAccount);
         when(transaction.getReceiverAccount()).thenReturn(receiverAccount);
+        when(transaction.getAmount()).thenReturn(new BigDecimal("15.00"));
 
         when(senderAccount.getUser()).thenReturn(sender);
         when(receiverAccount.getUser()).thenReturn(receiver);
@@ -64,14 +70,16 @@ class TransactionRowMapperTest {
         when(sender.getId()).thenReturn(2L);
         when(receiver.getId()).thenReturn(1L);
 
-        when(sender.getUserName()).thenReturn("Bob");
-        when(sender.getEmail()).thenReturn("bob@mail.com");
+        when(sender.getUserName()).thenReturn("Jenny");
+        when(sender.getEmail()).thenReturn("jenny@mail.com");
 
         // Act
         TransactionRowDto dto = mapper.toRowDto(transaction, 1L);
 
         // Assert
         assertEquals(TransactionRowDto.Direction.RECEIVED, dto.direction());
-        assertEquals("Bob (bob@mail.com)", dto.counterpartyLabel());
+        assertEquals("Reçu", dto.directionLabel());
+        assertEquals("Jenny (jenny@mail.com)", dto.counterpartyLabel());
+        assertEquals(new BigDecimal("15.00"), dto.signedAmount());
     }
 }
