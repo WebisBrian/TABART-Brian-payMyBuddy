@@ -11,12 +11,14 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -51,5 +53,28 @@ class TransactionControllerTest {
                 .andExpect(model().attributeExists("transferForm"))
                 .andExpect(model().attributeExists("contacts"))
                 .andExpect(model().attributeExists("transactionHistory"));
+    }
+
+    @Test
+    void postTransfer_shouldRedirectToTransactionsPage_whenValid() throws Exception {
+        when(userService.listContacts(eq(1L))).thenReturn(List.of());
+        when(transactionService.getTransactionHistory(eq(1L), any())).thenReturn(Page.empty());
+
+        doNothing().when(transactionService).transfer(
+                eq(1L),
+                eq(2L),
+                eq(new BigDecimal("5.00")),
+                eq("Dinner")
+        );
+
+        // Act + Assert
+        mockMvc.perform(post("/transactions/transfer")
+                .param("userId", "1")
+                .param("receiverId", "2")
+                .param("amount", "5.00")
+                .param("description", "Dinner")
+                )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/transactions?userId=1"));
     }
 }
