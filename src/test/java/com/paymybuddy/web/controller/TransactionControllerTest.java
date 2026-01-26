@@ -72,7 +72,6 @@ class TransactionControllerTest {
 
         // Act + Assert
         mockMvc.perform(post("/transactions/transfer")
-                .with(csrf())
                 .param("userId", "1")
                 .param("receiverId", "2")
                 .param("amount", "5.00")
@@ -80,5 +79,26 @@ class TransactionControllerTest {
                 )
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/transactions?userId=1"));
+    }
+
+    @Test
+    void postTransfer_shouldReturnTransactionsView_whenValidationFails() throws Exception {
+        when(userService.listContacts(eq(1L))).thenReturn(List.of());
+        when(transactionService.getTransactionHistory(eq(1L), any())).thenReturn(Page.empty());
+
+        // Act + Assert
+        mockMvc.perform(post("/transactions/transfer")
+                .param("userId", "1")
+                .param("receiverId", "2")
+                // amount is missing
+                .param("description", "Dinner")
+                )
+                .andExpect(status().isOk())
+                .andExpect(view().name("transactions"))
+                .andExpect(model().attributeHasFieldErrors("transferForm", "amount"))
+                .andExpect(model().attributeExists("contacts"))
+                .andExpect(model().attributeExists("transactionHistory"));
+
+        verify(transactionService, never()).transfer(any(), any(), any(), any());
     }
 }
