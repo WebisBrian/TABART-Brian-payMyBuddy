@@ -47,6 +47,37 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    public void addContactByEmail(Long userId, String contactEmail) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID must not be null.");
+        }
+
+        if (contactEmail == null) {
+            throw new IllegalArgumentException("Contact email must not be null.");
+        }
+
+        String normalizedEmail = contactEmail.trim();
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found."));
+
+        if (user.getEmail().trim().equalsIgnoreCase(normalizedEmail)) {
+            throw new IllegalArgumentException("Cannot add self as contact.");
+        }
+
+        if(userContactRepository.existsByUser_IdAndContact_Email(userId, normalizedEmail)) {
+            throw new IllegalArgumentException("User already has this contact.");
+        }
+
+        User contact = userRepository.findByEmail(normalizedEmail)
+                .orElseThrow(() -> new IllegalArgumentException("Contact not found."));
+
+        UserContact newContact = UserContact.create(user, contact);
+        userContactRepository.save(newContact);
+    }
+
+    @Override
+    @Transactional
     public void removeContact(Long userId, Long contactId) {
         if (userId == null || contactId == null) {
             throw new IllegalArgumentException("User and contact IDs must not be null.");
