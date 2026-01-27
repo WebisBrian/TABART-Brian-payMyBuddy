@@ -148,16 +148,17 @@ class UserServiceImplTest {
     void addContactByEmail_shouldCreateContact_whenValidUsers() {
         long userId = 1L;
         String contactEmail = "contact@email.com";
+        String normalizedEmail = contactEmail.trim();
 
         User user = User.create("user", "user@email.com", "password");
         User contact = User.create("contact", "contact@email.com", "password");
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userRepository.findByEmail(contactEmail)).thenReturn(Optional.of(contact));
-        when(userContactRepository.existsByUser_IdAndContact_Email(userId, contactEmail)).thenReturn(false);
+        when(userRepository.findByEmail(normalizedEmail)).thenReturn(Optional.of(contact));
+        when(userContactRepository.existsByUser_IdAndContact_Email(userId, normalizedEmail)).thenReturn(false);
 
         // Act
-        userService.addContactByEmail(userId, contactEmail);
+        userService.addContactByEmail(userId, normalizedEmail);
 
         // Assert
         ArgumentCaptor<UserContact> captor = ArgumentCaptor.forClass(UserContact.class);
@@ -168,8 +169,8 @@ class UserServiceImplTest {
         assertThat(saved.getContact()).isSameAs(contact);
 
         verify(userRepository).findById(userId);
-        verify(userRepository).findByEmail(contactEmail);
-        verify(userContactRepository).existsByUser_IdAndContact_Email(userId, contactEmail);
+        verify(userRepository).findByEmail(normalizedEmail);
+        verify(userContactRepository).existsByUser_IdAndContact_Email(userId, normalizedEmail);
         verifyNoMoreInteractions(userRepository, userContactRepository);
     }
 
@@ -193,14 +194,16 @@ class UserServiceImplTest {
     void addContactByEmail_shouldThrow_whenUserNotFound() {
         long userId = 1L;
         String contactEmail = "contact@email.com";
+        String normalizedEmail = contactEmail.trim();
+
 
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> userService.addContactByEmail(userId, contactEmail))
+        assertThatThrownBy(() -> userService.addContactByEmail(userId, normalizedEmail))
                 .isInstanceOf(IllegalArgumentException.class);
 
         verify(userRepository).findById(userId);
-        verify(userRepository, never()).findByEmail(contactEmail);
+        verify(userRepository, never()).findByEmail(normalizedEmail);
         verifyNoInteractions(userContactRepository);
     }
 
@@ -208,31 +211,37 @@ class UserServiceImplTest {
     void addContactByEmail_shouldThrow_whenEmailNotFound() {
         long userId = 1L;
         String contactEmail = "contact@email.com";
+        String normalizedEmail = contactEmail.trim();
+
+        User user = User.create("user", "user@email.com", "password");
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userRepository.findByEmail(contactEmail)).thenReturn(Optional.empty());
+        when(userRepository.findByEmail(normalizedEmail)).thenReturn(Optional.empty());
+        when(userContactRepository.existsByUser_IdAndContact_Email(userId, normalizedEmail)).thenReturn(false);
 
-        assertThatThrownBy(() -> userService.addContactByEmail(userId, contactEmail))
+        assertThatThrownBy(() -> userService.addContactByEmail(userId, normalizedEmail))
                 .isInstanceOf(IllegalArgumentException.class);
 
         verify(userRepository).findById(userId);
-        verify(userRepository).findByEmail(contactEmail);
-        verifyNoInteractions(userContactRepository);
+        verify(userRepository).findByEmail(normalizedEmail);
+        verify(userContactRepository).existsByUser_IdAndContact_Email(userId, normalizedEmail);
+        verify(userContactRepository, never()).save(any());
+        verifyNoMoreInteractions(userRepository, userContactRepository);
     }
 
     @Test
     void addContactByEmail_shouldThrow_whenUserAndContactAreSame() {
         long userId = 1L;
         String sameEmail = "contact@email.com";
+        String normalizedEmail = sameEmail.trim();
 
         User user = User.create("user", sameEmail, "password");
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
-        assertThatThrownBy(() -> userService.addContactByEmail(userId, sameEmail))
+        assertThatThrownBy(() -> userService.addContactByEmail(userId, normalizedEmail))
                 .isInstanceOf(IllegalArgumentException.class);
 
         verify(userRepository).findById(userId);
-        verify(userRepository, never()).findByEmail(anyString());
         verifyNoInteractions(userContactRepository);
     }
 
@@ -240,26 +249,25 @@ class UserServiceImplTest {
     void addContactByEmail_shouldThrow_whenContactAlreadyExists() {
         long userId = 1L;
         String contactEmail = "contact@email.com";
+        String normalizedEmail = contactEmail.trim();
 
         User user = User.create("user", "user@email.com", "password");
-        User contact = User.create("contact", contactEmail, "password");
+        User contact = User.create("contact", normalizedEmail, "password");
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userRepository.findByEmail(contactEmail)).thenReturn(Optional.of(contact));
-        when(userContactRepository.existsByUser_IdAndContact_Email(userId, contactEmail)).thenReturn(true);
+        when(userContactRepository.existsByUser_IdAndContact_Email(userId, normalizedEmail)).thenReturn(true);
 
         // Act + Assert
-        assertThatThrownBy(() -> userService.addContactByEmail(userId, contactEmail))
+        assertThatThrownBy(() -> userService.addContactByEmail(userId, normalizedEmail))
                 .isInstanceOf(IllegalArgumentException.class);
 
         verify(userRepository).findById(userId);
-        verify(userRepository).findByEmail(contactEmail);
-        verify(userContactRepository).existsByUser_IdAndContact_Email(userId, contactEmail);
+        verify(userRepository, never()).findByEmail(anyString());
+        verify(userContactRepository).existsByUser_IdAndContact_Email(userId, normalizedEmail);
 
         verify(userContactRepository, never()).save(any(UserContact.class));
         verifyNoMoreInteractions(userRepository, userContactRepository);
     }
-
 
     /* ---------- removeContact() ---------- */
     @Test
