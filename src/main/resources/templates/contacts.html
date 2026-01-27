@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <title>Ajouter une relation</title>
+</head>
+<body>
+
+<nav>
+    <a href="#">Transférer</a>
+    <a href="#">Profil</a>
+    <a href="#" aria-current="page">Ajouter relation</a>
+    <a href="#">Se déconnecter</a>
+</nav>
+
+<main>
+    <h1>Ajouter une relation</h1>
+
+    <!-- Success message -->
+    <div th:if="${addContactSuccess}" style="color: green; margin: 10px 0;">
+        <p th:text="${addContactSuccess}"></p>
+    </div>
+
+    <!-- Error message -->
+    <div th:if="${addContactError}" style="color: red; margin: 10px 0;">
+        <p th:text="${addContactError}"></p>
+    </div>
+
+    <!-- Add contact form -->
+    <form th:action="@{/contacts/add(userId=${param.userId})}"
+          th:object="${addContactForm}"
+          method="post">
+
+        <div>
+            <label for="email">Chercher une relation</label>
+            <input id="email"
+                   type="email"
+                   th:field="*{email}"
+                   placeholder="Saisir une adresse mail"/>
+
+            <div th:if="${#fields.hasErrors('email')}" style="color:red;">
+                <span th:errors="*{email}">Erreur email</span>
+            </div>
+        </div>
+
+        <div style="margin-top: 10px;">
+            <button type="submit">Ajouter</button>
+        </div>
+    </form>
+
+    <!-- Contacts list -->
+    <section style="margin-top: 40px;">
+        <h2>Mes relations</h2>
+
+        <table border="1" cellpadding="6" cellspacing="0">
+            <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Email</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:if="${contacts == null || contacts.isEmpty()}">
+                <td colspan="2">Aucune relation</td>
+            </tr>
+
+            <tr th:each="c : ${contacts}">
+                <td th:text="${c.userName}">Nom</td>
+                <td th:text="${c.email}">email@mail.com</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+</main>
+
+</body>
+</html>
