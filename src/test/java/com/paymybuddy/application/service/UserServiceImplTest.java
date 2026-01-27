@@ -143,6 +143,124 @@ class UserServiceImplTest {
         verifyNoMoreInteractions(userRepository, userContactRepository);
     }
 
+    /* ---------- addContactByEmail() ---------- */
+    @Test
+    void addContactByEmail_shouldCreateContact_whenValidUsers() {
+        long userId = 1L;
+        String contactEmail = "contact@email.com";
+
+        User user = User.create("user", "user@email.com", "password");
+        User contact = User.create("contact", "contact@email.com", "password");
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail(contactEmail)).thenReturn(Optional.of(contact));
+        when(userContactRepository.existsByUser_IdAndContact_Email(userId, contactEmail)).thenReturn(false);
+
+        // Act
+        userService.addContactByEmail(userId, contactEmail);
+
+        // Assert
+        ArgumentCaptor<UserContact> captor = ArgumentCaptor.forClass(UserContact.class);
+        verify(userContactRepository).save(captor.capture());
+
+        UserContact saved = captor.getValue();
+        assertThat(saved.getUser()).isSameAs(user);
+        assertThat(saved.getContact()).isSameAs(contact);
+
+        verify(userRepository).findById(userId);
+        verify(userRepository).findByEmail(contactEmail);
+        verify(userContactRepository).existsByUser_IdAndContact_Email(userId, contactEmail);
+        verifyNoMoreInteractions(userRepository, userContactRepository);
+    }
+
+    @Test
+    void addContactByEmail_shouldThrow_whenUserIdIsNull() {
+        assertThatThrownBy(() -> userService.addContactByEmail(null, "contact@email.com"))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verifyNoInteractions(userRepository, userContactRepository);
+    }
+
+    @Test
+    void addContactByEmail_shouldThrow_whenContactEmailIsNull() {
+        assertThatThrownBy(() -> userService.addContactByEmail(1L, null))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verifyNoInteractions(userRepository, userContactRepository);
+    }
+
+    @Test
+    void addContactByEmail_shouldThrow_whenUserNotFound() {
+        long userId = 1L;
+        String contactEmail = "contact@email.com";
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userService.addContactByEmail(userId, contactEmail))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verify(userRepository).findById(userId);
+        verify(userRepository, never()).findByEmail(contactEmail);
+        verifyNoInteractions(userContactRepository);
+    }
+
+    @Test
+    void addContactByEmail_shouldThrow_whenEmailNotFound() {
+        long userId = 1L;
+        String contactEmail = "contact@email.com";
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail(contactEmail)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userService.addContactByEmail(userId, contactEmail))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verify(userRepository).findById(userId);
+        verify(userRepository).findByEmail(contactEmail);
+        verifyNoInteractions(userContactRepository);
+    }
+
+    @Test
+    void addContactByEmail_shouldThrow_whenUserAndContactAreSame() {
+        long userId = 1L;
+        String sameEmail = "contact@email.com";
+
+        User user = User.create("user", sameEmail, "password");
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        assertThatThrownBy(() -> userService.addContactByEmail(userId, sameEmail))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verify(userRepository).findById(userId);
+        verify(userRepository, never()).findByEmail(anyString());
+        verifyNoInteractions(userContactRepository);
+    }
+
+    @Test
+    void addContactByEmail_shouldThrow_whenContactAlreadyExists() {
+        long userId = 1L;
+        String contactEmail = "contact@email.com";
+
+        User user = User.create("user", "user@email.com", "password");
+        User contact = User.create("contact", contactEmail, "password");
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail(contactEmail)).thenReturn(Optional.of(contact));
+        when(userContactRepository.existsByUser_IdAndContact_Email(userId, contactEmail)).thenReturn(true);
+
+        // Act + Assert
+        assertThatThrownBy(() -> userService.addContactByEmail(userId, contactEmail))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verify(userRepository).findById(userId);
+        verify(userRepository).findByEmail(contactEmail);
+        verify(userContactRepository).existsByUser_IdAndContact_Email(userId, contactEmail);
+
+        verify(userContactRepository, never()).save(any(UserContact.class));
+        verifyNoMoreInteractions(userRepository, userContactRepository);
+    }
+
+
     /* ---------- removeContact() ---------- */
     @Test
     void removeContact_shouldDeleteContact_whenExists() {
