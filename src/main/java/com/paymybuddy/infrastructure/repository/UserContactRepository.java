@@ -13,6 +13,8 @@ public interface UserContactRepository extends JpaRepository<UserContact, Long> 
 
     boolean existsByUser_IdAndContact_Id(Long userId, Long contactId);
 
+    boolean existsByUser_IdAndContact_Email(Long userId, String contactEmail);
+
     Optional<UserContact> findByUser_IdAndContact_Id(Long userId, Long contactId);
 
     List<UserContact> findAllByUser_Id(Long userId);
