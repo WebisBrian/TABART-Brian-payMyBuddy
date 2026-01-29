@@ -23,6 +23,7 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .loginPage("/login")
                         .usernameParameter("email")
+                        .defaultSuccessUrl("/transactions", true)
                         .permitAll()
                 )
                 .logout(Customizer.withDefaults())
