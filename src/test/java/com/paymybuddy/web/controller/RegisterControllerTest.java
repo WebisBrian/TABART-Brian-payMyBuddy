@@ -1,6 +1,7 @@
 package com.paymybuddy.web.controller;
 
 import com.paymybuddy.application.service.RegistrationService;
+import com.paymybuddy.application.service.exception.EmailAlreadyUsedException;
 import com.paymybuddy.infrastructure.security.SecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,50 @@ class RegisterControllerTest {
                         .param("password", "Password123!"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/login"));
+
+        verify(registrationService).register("Brian", "brian@email.com", "Password123!");
+    }
+
+    @Test
+    void postRegister_shouldReturn403_whenCsrfMissing() throws Exception {
+        mockMvc.perform(post("/register")
+                .param("userName", "Brian")
+                .param("email", "brian@email.com")
+                .param("password", "Password123!")
+                )
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void postRegister_shouldReturnRegisterView_whenValidationFails() throws Exception {
+        mockMvc.perform(post("/register")
+                .with(csrf())
+                .param("userName", "")
+                .param("email", "not-an-email")
+                .param("password", "123")
+                )
+                .andExpect(status().isOk())
+                .andExpect(view().name("register"))
+                .andExpect(model().attributeHasFieldErrors("form", "userName", "email", "password"));
+
+        verify(registrationService, never()).register(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void postRegister_shouldReturnRegisterView_whenEmailAlreadyExists() throws Exception {
+        doThrow(new EmailAlreadyUsedException("brian@email.com"))
+                .when(registrationService)
+                .register("Brian", "brian@email.com", "Password123!");
+
+        mockMvc.perform(post("/register")
+                .with(csrf())
+                .param("userName", "Brian")
+                .param("email", "brian@email.com")
+                .param("password", "Password123!")
+                )
+                .andExpect(status().isOk())
+                .andExpect(view().name("register"))
+                .andExpect(model().attributeHasFieldErrors("form", "email"));
 
         verify(registrationService).register("Brian", "brian@email.com", "Password123!");
     }
