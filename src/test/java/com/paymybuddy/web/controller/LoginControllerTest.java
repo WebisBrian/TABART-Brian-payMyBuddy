@@ -3,12 +3,13 @@ package com.paymybuddy.web.controller;
 import com.paymybuddy.infrastructure.security.SecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(LoginController.class)
@@ -27,7 +28,7 @@ class LoginControllerTest {
 
     @Test
     void postLogin_shouldRedirectToLoginError_whenBadCredentials() throws Exception {
-        mockMvc.perform(get("/login")
+        mockMvc.perform(post("/login")
                         .with(csrf())
                         .param("email", "bad@email.com")
                         .param("password", "wrong")
