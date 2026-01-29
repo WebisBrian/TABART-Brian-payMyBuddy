@@ -65,7 +65,7 @@ class RegisterControllerTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(view().name("register"))
-                .andExpect(model().attributeHasFieldErrors("form", "userName", "email", "password"));
+                .andExpect(model().attributeHasFieldErrors("registerForm", "userName", "email", "password"));
 
         verify(registrationService, never()).register(anyString(), anyString(), anyString());
     }
@@ -84,7 +84,7 @@ class RegisterControllerTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(view().name("register"))
-                .andExpect(model().attributeHasFieldErrors("form", "email"));
+                .andExpect(model().attributeHasFieldErrors("registerForm", "email"));
 
         verify(registrationService).register("Brian", "brian@email.com", "Password123!");
     }
