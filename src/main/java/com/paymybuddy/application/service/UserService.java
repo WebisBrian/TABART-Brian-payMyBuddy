@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface UserService {
 
+    User getByEmail(String email);
+
     void addContact(Long userId, Long contactId);
 
     void addContactByEmail(Long userId, String contactEmail);

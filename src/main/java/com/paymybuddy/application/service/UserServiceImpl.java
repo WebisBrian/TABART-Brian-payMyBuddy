@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -18,6 +19,22 @@ public class UserServiceImpl implements UserService {
     public UserServiceImpl(UserRepository userRepository, UserContactRepository userContactRepository) {
         this.userRepository = userRepository;
         this.userContactRepository = userContactRepository;
+    }
+
+    @Override
+    @Transactional (readOnly = true)
+    public User getByEmail(String email) {
+        if (email == null) {
+            throw new IllegalArgumentException("Email must not be null.");
+        }
+
+        String normalizedEmail = email.trim().toLowerCase();
+        if (normalizedEmail.isEmpty()) {
+            throw new IllegalArgumentException("Email must not be empty.");
+        }
+
+        return userRepository.findByEmail(normalizedEmail)
+                .orElseThrow(() -> new IllegalArgumentException("User not found."));
     }
 
     @Override
