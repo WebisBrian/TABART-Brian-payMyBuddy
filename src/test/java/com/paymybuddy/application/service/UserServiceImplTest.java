@@ -29,6 +29,54 @@ class UserServiceImplTest {
     @InjectMocks
     private UserServiceImpl userService;
 
+    /* ---------- getByEmail() ---------- */
+    @Test
+    void getByEmail_shouldReturnUser_whenValidEmail() {
+        String userEmail = "user@email.com";
+
+        User user = User.create("user", userEmail, "password");
+
+        when(userRepository.findByEmail(userEmail)).thenReturn(Optional.of(user));
+
+        // Act
+        User result = userService.getByEmail(userEmail);
+
+        // Assert
+        verify(userRepository).findByEmail(userEmail);
+        assertThat(result).isSameAs(user);
+    }
+
+    @Test
+    void getByEmail_shouldThrow_whenEmailIsNull() {
+        assertThatThrownBy(() -> userService.getByEmail(null))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verifyNoInteractions(userRepository);
+    }
+
+    @Test
+    void getByEmail_shouldThrow_whenEmailIsBlank() {
+        assertThatThrownBy(() -> userService.getByEmail("  "))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verifyNoInteractions(userRepository);
+    }
+
+    @Test
+    void getByEmail_shouldThrow_whenUserNotFound() {
+        String userEmail = "user@email.com";
+
+        when(userRepository.findByEmail(userEmail)).thenReturn(Optional.empty());
+
+        // Act + Assert
+        assertThatThrownBy(() -> userService.getByEmail(userEmail))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verify(userRepository).findByEmail(userEmail);
+        verifyNoMoreInteractions(userRepository);
+    }
+
+
     /* ---------- addContact() ---------- */
     @Test
     void addContact_shouldCreateContact_whenValidUsers() {
