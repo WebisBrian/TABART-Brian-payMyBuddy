@@ -2,14 +2,18 @@ package com.paymybuddy.web.controller;
 
 import com.paymybuddy.application.service.TransactionService;
 import com.paymybuddy.application.service.UserService;
+import com.paymybuddy.domain.entity.User;
+import com.paymybuddy.infrastructure.security.SecurityConfig;
 import com.paymybuddy.web.mapper.TransactionRowMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -18,13 +22,15 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @WebMvcTest(TransactionController.class)
-@AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc(addFilters = true)
+@Import(SecurityConfig.class)
 class TransactionControllerTest {
 
     @Autowired
@@ -40,25 +46,29 @@ class TransactionControllerTest {
     private TransactionRowMapper transactionRowMapper;
 
     @Test
-    @WithMockUser
+    @WithMockUser(username = "user@email.com")
     void getTransactionsPage_shouldRenderViewAndPrepareModel() throws Exception {
+        when(userService.getByEmail("user@email.com")).thenReturn(userWithId(1L, "user@email.com"));
         when(transactionService.getTransactionHistory(eq(1L), any()))
                 .thenReturn(Page.empty());
-
         when(userService.listContacts(eq(1L)))
                 .thenReturn(List.of());
 
         // Act + Assert
-        mockMvc.perform(get("/transactions").param("userId", "1"))
+        mockMvc.perform(get("/transactions"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("transactions"))
                 .andExpect(model().attributeExists("transferForm"))
                 .andExpect(model().attributeExists("contacts"))
                 .andExpect(model().attributeExists("transactionRows"));
+
+        verify(userService).getByEmail("user@email.com");
     }
 
     @Test
+    @WithMockUser(username = "user@email.com")
     void postTransfer_shouldRedirectToTransactionsPage_whenValid() throws Exception {
+        when(userService.getByEmail("user@email.com")).thenReturn(userWithId(1L, "user@email.com"));
         when(userService.listContacts(eq(1L))).thenReturn(List.of());
         when(transactionService.getTransactionHistory(eq(1L), any())).thenReturn(Page.empty());
 
@@ -71,38 +81,43 @@ class TransactionControllerTest {
 
         // Act + Assert
         mockMvc.perform(post("/transactions/transfer")
-                .param("userId", "1")
-                .param("receiverId", "2")
-                .param("amount", "5.00")
-                .param("description", "Dinner")
-                )
+                                .with(csrf())
+                                .param("receiverId", "2")
+                                .param("amount", "5.00")
+                                .param("description", "Dinner"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/transactions?userId=1"));
+                .andExpect(redirectedUrl("/transactions"));
+
+        verify(userService).getByEmail("user@email.com");
     }
 
     @Test
+    @WithMockUser(username = "user@email.com")
     void postTransfer_shouldReturnTransactionsView_whenValidationFails() throws Exception {
+        when(userService.getByEmail("user@email.com")).thenReturn(userWithId(1L, "user@email.com"));
         when(userService.listContacts(eq(1L))).thenReturn(List.of());
         when(transactionService.getTransactionHistory(eq(1L), any())).thenReturn(Page.empty());
 
         // Act + Assert
         mockMvc.perform(post("/transactions/transfer")
-                .param("userId", "1")
-                .param("receiverId", "2")
-                // amount is missing
-                .param("description", "Dinner")
-                )
+                                .with(csrf())
+                                .param("receiverId", "2")
+                                // amount is missing
+                                .param("description", "Dinner"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("transactions"))
                 .andExpect(model().attributeHasFieldErrors("transferForm", "amount"))
                 .andExpect(model().attributeExists("contacts"))
                 .andExpect(model().attributeExists("transactionRows"));
 
+        verify(userService).getByEmail("user@email.com");
         verify(transactionService, never()).transfer(any(), any(), any(), any());
     }
 
     @Test
+    @WithMockUser(username = "user@email.com")
     void postTransfer_shouldReturnTransactionsView_withErrorMessage_whenServiceThrows() throws Exception {
+        when(userService.getByEmail("user@email.com")).thenReturn(userWithId(1L, "user@email.com"));
         when(userService.listContacts(eq(1L))).thenReturn(List.of());
         when(transactionService.getTransactionHistory(eq(1L), any())).thenReturn(Page.empty());
 
@@ -112,16 +127,23 @@ class TransactionControllerTest {
 
         // Act + Assert
         mockMvc.perform(post("/transactions/transfer")
-                .param("userId", "1")
-                .param("receiverId", "2")
-                .param("amount", "5.00")
-                .param("description", "Dinner")
-                )
+                                .with(csrf())
+                                .param("receiverId", "2")
+                                .param("amount", "5.00")
+                                .param("description", "Dinner"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("transactions"))
                 .andExpect(model().attributeExists("transferForm"))
                 .andExpect(model().attributeExists("contacts"))
                 .andExpect(model().attributeExists("transactionRows"))
                 .andExpect(model().attribute("transferError", "Insufficient balance in sender account."));
+
+        verify(userService).getByEmail("user@email.com");
+    }
+
+    private User userWithId(long id, String email) {
+        User user = User.create("user", email, "password");
+        ReflectionTestUtils.setField(user, "id", id);
+        return user;
     }
 }

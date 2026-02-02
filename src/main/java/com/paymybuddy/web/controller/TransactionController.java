@@ -9,6 +9,8 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -30,9 +32,11 @@ public class TransactionController {
     }
 
     @GetMapping("/transactions")
-    public String getTransactions(@RequestParam("userId") Long userId,
+    public String getTransactions(@AuthenticationPrincipal UserDetails userDetails,
                                   @PageableDefault(size = 10, sort = "date") Pageable pageable,
                                   Model model) {
+        String email = userDetails.getUsername();
+        Long userId = userService.getByEmail(email).getId();
 
         model.addAttribute("transferForm", new TransferFormDto());
         model.addAttribute("contacts", userService.listContacts(userId));
@@ -46,11 +50,13 @@ public class TransactionController {
     }
 
     @PostMapping("/transactions/transfer")
-    public String transfer(@RequestParam("userId") Long userId,
+    public String transfer(@AuthenticationPrincipal UserDetails userDetails,
                            @Valid @ModelAttribute("transferForm") TransferFormDto form,
                            BindingResult bindingResult,
                            @PageableDefault(size = 10, sort = "date") Pageable pageable,
                            Model model) {
+        String email = userDetails.getUsername();
+        Long userId = userService.getByEmail(email).getId();
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("contacts", userService.listContacts(userId));
@@ -75,6 +81,6 @@ public class TransactionController {
             return "transactions";
         }
 
-        return "redirect:/transactions?userId=" + userId;
+        return "redirect:/transactions";
     }
 }
