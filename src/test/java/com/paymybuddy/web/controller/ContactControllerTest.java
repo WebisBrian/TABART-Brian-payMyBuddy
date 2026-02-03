@@ -43,7 +43,6 @@ class ContactControllerTest {
         // Act + Assert
         mockMvc.perform(get("/contacts")
                         .with(csrf())
-                        .param("userId", "1")
                 )
                 .andExpect(status().isOk())
                 .andExpect(view().name("contacts"))
