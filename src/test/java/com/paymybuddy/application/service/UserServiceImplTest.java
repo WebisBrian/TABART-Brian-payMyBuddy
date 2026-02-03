@@ -52,7 +52,7 @@ class UserServiceImplTest {
                 .isInstanceOf(IllegalArgumentException.class);
 
         verifyNoInteractions(userRepository);
-    }
+}
 
     @Test
     void getByEmail_shouldThrow_whenEmailIsBlank() {
