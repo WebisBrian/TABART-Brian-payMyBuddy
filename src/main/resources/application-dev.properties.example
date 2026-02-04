@@ -1,20 +1,25 @@
 # =========================
-# Profil DEV : initialisation SQL activée
+# DEV profile (EXAMPLE)
 # =========================
+# Copy this file to: application-dev.properties
 
-# DB configuration (replace with your credentials)
-spring.datasource.url=jdbc:mysql://localhost:3306/pay_my_buddy?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-spring.datasource.username=CHANGE_ME
-spring.datasource.password=CHANGE_ME
-
-# SQL Initialization
-spring.sql.init.mode=always
-spring.sql.init.schema-locations=classpath:schema.sql
-spring.sql.init.data-locations=classpath:data.sql
+# -------------------------
+# Datasource (MySQL)
+# -------------------------
+# Defaults allow local launch without additional config.
+spring.datasource.url=jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:pay_my_buddy}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+spring.datasource.username=${DB_USERNAME:root}
+spring.datasource.password=${DB_PASSWORD:root}
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
-# Avoid a crash if data don't exist
-spring.sql.init.continue-on-error=false
-
-# SQL logging - activated only for dev profile
+# -------------------------
+# JPA (dev convenience)
+# -------------------------
 spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+# -------------------------
+# DB-first rule
+# -------------------------
+spring.jpa.hibernate.ddl-auto=validate
+spring.sql.init.mode=never
