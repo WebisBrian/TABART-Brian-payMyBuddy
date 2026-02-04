@@ -1,0 +1,15 @@
+# =========================
+# TEST profile (EXAMPLE)
+# =========================
+# Copy this file to: application-test.properties
+# Used for automated tests.
+
+spring.datasource.url=jdbc:h2:mem:paymybuddy;MODE=MySQL;DB_CLOSE_DELAY=-1
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+
+# In tests, schema can be created/dropped automatically
+spring.jpa.hibernate.ddl-auto=create-drop
+spring.jpa.open-in-view=false
+spring.sql.init.mode=never

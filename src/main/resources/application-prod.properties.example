@@ -1,0 +1,18 @@
+# =========================
+# PROD profile (EXAMPLE)
+# =========================
+# Copy this file to: application-prod.properties
+# Provide values via environment variables (recommended in production).
+
+spring.datasource.url=${DB_URL}
+spring.datasource.username=${DB_USERNAME}
+spring.datasource.password=${DB_PASSWORD}
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# DB-first: schema managed externally
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.open-in-view=false
+spring.sql.init.mode=never
+
+# Conservative logging
+logging.level.org.springframework.web=INFO
