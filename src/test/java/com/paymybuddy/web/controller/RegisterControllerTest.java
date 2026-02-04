@@ -36,7 +36,7 @@ class RegisterControllerTest {
     void postRegister_shouldRedirectToLogin_whenValid_andCsrfPresent() throws Exception {
         mockMvc.perform(post("/register")
                         .with(csrf())
-                        .param("userName", "Brian")
+                        .param("username", "Brian")
                         .param("email", "brian@email.com")
                         .param("password", "Password123!"))
                 .andExpect(status().is3xxRedirection())
@@ -48,7 +48,7 @@ class RegisterControllerTest {
     @Test
     void postRegister_shouldReturn403_whenCsrfMissing() throws Exception {
         mockMvc.perform(post("/register")
-                .param("userName", "Brian")
+                .param("username", "Brian")
                 .param("email", "brian@email.com")
                 .param("password", "Password123!")
                 )
@@ -59,13 +59,13 @@ class RegisterControllerTest {
     void postRegister_shouldReturnRegisterView_whenValidationFails() throws Exception {
         mockMvc.perform(post("/register")
                 .with(csrf())
-                .param("userName", "")
+                .param("username", "")
                 .param("email", "not-an-email")
                 .param("password", "123")
                 )
                 .andExpect(status().isOk())
                 .andExpect(view().name("register"))
-                .andExpect(model().attributeHasFieldErrors("registerForm", "userName", "email", "password"));
+                .andExpect(model().attributeHasFieldErrors("registerForm", "username", "email", "password"));
 
         verify(registrationService, never()).register(anyString(), anyString(), anyString());
     }
@@ -78,7 +78,7 @@ class RegisterControllerTest {
 
         mockMvc.perform(post("/register")
                 .with(csrf())
-                .param("userName", "Brian")
+                .param("username", "Brian")
                 .param("email", "brian@email.com")
                 .param("password", "Password123!")
                 )

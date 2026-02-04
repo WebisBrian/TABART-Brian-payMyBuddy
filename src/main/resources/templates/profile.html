@@ -43,14 +43,14 @@
 
         <!-- Username -->
         <div>
-            <label for="newUserName">Nom d’utilisateur</label>
-            <input id="newUserName"
+            <label for="newUsername">Nom d’utilisateur</label>
+            <input id="newUsername"
                    type="text"
-                   th:field="*{newUserName}"
+                   th:field="*{newUsername}"
                    placeholder="Nom d’utilisateur"/>
 
-            <div th:if="${#fields.hasErrors('newUserName')}" style="color:red;">
-                <span th:errors="*{newUserName}">Erreur nom</span>
+            <div th:if="${#fields.hasErrors('newUsername')}" style="color:red;">
+                <span th:errors="*{newUsername}">Erreur nom</span>
             </div>
         </div>
 

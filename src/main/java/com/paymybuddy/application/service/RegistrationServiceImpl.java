@@ -26,8 +26,8 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Override
     @Transactional
-    public void register(String userName, String email, String password) {
-        if (userName == null) {
+    public void register(String username, String email, String password) {
+        if (username == null) {
             throw new IllegalArgumentException("Username must not be null.");
         }
 
@@ -46,7 +46,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         String passwordHash = passwordEncoder.encode(password);
 
-        User user = User.create(userName, normalizedEmail, passwordHash);
+        User user = User.create(username, normalizedEmail, passwordHash);
         User savedUser = userRepository.save(user);
 
         Account account = Account.create(savedUser);

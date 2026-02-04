@@ -37,7 +37,7 @@ class TransactionRowMapperTest {
         when(sender.getId()).thenReturn(1L);
         when(receiver.getId()).thenReturn(2L);
 
-        when(receiver.getUserName()).thenReturn("Jason");
+        when(receiver.getUsername()).thenReturn("Jason");
         when(receiver.getEmail()).thenReturn("jason@email.com");
 
         // Act
@@ -70,7 +70,7 @@ class TransactionRowMapperTest {
         when(sender.getId()).thenReturn(2L);
         when(receiver.getId()).thenReturn(1L);
 
-        when(sender.getUserName()).thenReturn("Jenny");
+        when(sender.getUsername()).thenReturn("Jenny");
         when(sender.getEmail()).thenReturn("jenny@mail.com");
 
         // Act

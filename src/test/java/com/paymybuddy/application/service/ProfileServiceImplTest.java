@@ -25,16 +25,16 @@ class ProfileServiceImplTest {
     /* ---------- updateProfile() ---------- */
     @Test
     void updateProfile_shouldUpdateUser_whenDataIsValid() {
-        User user = User.create("oldUserName", "user@email.com", "password");
+        User user = User.create("oldUsername", "user@email.com", "password");
 
         when(userRepository.findByEmail("user@email.com")).thenReturn(Optional.of(user));
         when(userRepository.existsByEmail("new@email.com")).thenReturn(false);
 
         // Act
-        profileService.updateProfile("User@email.com", "newUserName", "New@email.com");
+        profileService.updateProfile("User@email.com", "newUsername", "New@email.com");
 
         // Assert
-        assertThat(user.getUserName()).isEqualTo("newUserName");
+        assertThat(user.getUsername()).isEqualTo("newUsername");
         assertThat(user.getEmail()).isEqualTo("new@email.com");
         verify(userRepository).save(user);
     }
@@ -42,7 +42,7 @@ class ProfileServiceImplTest {
     @Test
     void updateProfile_shouldThrow_whenCurrentEmailIsNull() {
         // Act + Assert
-        assertThatThrownBy(() -> profileService.updateProfile(null, "newUserName", "newEmail@email.com"))
+        assertThatThrownBy(() -> profileService.updateProfile(null, "newUsername", "newEmail@email.com"))
                 .isInstanceOf(IllegalArgumentException.class);
 
         verifyNoInteractions(userRepository);
@@ -55,7 +55,7 @@ class ProfileServiceImplTest {
         when(userRepository.findByEmail(userEmail)).thenReturn(Optional.empty());
 
         // Act + Assert
-        assertThatThrownBy(() -> profileService.updateProfile(userEmail, "newUserName", "New@email.com"))
+        assertThatThrownBy(() -> profileService.updateProfile(userEmail, "newUsername", "New@email.com"))
                 .isInstanceOf(IllegalArgumentException.class);
 
         verify(userRepository).findByEmail(userEmail);

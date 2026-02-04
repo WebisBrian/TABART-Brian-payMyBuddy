@@ -16,12 +16,12 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     @Transactional
-    public void updateProfile(String email, String newUserName, String newEmail) {
+    public void updateProfile(String email, String newUsername, String newEmail) {
         if (email == null || email.isBlank()) {
             throw new IllegalArgumentException("Email must not be null or blank.");
         }
-        if (newUserName == null || newUserName.isBlank()) {
-            throw new IllegalArgumentException("UserName must not be null or blank.");
+        if (newUsername == null || newUsername.isBlank()) {
+            throw new IllegalArgumentException("Username must not be null or blank.");
         }
         if (newEmail == null || newEmail.isBlank()) {
             throw new IllegalArgumentException("New email must not be null or blank.");
@@ -39,8 +39,8 @@ public class ProfileServiceImpl implements ProfileService {
 
         boolean changed = false;
 
-        if (!user.getUserName().equals(newUserName)) {
-            user.changeUserName(newUserName);
+        if (!user.getUsername().equals(newUsername)) {
+            user.changeUsername(newUsername);
             changed = true;
         }
 

@@ -41,7 +41,7 @@
             <select id="receiverId" th:field="*{receiverId}">
                 <option th:each="c : ${contacts}"
                         th:value="${c.id}"
-                        th:text="|${c.userName} (${c.email})|">
+                        th:text="|${c.username} (${c.email})|">
                 </option>
             </select>
 

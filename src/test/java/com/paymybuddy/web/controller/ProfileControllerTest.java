@@ -46,7 +46,7 @@ class ProfileControllerTest {
                 .andExpect(model().attributeExists("profileForm"))
                 // verify that the form is pre-filled
                 .andExpect(model().attribute("profileForm", allOf(
-                        hasProperty("newUserName", is("existingName")),
+                        hasProperty("newUsername", is("existingName")),
                         hasProperty("newEmail", is("user@email.com"))
                 )));
 
@@ -59,7 +59,7 @@ class ProfileControllerTest {
     void postUpdateProfile_shouldRedirect_whenValid() throws Exception {
         mockMvc.perform(post("/profile/update")
                         .with(csrf())
-                        .param("newUserName", "newUser")
+                        .param("newUsername", "newUser")
                         .param("newEmail", "new@email.com"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/profile"));
@@ -75,13 +75,13 @@ class ProfileControllerTest {
     @Test
     @WithMockUser(username = "user@email.com")
     void postUpdateProfile_shouldReturnView_whenValidationFails() throws Exception {
-        // newUserName missing
+        // newUsername missing
         mockMvc.perform(post("/profile/update")
                         .with(csrf())
                         .param("newEmail", "new@email.com"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("profile"))
-                .andExpect(model().attributeHasFieldErrors("profileForm", "newUserName"));
+                .andExpect(model().attributeHasFieldErrors("profileForm", "newUsername"));
 
         verifyNoInteractions(profileService);
     }
@@ -95,7 +95,7 @@ class ProfileControllerTest {
 
         mockMvc.perform(post("/profile/update")
                         .with(csrf())
-                        .param("newUserName", "newUser")
+                        .param("newUsername", "newUser")
                         .param("newEmail", "taken@email.com"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("profile"))
@@ -105,8 +105,8 @@ class ProfileControllerTest {
         verify(profileService).updateProfile("user@email.com", "newUser", "taken@email.com");
     }
 
-    private User userWithId(long id, String userName, String email) {
-        User user = User.create(userName, email, "password");
+    private User userWithId(long id, String username, String email) {
+        User user = User.create(username, email, "password");
         ReflectionTestUtils.setField(user, "id", id);
         return user;
     }

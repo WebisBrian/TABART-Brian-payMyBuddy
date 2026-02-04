@@ -47,7 +47,7 @@ class RegistrationServiceImplTest {
         verify(userRepository).save(userCaptor.capture());
 
         User savedUser = userCaptor.getValue();
-        assertThat(savedUser.getUserName()).isEqualTo("user");
+        assertThat(savedUser.getUsername()).isEqualTo("user");
         assertThat(savedUser.getEmail()).isEqualTo("user@email.com");
         assertThat(savedUser.getPasswordHash()).isEqualTo("bcrypt-hash");
 

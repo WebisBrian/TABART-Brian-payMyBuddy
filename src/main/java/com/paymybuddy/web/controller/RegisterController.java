@@ -34,7 +34,7 @@ public class RegisterController {
         }
 
         try {
-            registrationService.register(form.getUserName(), form.getEmail(), form.getPassword());
+            registrationService.register(form.getUsername(), form.getEmail(), form.getPassword());
 
         } catch (EmailAlreadyUsedException e) {
             bindingResult.rejectValue("email", "emailAlreadyUsed", "Registration failed");

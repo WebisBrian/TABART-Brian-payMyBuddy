@@ -32,7 +32,7 @@ public class ProfileController {
         User user = userService.getByEmail(email);
 
         model.addAttribute("profileForm",
-                new ProfileFormDto(user.getUserName(), user.getEmail()));
+                new ProfileFormDto(user.getUsername(), user.getEmail()));
 
         return "profile";
     }
@@ -49,7 +49,7 @@ public class ProfileController {
     String email = userDetails.getUsername();
 
     try {
-        profileService.updateProfile(email, form.getNewUserName(), form.getNewEmail());
+        profileService.updateProfile(email, form.getNewUsername(), form.getNewEmail());
     } catch (IllegalArgumentException e) {
         model.addAttribute("profileError", e.getMessage());
         return "profile";

@@ -16,7 +16,7 @@ public class ProfileFormDto {
 
     @NotBlank
     @Size(max = 100)
-    private String newUserName;
+    private String newUsername;
 
     @NotBlank
     @Email
