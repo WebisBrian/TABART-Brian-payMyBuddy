@@ -9,10 +9,16 @@
 <body>
 
 <nav>
-    <a href="#">Transférer</a>
-    <a href="#">Profil</a>
-    <a href="#" aria-current="page">Ajouter relation</a>
-    <a href="#">Se déconnecter</a>
+    <a href="/transactions">Transférer</a>
+    <a href="/profile">Profil</a>
+    <a href="/contacts">Ajouter relation</a>
+
+    <form th:action="@{/logout}" method="post" style="display:inline;">
+        <input type="hidden"
+               th:name="${_csrf.parameterName}"
+               th:value="${_csrf.token}"/>
+        <button type="submit">Se déconnecter</button>
+    </form>
 </nav>
 
 <main>
