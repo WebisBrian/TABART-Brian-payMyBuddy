@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0,
+                   maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Profil</title>
+</head>
+<body>
+
+<nav>
+    <a href="/transactions">Transférer</a>
+    <a href="/profile">Profil</a>
+    <a href="/contacts">Ajouter relation</a>
+
+    <form th:action="@{/logout}" method="post" style="display:inline;">
+        <input type="hidden"
+               th:name="${_csrf.parameterName}"
+               th:value="${_csrf.token}"/>
+        <button type="submit">Se déconnecter</button>
+    </form>
+</nav>
+
+<main>
+    <h1>Mon profil</h1>
+
+    <!-- Global error message -->
+    <div th:if="${profileError}" style="color: red; margin: 10px 0;">
+        <p th:text="${profileError}">Erreur profil</p>
+    </div>
+
+    <!-- Profile form -->
+    <form th:action="@{/profile/update}"
+          th:object="${profileForm}"
+          method="post">
+
+        <!-- CSRF -->
+        <input type="hidden"
+               th:name="${_csrf.parameterName}"
+               th:value="${_csrf.token}"/>
+
+        <!-- Username -->
+        <div>
+            <label for="newUserName">Nom d’utilisateur</label>
+            <input id="newUserName"
+                   type="text"
+                   th:field="*{newUserName}"
+                   placeholder="Nom d’utilisateur"/>
+
+            <div th:if="${#fields.hasErrors('newUserName')}" style="color:red;">
+                <span th:errors="*{newUserName}">Erreur nom</span>
+            </div>
+        </div>
+
+        <!-- Email -->
+        <div>
+            <label for="newEmail">Email</label>
+            <input id="newEmail"
+                   type="email"
+                   th:field="*{newEmail}"
+                   placeholder="email@example.com"/>
+
+            <div th:if="${#fields.hasErrors('newEmail')}" style="color:red;">
+                <span th:errors="*{newEmail}">Erreur email</span>
+            </div>
+        </div>
+
+        <div>
+            <button type="submit">Mettre à jour</button>
+        </div>
+    </form>
+
+</main>
+
+</body>
+</html>
