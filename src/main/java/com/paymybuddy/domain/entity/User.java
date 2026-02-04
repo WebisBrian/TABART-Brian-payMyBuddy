@@ -7,7 +7,7 @@ import lombok.*;
 @Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString(exclude = "password")
+@ToString(exclude = "passwordHash")
 public class User {
 
     @Id
@@ -20,19 +20,19 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
-    private String password;
+    @Column(name = "password", nullable = false)
+    private String passwordHash;
 
     // private constructor
-    private User(String userName, String email, String password) {
+    private User(String userName, String email, String passwordHash) {
         this.userName = userName;
         this.email = email;
-        this.password = password;
+        this.passwordHash = passwordHash;
     }
 
     // factory method
-    public static User create(String userName, String email, String password) {
-        return new User(userName, email, password);
+    public static User create(String userName, String email, String passwordHash) {
+        return new User(userName, email, passwordHash);
     }
 
     // methods
@@ -45,6 +45,6 @@ public class User {
     }
 
     public void changePasswordHash(String passwordHash) {
-        this.password = passwordHash;
+        this.passwordHash = passwordHash;
     }
 }
