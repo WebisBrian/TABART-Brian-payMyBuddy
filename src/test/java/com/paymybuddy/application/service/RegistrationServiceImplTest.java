@@ -49,7 +49,7 @@ class RegistrationServiceImplTest {
         User savedUser = userCaptor.getValue();
         assertThat(savedUser.getUserName()).isEqualTo("user");
         assertThat(savedUser.getEmail()).isEqualTo("user@email.com");
-        assertThat(savedUser.getPassword()).isEqualTo("bcrypt-hash");
+        assertThat(savedUser.getPasswordHash()).isEqualTo("bcrypt-hash");
 
         // Account saved and linked to the same user
         ArgumentCaptor<Account> accountCaptor = ArgumentCaptor.forClass(Account.class);
