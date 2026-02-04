@@ -1,6 +1,8 @@
 package com.paymybuddy.web.controller;
 
 import com.paymybuddy.application.service.ProfileService;
+import com.paymybuddy.application.service.UserService;
+import com.paymybuddy.domain.entity.User;
 import com.paymybuddy.infrastructure.security.SecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +11,10 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -22,33 +26,37 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ProfileControllerTest {
 
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
+
+    @MockitoBean
+    private UserService userService;
 
     @MockitoBean
     private ProfileService profileService;
 
     @Test
     @WithMockUser(username = "user@email.com")
-    void getProfile_shouldReturnProfileView() throws Exception {
+    void getProfilePage_shouldRenderViewAndPreparePrefilledForm() throws Exception {
+        when(userService.getByEmail("user@email.com"))
+                .thenReturn(userWithId(1L, "existingName", "user@email.com"));
+
         mockMvc.perform(get("/profile"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("profile"));
-    }
+                .andExpect(view().name("profile"))
+                .andExpect(model().attributeExists("profileForm"))
+                // verify that the form is pre-filled
+                .andExpect(model().attribute("profileForm", allOf(
+                        hasProperty("newUserName", is("existingName")),
+                        hasProperty("newEmail", is("user@email.com"))
+                )));
 
-    @Test
-    @WithMockUser(username = "user@email.com")
-    void postUpdateProfile_shouldBeForbidden_whenCsrfMissing() throws Exception {
-        mockMvc.perform(post("/profile/update")
-                        .param("newUserName", "newUser")
-                        .param("newEmail", "new@email.com"))
-                .andExpect(status().isForbidden());
-
+        verify(userService).getByEmail("user@email.com");
         verifyNoInteractions(profileService);
     }
 
     @Test
     @WithMockUser(username = "user@email.com")
-    void postUpdateProfile_shouldRedirectAndCallService_whenCsrfPresent() throws Exception {
+    void postUpdateProfile_shouldRedirect_whenValid() throws Exception {
         mockMvc.perform(post("/profile/update")
                         .with(csrf())
                         .param("newUserName", "newUser")
@@ -56,7 +64,50 @@ class ProfileControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/profile"));
 
-        verify(profileService).updateProfile("user@email.com", "newUser", "new@email.com");
+        verify(profileService).updateProfile(
+                eq("user@email.com"),
+                eq("newUser"),
+                eq("new@email.com")
+        );
+        verifyNoInteractions(userService);
     }
 
+    @Test
+    @WithMockUser(username = "user@email.com")
+    void postUpdateProfile_shouldReturnView_whenValidationFails() throws Exception {
+        // newUserName missing
+        mockMvc.perform(post("/profile/update")
+                        .with(csrf())
+                        .param("newEmail", "new@email.com"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("profile"))
+                .andExpect(model().attributeHasFieldErrors("profileForm", "newUserName"));
+
+        verifyNoInteractions(profileService);
+    }
+
+    @Test
+    @WithMockUser(username = "user@email.com")
+    void postUpdateProfile_shouldReturnView_withErrorMessage_whenServiceThrows() throws Exception {
+        doThrow(new IllegalArgumentException("Email already used."))
+                .when(profileService)
+                .updateProfile("user@email.com", "newUser", "taken@email.com");
+
+        mockMvc.perform(post("/profile/update")
+                        .with(csrf())
+                        .param("newUserName", "newUser")
+                        .param("newEmail", "taken@email.com"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("profile"))
+                .andExpect(model().attributeExists("profileForm"))
+                .andExpect(model().attribute("profileError", "Email already used."));
+
+        verify(profileService).updateProfile("user@email.com", "newUser", "taken@email.com");
+    }
+
+    private User userWithId(long id, String userName, String email) {
+        User user = User.create(userName, email, "password");
+        ReflectionTestUtils.setField(user, "id", id);
+        return user;
+    }
 }
