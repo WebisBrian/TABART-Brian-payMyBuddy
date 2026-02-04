@@ -14,7 +14,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE users (
                        id        BIGINT AUTO_INCREMENT PRIMARY KEY,
-                       user_name VARCHAR(100) NOT NULL,
+                       username VARCHAR(100) NOT NULL,
                        email     VARCHAR(255) NOT NULL UNIQUE,
                        password  VARCHAR(255) NOT NULL
 );

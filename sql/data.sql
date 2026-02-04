@@ -18,7 +18,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- USERS
 -- Password hash below is a BCrypt hash for the clear password: "password"
 -- ---------------------------------------------------------
-INSERT INTO users (id, user_name, email, password) VALUES
+INSERT INTO users (id, username, email, password) VALUES
                                                        (1, 'Alice Martin',    'alice@paymybuddy.local',   '$2a$10$24U/YAoh6vzt0vV4H8KLn.HZmS68P9ftCsNU8SC8SSK43PuNG/4wK'),
                                                        (2, 'Bob Dupont',      'bob@paymybuddy.local',     '$2a$10$24U/YAoh6vzt0vV4H8KLn.HZmS68P9ftCsNU8SC8SSK43PuNG/4wK'),
                                                        (3, 'Chloé Bernard',   'chloe@paymybuddy.local',   '$2a$10$24U/YAoh6vzt0vV4H8KLn.HZmS68P9ftCsNU8SC8SSK43PuNG/4wK'),
