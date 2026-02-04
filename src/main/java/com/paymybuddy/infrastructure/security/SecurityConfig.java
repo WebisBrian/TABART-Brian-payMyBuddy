@@ -26,7 +26,7 @@ public class SecurityConfig {
                         .defaultSuccessUrl("/transactions", true)
                         .permitAll()
                 )
-                .logout(Customizer.withDefaults())
+                .logout(logout -> logout.logoutSuccessUrl("/login?logout"))
                 .build();
     }
 
