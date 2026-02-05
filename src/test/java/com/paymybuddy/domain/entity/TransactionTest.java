@@ -117,7 +117,7 @@ class TransactionTest {
         assertEquals("Date is required.", ex.getMessage());
     }
 
-    // --- Test helper: creates a valid Account (and User) without touching DB/Spring ---
+    // Helpers
     private static Account validAccount(String email) {
         User user = User.create("User", email, "hash");
         return Account.create(user);
