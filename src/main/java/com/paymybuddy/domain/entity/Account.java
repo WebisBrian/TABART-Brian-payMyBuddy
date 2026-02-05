@@ -31,6 +31,10 @@ public class Account {
 
     // Factory method
     public static Account create(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User must not be null.");
+        }
+
         return new Account(user);
     }
 
@@ -42,13 +46,17 @@ public class Account {
 
     public void withdraw(BigDecimal amount) {
         requirePositive(amount);
+        if (balance.compareTo(amount) < 0) {
+            throw new IllegalStateException("Insufficient balance.");
+        }
+
         this.balance = this.balance.subtract(amount);
     }
 
     // Private Methods
     private static void requirePositive(BigDecimal amount) {
         if (amount == null || amount.signum() <= 0) {
-            throw new IllegalArgumentException("Le montant indiqué doit être positif.");
+            throw new IllegalArgumentException("Amount must be positive");
         }
     }
 }

@@ -32,19 +32,36 @@ public class User {
 
     // Factory method
     public static User create(String username, String email, String passwordHash) {
-        return new User(username, email, passwordHash);
+        return new User(
+                requireNonBlank(username, "Username"),
+                normalizeEmail(requireNonBlank(email, "Email")),
+                requireNonBlank(passwordHash, "Password")
+        );
     }
 
     // Public methods
     public void changeUsername(String username) {
-        this.username = username;
+        this.username = requireNonBlank(username, "Username");
     }
 
     public void changeEmail(String email) {
-        this.email = email;
+        this.email = normalizeEmail(requireNonBlank(email, "Email"));
     }
 
     public void changePasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
+        this.passwordHash = this.username = requireNonBlank(passwordHash, "Password");
+    }
+
+    // Private methods
+    private static String requireNonBlank(String value, String field) {
+        if (value == null || value.trim().isEmpty()) {
+            throw new IllegalArgumentException(field + " must not be blank.");
+        }
+
+        return value.trim();
+    }
+
+    private static String normalizeEmail(String email) {
+        return email.toLowerCase();
     }
 }

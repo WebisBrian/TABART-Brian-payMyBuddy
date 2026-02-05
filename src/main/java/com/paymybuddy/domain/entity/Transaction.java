@@ -61,6 +61,22 @@ public class Transaction {
                                      BigDecimal fee,
                                      LocalDateTime date,
                                      String description) {
+        if (senderAccount == null) {
+            throw new IllegalArgumentException("Sender account is required.");
+        }
+        if (receiverAccount == null) {
+            throw new IllegalArgumentException("Receiver account is required.");
+        }
+        if (amount == null || amount.signum() <= 0) {
+            throw new IllegalArgumentException("Amount must be positive.");
+        }
+        if (fee == null || fee.signum() < 0) {
+            throw new IllegalArgumentException("Fee must be zero or positive.");
+        }
+        if (date == null) {
+            throw new IllegalArgumentException("Date is required.");
+        }
+
         return new Transaction(senderAccount, receiverAccount, amount, fee, date, description);
     }
 }

@@ -1,10 +1,7 @@
 package com.paymybuddy.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 @Entity
 @Table(
@@ -16,6 +13,7 @@ import lombok.ToString;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(exclude = {"user", "contact"})
+@EqualsAndHashCode(of = {"user", "contact"})
 public class UserContact {
 
     @Id
@@ -32,14 +30,22 @@ public class UserContact {
     @JoinColumn(name = "contact_id", nullable = false)
     private User contact;
 
-    // private constructor
+    // Private constructor
     private UserContact(User user, User contact) {
         this.user = user;
         this.contact = contact;
     }
 
-    // factory method
+    // Factory method
     public static UserContact create(User user, User contact) {
+        if (user == null || contact == null) {
+            throw new IllegalArgumentException("User and contact must not be null.");
+        }
+
+        if (user == contact || (user.getId() != null && user.getId().equals(contact.getId()))) {
+            throw new IllegalArgumentException("User cannot add himself as a contact.");
+        }
+
         return new UserContact(user, contact);
     }
 }
