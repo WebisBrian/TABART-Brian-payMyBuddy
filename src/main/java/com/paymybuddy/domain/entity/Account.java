@@ -1,7 +1,6 @@
 package com.paymybuddy.domain.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -19,7 +18,6 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "Balance is required.")
     @Column(nullable = false, precision=19, scale=2)
     private BigDecimal balance = BigDecimal.ZERO;
 
