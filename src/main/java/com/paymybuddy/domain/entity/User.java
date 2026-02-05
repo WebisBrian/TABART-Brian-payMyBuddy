@@ -49,7 +49,7 @@ public class User {
     }
 
     public void changePasswordHash(String passwordHash) {
-        this.passwordHash = this.username = requireNonBlank(passwordHash, "Password");
+        this.passwordHash = requireNonBlank(passwordHash, "Password");
     }
 
     // Private methods
