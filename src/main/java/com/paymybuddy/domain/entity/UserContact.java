@@ -13,7 +13,7 @@ import lombok.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(exclude = {"user", "contact"})
-@EqualsAndHashCode(of = {"user", "contact"})
+@EqualsAndHashCode(of = "id")
 public class UserContact {
 
     @Id
