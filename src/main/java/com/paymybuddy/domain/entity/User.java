@@ -14,28 +14,27 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "username", nullable = false, length = 100)
+    @Column(nullable = false, length = 100)
     private String username;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 255)
     private String email;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password", nullable = false, length = 255)
     private String passwordHash;
 
-    // private constructor
     private User(String username, String email, String passwordHash) {
         this.username = username;
         this.email = email;
         this.passwordHash = passwordHash;
     }
 
-    // factory method
+    // Factory method
     public static User create(String username, String email, String passwordHash) {
         return new User(username, email, passwordHash);
     }
 
-    // methods
+    // Public methods
     public void changeUsername(String username) {
         this.username = username;
     }
