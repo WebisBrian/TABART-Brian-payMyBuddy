@@ -41,7 +41,7 @@ public class Transaction {
     @JoinColumn(name = "receiver_account_id", nullable = false)
     private Account receiverAccount;
 
-    // private constructor
+    // Private constructor
     private Transaction(Account senderAccount,
                        Account receiverAccount,
                        BigDecimal amount,
@@ -56,7 +56,7 @@ public class Transaction {
         this.description = description;
     }
 
-    // factory method
+    // Factory method
     public static Transaction create(Account senderAccount,
                                      Account receiverAccount,
                                      BigDecimal amount,
