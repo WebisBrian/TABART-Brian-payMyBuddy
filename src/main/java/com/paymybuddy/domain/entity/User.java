@@ -8,6 +8,7 @@ import lombok.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(exclude = "passwordHash")
+@EqualsAndHashCode(of = "id")
 public class User {
 
     @Id
@@ -17,10 +18,10 @@ public class User {
     @Column(nullable = false, length = 100)
     private String username;
 
-    @Column(nullable = false, unique = true, length = 255)
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(name = "password", nullable = false, length = 255)
+    @Column(name = "password", nullable = false)
     private String passwordHash;
 
     private User(String username, String email, String passwordHash) {
