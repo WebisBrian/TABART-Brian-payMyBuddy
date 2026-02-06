@@ -51,7 +51,7 @@ class AccountServiceImplTest {
         when(accountRepository.findByUserId(userId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> accountService.getBalance(userId))
-                .isInstanceOf(InvalidUserIdException.class);
+                .isInstanceOf(UserAccountNotFoundException.class);
 
         verify(accountRepository).findByUserId(userId);
         verifyNoMoreInteractions(accountRepository);
@@ -60,7 +60,7 @@ class AccountServiceImplTest {
     @Test
     void getBalance_shouldThrow_whenUserIdIsNull() {
         assertThatThrownBy(() -> accountService.getBalance(null))
-                .isInstanceOf(UserAccountNotFoundException.class);
+                .isInstanceOf(InvalidUserIdException.class);
 
         verifyNoInteractions(accountRepository);
     }
