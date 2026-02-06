@@ -1,5 +1,6 @@
 package com.paymybuddy.domain.entity;
 
+import com.paymybuddy.domain.exception.InvalidUserFieldException;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -55,7 +56,7 @@ public class User {
     // Private methods
     private static String requireNonBlank(String value, String field) {
         if (value == null || value.trim().isEmpty()) {
-            throw new IllegalArgumentException(field + " must not be blank.");
+            throw new InvalidUserFieldException(field + " must not be null or blank.");
         }
 
         return value.trim();
