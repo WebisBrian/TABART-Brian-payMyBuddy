@@ -1,7 +1,7 @@
 package com.paymybuddy.domain.entity;
 
 import com.paymybuddy.domain.exception.InsufficientBalanceException;
-import com.paymybuddy.domain.exception.InvalidAmountParamException;
+import com.paymybuddy.domain.exception.InvalidMoneyAmountException;
 import com.paymybuddy.domain.exception.MissingAccountOwnerException;
 import jakarta.persistence.*;
 import lombok.*;
@@ -59,7 +59,7 @@ public class Account {
     // Private Methods
     private static void requirePositive(BigDecimal amount) {
         if (amount == null || amount.signum() <= 0) {
-            throw new InvalidAmountParamException(amount);
+            throw new InvalidMoneyAmountException(amount);
         }
     }
 }
