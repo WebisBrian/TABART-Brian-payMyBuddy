@@ -1,5 +1,6 @@
 package com.paymybuddy.domain.entity;
 
+import com.paymybuddy.domain.exception.*;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -62,19 +63,19 @@ public class Transaction {
                                      LocalDateTime date,
                                      String description) {
         if (senderAccount == null) {
-            throw new IllegalArgumentException("Sender account is required.");
+            throw new MissingSenderAccountException();
         }
         if (receiverAccount == null) {
-            throw new IllegalArgumentException("Receiver account is required.");
+            throw new MissingReceiverAccountException();
         }
         if (amount == null || amount.signum() <= 0) {
-            throw new IllegalArgumentException("Amount must be positive.");
+            throw new InvalidTransactionAmountException(amount);
         }
         if (fee == null || fee.signum() < 0) {
-            throw new IllegalArgumentException("Fee must be zero or positive.");
+            throw new InvalidTransactionFeeException(fee);
         }
         if (date == null) {
-            throw new IllegalArgumentException("Date is required.");
+            throw new MissingTransactionDateException();
         }
 
         return new Transaction(senderAccount, receiverAccount, amount, fee, date, description);
