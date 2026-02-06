@@ -1,5 +1,8 @@
 package com.paymybuddy.domain.entity;
 
+import com.paymybuddy.domain.exception.InsufficientBalanceException;
+import com.paymybuddy.domain.exception.InvalidAmountException;
+import com.paymybuddy.domain.exception.MissingAccountOwnerException;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,7 +35,7 @@ public class Account {
     // Factory method
     public static Account create(User user) {
         if (user == null) {
-            throw new IllegalArgumentException("User must not be null.");
+            throw new MissingAccountOwnerException();
         }
 
         return new Account(user);
@@ -47,7 +50,7 @@ public class Account {
     public void withdraw(BigDecimal amount) {
         requirePositive(amount);
         if (balance.compareTo(amount) < 0) {
-            throw new IllegalStateException("Insufficient balance.");
+            throw new InsufficientBalanceException(balance, amount);
         }
 
         this.balance = this.balance.subtract(amount);
@@ -56,7 +59,7 @@ public class Account {
     // Private Methods
     private static void requirePositive(BigDecimal amount) {
         if (amount == null || amount.signum() <= 0) {
-            throw new IllegalArgumentException("Amount must be positive");
+            throw new InvalidAmountException(amount);
         }
     }
 }
