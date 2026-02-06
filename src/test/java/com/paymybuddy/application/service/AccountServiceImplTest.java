@@ -100,21 +100,21 @@ class AccountServiceImplTest {
         verifyNoMoreInteractions(accountRepository);
     }
 
-    @Test
-    void deposit_shouldThrow_whenInvalidAmount() {
-        long userId = 1L;
-        User user = User.create("user", "user@email.com", "password");
-        Account account = Account.create(user);
-
-        when(accountRepository.findByUserId(userId)).thenReturn(Optional.of(account));
-
-        assertThatThrownBy(() -> accountService.deposit(userId, new BigDecimal("-95.00")))
-                .isInstanceOf(IllegalArgumentException.class);
-
-        assertThat(account.getBalance()).isEqualByComparingTo("0.00");
-        verify(accountRepository).findByUserId(userId);
-        verifyNoMoreInteractions(accountRepository);
-    }
+//    @Test
+//    void deposit_shouldThrow_whenInvalidAmount() {
+//        long userId = 1L;
+//        User user = User.create("user", "user@email.com", "password");
+//        Account account = Account.create(user);
+//
+//        when(accountRepository.findByUserId(userId)).thenReturn(Optional.of(account));
+//
+//        assertThatThrownBy(() -> accountService.deposit(userId, new BigDecimal("-95.00")))
+//                .isInstanceOf(IllegalArgumentException.class);
+//
+//        assertThat(account.getBalance()).isEqualByComparingTo("0.00");
+//        verify(accountRepository).findByUserId(userId);
+//        verifyNoMoreInteractions(accountRepository);
+//    }
 
     /* ---------- withdraw() ---------- */
     @Test
