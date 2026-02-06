@@ -1,5 +1,6 @@
 package com.paymybuddy.domain.entity;
 
+import com.paymybuddy.domain.exception.*;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -35,22 +36,22 @@ class TransactionTest {
     void create_shouldThrow_whenSenderAccountIsNull() {
         Account receiver = validAccount("receiver@mail.com");
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+        MissingSenderAccountException ex = assertThrows(MissingSenderAccountException.class, () ->
                 Transaction.create(null, receiver, new BigDecimal("10.00"), BigDecimal.ZERO, LocalDateTime.now(), null)
         );
 
-        assertEquals("Sender account is required.", ex.getMessage());
+        assertTrue(ex.getMessage().contains("Sender account is required"));
     }
 
     @Test
     void create_shouldThrow_whenReceiverAccountIsNull() {
         Account sender = validAccount("sender@mail.com");
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+        MissingReceiverAccountException ex = assertThrows(MissingReceiverAccountException.class, () ->
                 Transaction.create(sender, null, new BigDecimal("10.00"), BigDecimal.ZERO, LocalDateTime.now(), null)
         );
 
-        assertEquals("Receiver account is required.", ex.getMessage());
+        assertTrue(ex.getMessage().contains("Receiver account is required"));
     }
 
     @Test
@@ -58,11 +59,11 @@ class TransactionTest {
         Account sender = validAccount("sender@mail.com");
         Account receiver = validAccount("receiver@mail.com");
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+        InvalidTransactionAmountException ex = assertThrows(InvalidTransactionAmountException.class, () ->
                 Transaction.create(sender, receiver, null, BigDecimal.ZERO, LocalDateTime.now(), null)
         );
 
-        assertEquals("Amount must be positive.", ex.getMessage());
+        assertTrue(ex.getMessage().contains("Amount must be strictly positive."));
     }
 
     @Test
@@ -70,15 +71,17 @@ class TransactionTest {
         Account sender = validAccount("sender@mail.com");
         Account receiver = validAccount("receiver@mail.com");
 
-        IllegalArgumentException exZero = assertThrows(IllegalArgumentException.class, () ->
+        // Test zero amount
+        InvalidTransactionAmountException exZero = assertThrows(InvalidTransactionAmountException.class, () ->
                 Transaction.create(sender, receiver, new BigDecimal("0.00"), BigDecimal.ZERO, LocalDateTime.now(), null)
         );
-        assertEquals("Amount must be positive.", exZero.getMessage());
+        assertTrue(exZero.getMessage().contains("Amount must be strictly positive."));
 
-        IllegalArgumentException exNegative = assertThrows(IllegalArgumentException.class, () ->
+        // Test negative amount
+        InvalidTransactionAmountException exNegative = assertThrows(InvalidTransactionAmountException.class, () ->
                 Transaction.create(sender, receiver, new BigDecimal("-1.00"), BigDecimal.ZERO, LocalDateTime.now(), null)
         );
-        assertEquals("Amount must be positive.", exNegative.getMessage());
+        assertTrue(exNegative.getMessage().contains("Amount must be strictly positive."));
     }
 
     @Test
@@ -86,11 +89,11 @@ class TransactionTest {
         Account sender = validAccount("sender@mail.com");
         Account receiver = validAccount("receiver@mail.com");
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+        InvalidTransactionFeeException ex = assertThrows(InvalidTransactionFeeException.class, () ->
                 Transaction.create(sender, receiver, new BigDecimal("10.00"), null, LocalDateTime.now(), null)
         );
 
-        assertEquals("Fee must be zero or positive.", ex.getMessage());
+        assertTrue(ex.getMessage().contains("Fee must be zero or positive."));
     }
 
     @Test
@@ -98,11 +101,11 @@ class TransactionTest {
         Account sender = validAccount("sender@mail.com");
         Account receiver = validAccount("receiver@mail.com");
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+        InvalidTransactionFeeException ex = assertThrows(InvalidTransactionFeeException.class, () ->
                 Transaction.create(sender, receiver, new BigDecimal("10.00"), new BigDecimal("-0.01"), LocalDateTime.now(), null)
         );
 
-        assertEquals("Fee must be zero or positive.", ex.getMessage());
+        assertTrue(ex.getMessage().contains("Fee must be zero or positive."));
     }
 
     @Test
@@ -110,11 +113,11 @@ class TransactionTest {
         Account sender = validAccount("sender@mail.com");
         Account receiver = validAccount("receiver@mail.com");
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+        MissingTransactionDateException ex = assertThrows(MissingTransactionDateException.class, () ->
                 Transaction.create(sender, receiver, new BigDecimal("10.00"), BigDecimal.ZERO, null, null)
         );
 
-        assertEquals("Date is required.", ex.getMessage());
+        assertTrue(ex.getMessage().contains("Transaction date is required."));
     }
 
     // Helpers
