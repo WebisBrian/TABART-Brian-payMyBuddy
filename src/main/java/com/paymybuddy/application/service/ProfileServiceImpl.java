@@ -1,5 +1,8 @@
 package com.paymybuddy.application.service;
 
+import com.paymybuddy.application.service.exception.EmailAlreadyUsedException;
+import com.paymybuddy.application.service.exception.InvalidProfileUpdateParameterException;
+import com.paymybuddy.application.service.exception.UserAccountNotFoundException;
 import com.paymybuddy.domain.entity.User;
 import com.paymybuddy.infrastructure.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -18,23 +21,23 @@ public class ProfileServiceImpl implements ProfileService {
     @Transactional
     public void updateProfile(String email, String newUsername, String newEmail) {
         if (email == null || email.isBlank()) {
-            throw new IllegalArgumentException("Email must not be null or blank.");
+            throw new InvalidProfileUpdateParameterException("Email");
         }
         if (newUsername == null || newUsername.isBlank()) {
-            throw new IllegalArgumentException("Username must not be null or blank.");
+            throw new InvalidProfileUpdateParameterException("Username");
         }
         if (newEmail == null || newEmail.isBlank()) {
-            throw new IllegalArgumentException("New email must not be null or blank.");
+            throw new InvalidProfileUpdateParameterException("New email");
         }
 
         String normalizedEmail = email.trim().toLowerCase();
         String normalizedNewEmail = newEmail.trim().toLowerCase();
 
         User user = userRepository.findByEmail(normalizedEmail)
-                .orElseThrow(() -> new IllegalArgumentException("User not found."));
+                .orElseThrow(() -> new UserAccountNotFoundException(normalizedEmail));
 
         if (!normalizedEmail.equals(normalizedNewEmail) && userRepository.existsByEmail(normalizedNewEmail)) {
-            throw new IllegalArgumentException("New email is not available.");
+            throw new EmailAlreadyUsedException(normalizedNewEmail);
         }
 
         boolean changed = false;
