@@ -1,5 +1,7 @@
 package com.paymybuddy.domain.entity;
 
+import com.paymybuddy.domain.exception.MissingUserOrContactException;
+import com.paymybuddy.domain.exception.SelfContactNotAllowedException;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -39,11 +41,11 @@ public class UserContact {
     // Factory method
     public static UserContact create(User user, User contact) {
         if (user == null || contact == null) {
-            throw new IllegalArgumentException("User and contact must not be null.");
+            throw new MissingUserOrContactException(user, contact);
         }
 
         if (user == contact || (user.getId() != null && user.getId().equals(contact.getId()))) {
-            throw new IllegalArgumentException("User cannot add himself as a contact.");
+            throw new SelfContactNotAllowedException(user);
         }
 
         return new UserContact(user, contact);
