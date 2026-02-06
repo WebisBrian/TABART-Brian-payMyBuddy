@@ -1,5 +1,6 @@
 package com.paymybuddy.domain.entity;
 
+import com.paymybuddy.domain.exception.InvalidUserFieldException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,12 +27,18 @@ class UserTest {
 
     @Test
     void create_shouldThrow_whenUsernameIsNull() {
-        assertThrows(IllegalArgumentException.class, () -> User.create(null, "User@email.com", "password"));
+        InvalidUserFieldException ex = assertThrows(InvalidUserFieldException.class,
+                () -> User.create(null, "User@email.com", "password"));
+
+        assertTrue(ex.getMessage().contains("Username must not be null or blank."));
     }
 
     @Test
     void create_shouldThrow_whenEmailIsBlank() {
-        assertThrows(IllegalArgumentException.class, () -> User.create("User 1", " ", "password"));
+        InvalidUserFieldException ex = assertThrows(InvalidUserFieldException.class,
+                () -> User.create("User 1", " ", "password"));
+
+        assertTrue(ex.getMessage().contains("Email must not be null or blank."));
     }
 
     /* ---------- changeUsername() ---------- */
