@@ -15,10 +15,6 @@ public interface UserContactRepository extends JpaRepository<UserContact, Long> 
 
     boolean existsByUser_IdAndContact_Email(Long userId, String contactEmail);
 
-    Optional<UserContact> findByUser_IdAndContact_Id(Long userId, Long contactId);
-
-    List<UserContact> findAllByUser_Id(Long userId);
-
     @Query("select uc.contact from UserContact uc where uc.user.id = :userId")
     List<User> findContactsByUserId(@Param("userId") Long userId);
 
