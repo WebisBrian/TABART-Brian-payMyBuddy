@@ -1,5 +1,7 @@
 package com.paymybuddy.domain.entity;
 
+import com.paymybuddy.domain.exception.MissingUserOrContactException;
+import com.paymybuddy.domain.exception.SelfContactNotAllowedException;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -25,33 +27,33 @@ class UserContactTest {
     void create_shouldThrow_whenUserIsNull() {
         User contact = validUser("contact@mail.com");
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+        MissingUserOrContactException ex = assertThrows(MissingUserOrContactException.class, () ->
                 UserContact.create(null, contact)
         );
 
-        assertEquals("User and contact must not be null.", ex.getMessage());
+        assertTrue(ex.getMessage().contains("User or contact must not be null"));
     }
 
     @Test
     void create_shouldThrow_whenContactIsNull() {
         User user = validUser("user@mail.com");
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+        MissingUserOrContactException ex = assertThrows(MissingUserOrContactException.class, () ->
                 UserContact.create(user, null)
         );
 
-        assertEquals("User and contact must not be null.", ex.getMessage());
+        assertTrue(ex.getMessage().contains("User or contact must not be null"));
     }
 
     @Test
     void create_shouldThrow_whenUserAndContactAreSameInstance() {
         User user = validUser("user@mail.com");
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+        SelfContactNotAllowedException ex = assertThrows(SelfContactNotAllowedException.class, () ->
                 UserContact.create(user, user)
         );
 
-        assertEquals("User cannot add himself as a contact.", ex.getMessage());
+        assertTrue(ex.getMessage().contains("User cannot add himself as a contact."));
     }
 
     @Test
@@ -63,14 +65,14 @@ class UserContactTest {
         setId(user, 42L);
         setId(contact, 42L);
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+        SelfContactNotAllowedException ex = assertThrows(SelfContactNotAllowedException.class, () ->
                 UserContact.create(user, contact)
         );
 
-        assertEquals("User cannot add himself as a contact.", ex.getMessage());
+        assertTrue(ex.getMessage().contains("User cannot add himself as a contact."));
     }
 
-    // Helpers
+    /* ---------- Helpers ---------- */
     private static User validUser(String email) {
         return User.create("User", email, "hash");
     }
