@@ -2,9 +2,9 @@ package com.paymybuddy.domain.exception;
 
 import java.math.BigDecimal;
 
-public class InvalidAmountException extends RuntimeException {
+public class InvalidAmountParamException extends RuntimeException {
 
-    public InvalidAmountException(BigDecimal amount) {
+    public InvalidAmountParamException(BigDecimal amount) {
         super("Amount must be strictly positive. Provided: " + amount);
     }
 }

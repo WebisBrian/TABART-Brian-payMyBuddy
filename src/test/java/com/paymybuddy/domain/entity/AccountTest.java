@@ -1,7 +1,7 @@
 package com.paymybuddy.domain.entity;
 
 import com.paymybuddy.domain.exception.InsufficientBalanceException;
-import com.paymybuddy.domain.exception.InvalidAmountException;
+import com.paymybuddy.domain.exception.InvalidAmountParamException;
 import com.paymybuddy.domain.exception.MissingAccountOwnerException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -46,7 +46,7 @@ class AccountTest {
     void deposit_shouldThrow_whenAmountIsNull() {
         Account account = newAccount("user@mail.com");
 
-        InvalidAmountException ex = assertThrows(InvalidAmountException.class, () ->
+        InvalidAmountParamException ex = assertThrows(InvalidAmountParamException.class, () ->
                 account.deposit(null)
         );
 
@@ -58,14 +58,14 @@ class AccountTest {
         Account account = newAccount("user@mail.com");
 
         // Test zero amount
-        InvalidAmountException exZero = assertThrows(InvalidAmountException.class, () ->
+        InvalidAmountParamException exZero = assertThrows(InvalidAmountParamException.class, () ->
                 account.deposit(BigDecimal.ZERO)
         );
-        InvalidAmountException exNegative;
+        InvalidAmountParamException exNegative;
         assertTrue(exZero.getMessage().contains("Amount must be strictly positive."));
 
         // Test negative amount
-        exNegative = Assertions.assertThrows(InvalidAmountException.class, () ->
+        exNegative = Assertions.assertThrows(InvalidAmountParamException.class, () ->
                 account.deposit(new BigDecimal("-1.00"))
         );
         assertTrue(exNegative.getMessage().contains("Amount must be strictly positive."));
@@ -87,7 +87,7 @@ class AccountTest {
         Account account = newAccount("user@mail.com");
         account.deposit(new BigDecimal("10.00"));
 
-        InvalidAmountException ex = assertThrows(InvalidAmountException.class, () ->
+        InvalidAmountParamException ex = assertThrows(InvalidAmountParamException.class, () ->
                 account.withdraw(null)
         );
 
@@ -100,13 +100,13 @@ class AccountTest {
         account.deposit(new BigDecimal("10.00"));
 
         // Test zero amount
-        InvalidAmountException exZero = assertThrows(InvalidAmountException.class, () ->
+        InvalidAmountParamException exZero = assertThrows(InvalidAmountParamException.class, () ->
                 account.withdraw(BigDecimal.ZERO)
         );
         assertTrue(exZero.getMessage().contains("Amount must be strictly positive."));
 
         // Test negative amount
-        InvalidAmountException exNegative = assertThrows(InvalidAmountException.class, () ->
+        InvalidAmountParamException exNegative = assertThrows(InvalidAmountParamException.class, () ->
                 account.withdraw(new BigDecimal("-1.00"))
         );
         assertTrue(exNegative.getMessage().contains("Amount must be strictly positive."));
