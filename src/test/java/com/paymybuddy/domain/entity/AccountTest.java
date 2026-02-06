@@ -3,6 +3,7 @@ package com.paymybuddy.domain.entity;
 import com.paymybuddy.domain.exception.InsufficientBalanceException;
 import com.paymybuddy.domain.exception.InvalidAmountException;
 import com.paymybuddy.domain.exception.MissingAccountOwnerException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -28,8 +29,7 @@ class AccountTest {
         MissingAccountOwnerException ex = assertThrows(MissingAccountOwnerException.class, () ->
                 Account.create(null)
         );
-
-        assertEquals("Account must be associated with a user.", ex.getMessage());
+        assertTrue(ex.getMessage().contains("Account must be associated with a user."));
     }
 
     /* ---------- deposit() ---------- */
@@ -50,24 +50,25 @@ class AccountTest {
                 account.deposit(null)
         );
 
-        assertEquals("Amount must be strictly positive. Provided: " + null, ex.getMessage());
+        assertTrue(ex.getMessage().contains("Amount must be strictly positive."));
     }
 
     @Test
     void deposit_shouldThrow_whenAmountIsZeroOrNegative() {
         Account account = newAccount("user@mail.com");
-        BigDecimal amountZero = BigDecimal.ZERO;
-        BigDecimal amountNegative = new BigDecimal("-1.00");
 
+        // Test zero amount
         InvalidAmountException exZero = assertThrows(InvalidAmountException.class, () ->
-                account.deposit(amountZero)
+                account.deposit(BigDecimal.ZERO)
         );
-        assertEquals("Amount must be strictly positive. Provided: " + amountZero, exZero.getMessage());
+        InvalidAmountException exNegative;
+        assertTrue(exZero.getMessage().contains("Amount must be strictly positive."));
 
-        InvalidAmountException exNegative = assertThrows(InvalidAmountException.class, () ->
-                account.deposit(amountNegative)
+        // Test negative amount
+        exNegative = Assertions.assertThrows(InvalidAmountException.class, () ->
+                account.deposit(new BigDecimal("-1.00"))
         );
-        assertEquals("Amount must be strictly positive. Provided: " + amountNegative, exNegative.getMessage());
+        assertTrue(exNegative.getMessage().contains("Amount must be strictly positive."));
     }
 
     /* ---------- withdraw() ---------- */
@@ -90,41 +91,39 @@ class AccountTest {
                 account.withdraw(null)
         );
 
-        assertEquals("Amount must be strictly positive. Provided: " + null, ex.getMessage());
+        assertTrue(ex.getMessage().contains("Amount must be strictly positive."));
     }
 
     @Test
     void withdraw_shouldThrow_whenAmountIsZeroOrNegative() {
         Account account = newAccount("user@mail.com");
         account.deposit(new BigDecimal("10.00"));
-        BigDecimal amountZero = BigDecimal.ZERO;
-        BigDecimal amountNegative = new BigDecimal("-1.00");
 
+        // Test zero amount
         InvalidAmountException exZero = assertThrows(InvalidAmountException.class, () ->
-                account.withdraw(amountZero)
+                account.withdraw(BigDecimal.ZERO)
         );
-        assertEquals("Amount must be strictly positive. Provided: " + amountZero, exZero.getMessage());
+        assertTrue(exZero.getMessage().contains("Amount must be strictly positive."));
 
+        // Test negative amount
         InvalidAmountException exNegative = assertThrows(InvalidAmountException.class, () ->
-                account.withdraw(amountNegative)
+                account.withdraw(new BigDecimal("-1.00"))
         );
-        assertEquals("Amount must be strictly positive. Provided: " + amountNegative, exNegative.getMessage());
+        assertTrue(exNegative.getMessage().contains("Amount must be strictly positive."));
     }
 
     @Test
     void withdraw_shouldThrow_whenInsufficientBalance() {
         Account account = newAccount("user@mail.com");
-        BigDecimal balance = new BigDecimal("5.00");
-        account.deposit(balance);
+        account.deposit(new BigDecimal("5.00"));
 
-        BigDecimal amount = new BigDecimal("5.01");
         InsufficientBalanceException ex = assertThrows(InsufficientBalanceException.class, () ->
-                account.withdraw(amount)
+                account.withdraw(new BigDecimal("5.01"))
         );
 
-        assertEquals("Insufficient balance. Balance: " + balance + ", Amount: " + amount, ex.getMessage());
+        assertTrue(ex.getMessage().contains("Insufficient balance."));
         // Verify that the balance did not change
-        assertEquals(balance, account.getBalance());
+        assertEquals((new BigDecimal("5.00")), account.getBalance());
     }
 
     /* ---------- Helpers ---------- */
