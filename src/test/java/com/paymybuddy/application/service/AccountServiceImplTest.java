@@ -4,9 +4,14 @@ import com.paymybuddy.application.service.exception.InvalidUserIdException;
 import com.paymybuddy.application.service.exception.UserAccountNotFoundException;
 import com.paymybuddy.domain.entity.Account;
 import com.paymybuddy.domain.entity.User;
+import com.paymybuddy.domain.exception.InsufficientBalanceException;
+import com.paymybuddy.domain.exception.InvalidMoneyAmountException;
 import com.paymybuddy.infrastructure.repository.AccountRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -102,6 +107,30 @@ class AccountServiceImplTest {
         verifyNoMoreInteractions(accountRepository);
     }
 
+    @NullSource
+    @ParameterizedTest
+    @ValueSource(doubles = {0.0, -1.0})
+    void deposit_shouldThrow_whenAmountIsNullOrNegativeOrZero(Double amount) {
+        long userId = 1L;
+        User user = User.create("user", "user@email.com", "password");
+        Account account = Account.create(user);
+
+        when(accountRepository.findByUserId(userId)).thenReturn(Optional.of(account));
+
+        // The entity raises this exception
+        assertThatThrownBy(() -> accountService.deposit(
+                userId,
+                amount == null ? null : BigDecimal.valueOf(amount)
+                )
+        )
+                .isInstanceOf(InvalidMoneyAmountException.class);
+
+        assertThat(account.getBalance()).isEqualByComparingTo("0.00");
+        verify(accountRepository).findByUserId(userId);
+        verifyNoMoreInteractions(accountRepository);
+    }
+
+
     /* ---------- withdraw() ---------- */
     @Test
     void withdraw_shouldDecreaseBalance_whenSufficientBalance() {
@@ -136,6 +165,48 @@ class AccountServiceImplTest {
         assertThatThrownBy(() -> accountService.withdraw(userId, new BigDecimal("95.00")))
                 .isInstanceOf(UserAccountNotFoundException.class);
 
+        verify(accountRepository).findByUserId(userId);
+        verifyNoMoreInteractions(accountRepository);
+    }
+
+    @NullSource
+    @ParameterizedTest
+    @ValueSource(doubles = {0.0, -1.0})
+    void withdraw_shouldThrow_whenAmountIsNullOrNegativeOrZero(Double amount) {
+        long userId = 1L;
+        User user = User.create("user", "user@email.com", "password");
+        Account account = Account.create(user);
+        account.deposit(new BigDecimal("150.00"));
+
+        when(accountRepository.findByUserId(userId)).thenReturn(Optional.of(account));
+
+        // The entity raises this exception
+        assertThatThrownBy(() -> accountService.withdraw(
+                        userId,
+                        amount == null ? null : BigDecimal.valueOf(amount)
+                )
+        )
+                .isInstanceOf(InvalidMoneyAmountException.class);
+
+        assertThat(account.getBalance()).isEqualByComparingTo("150.00");
+        verify(accountRepository).findByUserId(userId);
+        verifyNoMoreInteractions(accountRepository);
+    }
+
+    @Test
+    void withdraw_shouldThrow_whenInsufficientBalance() {
+        long userId = 1L;
+        User user = User.create("user", "user@email.com", "password");
+        Account account = Account.create(user);
+        account.deposit(new BigDecimal("150.00"));
+
+        when(accountRepository.findByUserId(userId)).thenReturn(Optional.of(account));
+
+        // The entity raises this exception
+        assertThatThrownBy(() -> accountService.withdraw(userId, new BigDecimal("200.00")))
+                .isInstanceOf(InsufficientBalanceException.class);
+
+        assertThat(account.getBalance()).isEqualByComparingTo("150.00");
         verify(accountRepository).findByUserId(userId);
         verifyNoMoreInteractions(accountRepository);
     }
