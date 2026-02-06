@@ -8,14 +8,14 @@ import java.math.BigDecimal;
 
 public class TransferFormDto {
 
-    @NotNull(message = "Le destinataire est obligatoire")
+    @NotNull(message = "Receiver is required.")
     private Long receiverId;
 
-    @NotNull(message = "Le montant est obligatoire")
-    @Positive(message = "Le montant doit être positif")
+    @NotNull(message = "Amount is required.")
+    @Positive(message = "Amount should be positive.")
     private BigDecimal amount;
 
-    @Size(max = 255, message = "La description ne doit pas dépasser 255 caractères.")
+    @Size(max = 255, message = "Description should not exceed 255 characters.")
     private String description;
 
     public TransferFormDto() {
