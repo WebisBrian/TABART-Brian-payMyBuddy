@@ -120,7 +120,7 @@ class TransactionTest {
         assertTrue(ex.getMessage().contains("Transaction date is required."));
     }
 
-    // Helpers
+    /* ---------- Helpers ---------- */
     private static Account validAccount(String email) {
         User user = User.create("User", email, "hash");
         return Account.create(user);
