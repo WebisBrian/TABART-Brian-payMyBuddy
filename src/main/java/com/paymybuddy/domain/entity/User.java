@@ -47,7 +47,7 @@ public class User {
     }
 
     public void changeEmail(String email) {
-        this.email = EmailNormalizer.normalize(requireNonBlank(email, "Email"));
+        this.email = EmailNormalizer.normalize(email);
     }
 
     public void changePasswordHash(String passwordHash) {
