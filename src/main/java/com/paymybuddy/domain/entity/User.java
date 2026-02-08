@@ -1,6 +1,7 @@
 package com.paymybuddy.domain.entity;
 
 import com.paymybuddy.domain.exception.InvalidUserFieldException;
+import com.paymybuddy.domain.utils.EmailNormalizer;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -35,7 +36,7 @@ public class User {
     public static User create(String username, String email, String passwordHash) {
         return new User(
                 requireNonBlank(username, "Username"),
-                normalizeEmail(requireNonBlank(email, "Email")),
+                EmailNormalizer.normalize(requireNonBlank(email, "Email")),
                 requireNonBlank(passwordHash, "Password")
         );
     }
@@ -46,7 +47,7 @@ public class User {
     }
 
     public void changeEmail(String email) {
-        this.email = normalizeEmail(requireNonBlank(email, "Email"));
+        this.email = EmailNormalizer.normalize(requireNonBlank(email, "Email"));
     }
 
     public void changePasswordHash(String passwordHash) {
@@ -60,9 +61,5 @@ public class User {
         }
 
         return value.trim();
-    }
-
-    private static String normalizeEmail(String email) {
-        return email.toLowerCase();
     }
 }
