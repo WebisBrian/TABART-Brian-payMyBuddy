@@ -56,7 +56,7 @@ class ProfileServiceImplTest {
     @ValueSource(strings = {"", "   "})
     void updateProfile_shouldThrow_whenCurrentEmailInvalid(String email) {
         assertThatThrownBy(() -> profileService.updateProfile(email, NEW_USERNAME, NEW_EMAIL))
-                .isInstanceOf(InvalidEmailException.class);
+                .isInstanceOf(InvalidUserFieldException.class);
         verifyNoInteractions(userRepository);
     }
 
@@ -78,7 +78,7 @@ class ProfileServiceImplTest {
     @ValueSource(strings = {"", "   "})
     void updateProfile_shouldThrow_whenNewEmailInvalid(String email) {
         assertThatThrownBy(() -> profileService.updateProfile(EMAIL, NEW_USERNAME, email))
-                .isInstanceOf(InvalidEmailException.class);
+                .isInstanceOf(InvalidUserFieldException.class);
         verifyNoInteractions(userRepository);
     }
 

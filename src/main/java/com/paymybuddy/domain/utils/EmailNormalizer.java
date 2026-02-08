@@ -1,6 +1,6 @@
 package com.paymybuddy.domain.utils;
 
-import com.paymybuddy.domain.exception.InvalidEmailException;
+import com.paymybuddy.domain.exception.InvalidUserFieldException;
 
 public class EmailNormalizer {
 
@@ -10,7 +10,7 @@ public class EmailNormalizer {
      * The returned value is always lowercase. */
     public static String normalize(String email) {
         if (email == null || email.isBlank()) {
-            throw new InvalidEmailException();
+            throw new InvalidUserFieldException(email);
         }
         return email.trim().toLowerCase();
     }
