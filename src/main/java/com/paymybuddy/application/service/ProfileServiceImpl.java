@@ -4,6 +4,7 @@ import com.paymybuddy.application.service.exception.EmailAlreadyUsedException;
 import com.paymybuddy.application.service.exception.InvalidProfileUpdateParameterException;
 import com.paymybuddy.application.service.exception.UserAccountNotFoundException;
 import com.paymybuddy.domain.entity.User;
+import com.paymybuddy.domain.utils.EmailNormalizer;
 import com.paymybuddy.infrastructure.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,29 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     @Transactional
     public void updateProfile(String email, String newUsername, String newEmail) {
+        validateProfileUpdateInputs(email, newUsername, newEmail);
+
+        String currentEmailNormalized = EmailNormalizer.normalize(email);
+        String newEmailNormalized  = EmailNormalizer.normalize(newEmail);
+
+        User user = getUserByNormalizedEmail(currentEmailNormalized);
+
+        boolean emailChanged = !currentEmailNormalized.equals(newEmailNormalized);
+        // DB-level rule: unique email
+        if (emailChanged && userRepository.existsByEmail(newEmailNormalized)) {
+            throw new EmailAlreadyUsedException(newEmailNormalized);
+        }
+
+        if (!user.getUsername().equals(newUsername.trim())) {
+            user.changeUsername(newUsername);
+        }
+
+        if (emailChanged) {
+            user.changeEmail(newEmailNormalized);
+        }
+    }
+
+    private void validateProfileUpdateInputs(String email, String newUsername, String newEmail) {
         if (email == null || email.isBlank()) {
             throw new InvalidProfileUpdateParameterException("Email");
         }
@@ -29,31 +53,10 @@ public class ProfileServiceImpl implements ProfileService {
         if (newEmail == null || newEmail.isBlank()) {
             throw new InvalidProfileUpdateParameterException("New email");
         }
+    }
 
-        String normalizedEmail = email.trim().toLowerCase();
-        String normalizedNewEmail = newEmail.trim().toLowerCase();
-
-        User user = userRepository.findByEmail(normalizedEmail)
+    private User getUserByNormalizedEmail(String normalizedEmail) {
+        return userRepository.findByEmail(normalizedEmail)
                 .orElseThrow(() -> new UserAccountNotFoundException(normalizedEmail));
-
-        if (!normalizedEmail.equals(normalizedNewEmail) && userRepository.existsByEmail(normalizedNewEmail)) {
-            throw new EmailAlreadyUsedException(normalizedNewEmail);
-        }
-
-        boolean changed = false;
-
-        if (!user.getUsername().equals(newUsername)) {
-            user.changeUsername(newUsername);
-            changed = true;
-        }
-
-        if (!normalizedEmail.equals(normalizedNewEmail)) {
-            user.changeEmail(normalizedNewEmail);
-            changed = true;
-        }
-
-        if (changed) {
-            userRepository.save(user);
-        }
     }
 }

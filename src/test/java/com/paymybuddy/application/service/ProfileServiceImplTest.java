@@ -51,7 +51,6 @@ class ProfileServiceImplTest {
 
         verify(userRepository).findByEmail(EMAIL);
         verify(userRepository).existsByEmail(NEW_EMAIL);
-        verify(userRepository).save(user);
         verifyNoMoreInteractions(userRepository);
 
     }
@@ -120,7 +119,6 @@ class ProfileServiceImplTest {
 
         verify(userRepository).findByEmail(EMAIL);
         verify(userRepository, never()).existsByEmail(anyString());
-        verify(userRepository).save(user);
     }
 
     @Test
@@ -134,7 +132,6 @@ class ProfileServiceImplTest {
 
         verify(userRepository).findByEmail(EMAIL);
         verify(userRepository).existsByEmail(NEW_EMAIL);
-        verify(userRepository).save(user);
     }
 
     @Test
