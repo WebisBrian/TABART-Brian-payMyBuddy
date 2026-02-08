@@ -1,7 +1,6 @@
 package com.paymybuddy.application.service;
 
 import com.paymybuddy.application.service.exception.EmailAlreadyUsedException;
-import com.paymybuddy.application.service.exception.InvalidProfileUpdateParameterException;
 import com.paymybuddy.application.service.exception.UserAccountNotFoundException;
 import com.paymybuddy.domain.entity.User;
 import com.paymybuddy.domain.utils.EmailNormalizer;
@@ -20,10 +19,9 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     @Transactional
-    public void updateProfile(String email, String newUsername, String newEmail) {
-        validateProfileUpdateInputs(email, newUsername, newEmail);
+    public void updateProfile(String currentEmail, String newUsername, String newEmail) {
 
-        String currentEmailNormalized = EmailNormalizer.normalize(email);
+        String currentEmailNormalized = EmailNormalizer.normalize(currentEmail);
         String newEmailNormalized  = EmailNormalizer.normalize(newEmail);
 
         User user = getUserByNormalizedEmail(currentEmailNormalized);
@@ -34,25 +32,11 @@ public class ProfileServiceImpl implements ProfileService {
             throw new EmailAlreadyUsedException(newEmailNormalized);
         }
 
-        if (!user.getUsername().equals(newUsername.trim())) {
-            user.changeUsername(newUsername);
-        }
-
+        user.changeUsername(newUsername);
         if (emailChanged) {
-            user.changeEmail(newEmailNormalized);
+            user.changeEmail(newEmail);
         }
-    }
 
-    private void validateProfileUpdateInputs(String email, String newUsername, String newEmail) {
-        if (email == null || email.isBlank()) {
-            throw new InvalidProfileUpdateParameterException("Email");
-        }
-        if (newUsername == null || newUsername.isBlank()) {
-            throw new InvalidProfileUpdateParameterException("Username");
-        }
-        if (newEmail == null || newEmail.isBlank()) {
-            throw new InvalidProfileUpdateParameterException("New email");
-        }
     }
 
     private User getUserByNormalizedEmail(String normalizedEmail) {
