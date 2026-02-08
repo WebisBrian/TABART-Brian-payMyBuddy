@@ -3,7 +3,6 @@ package com.paymybuddy.application.service;
 import com.paymybuddy.application.service.exception.EmailAlreadyUsedException;
 import com.paymybuddy.application.service.exception.UserAccountNotFoundException;
 import com.paymybuddy.domain.entity.User;
-import com.paymybuddy.domain.exception.InvalidEmailException;
 import com.paymybuddy.domain.exception.InvalidUserFieldException;
 import com.paymybuddy.infrastructure.repository.UserRepository;
 import org.junit.jupiter.api.Test;
