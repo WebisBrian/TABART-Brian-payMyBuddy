@@ -38,6 +38,7 @@ public class ProfileServiceImpl implements ProfileService {
         }
     }
 
+    /* ---------- Helpers ---------- */
     private User getUserByNormalizedEmail(String normalizedEmail) {
         return userRepository.findByEmail(normalizedEmail)
                 .orElseThrow(() -> new UserAccountNotFoundException(normalizedEmail));
