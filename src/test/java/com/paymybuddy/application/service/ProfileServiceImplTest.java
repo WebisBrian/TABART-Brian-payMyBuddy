@@ -1,9 +1,10 @@
 package com.paymybuddy.application.service;
 
 import com.paymybuddy.application.service.exception.EmailAlreadyUsedException;
-import com.paymybuddy.application.service.exception.InvalidProfileUpdateParameterException;
 import com.paymybuddy.application.service.exception.UserAccountNotFoundException;
 import com.paymybuddy.domain.entity.User;
+import com.paymybuddy.domain.exception.InvalidEmailException;
+import com.paymybuddy.domain.exception.InvalidUserFieldException;
 import com.paymybuddy.infrastructure.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,31 +29,26 @@ class ProfileServiceImplTest {
     @InjectMocks
     private ProfileServiceImpl profileService;
 
-    /* ---------- constants ---------- */
     private static final String EMAIL = "user@email.com";
     private static final String NEW_EMAIL = "new@email.com";
     private static final String USERNAME = "oldUsername";
     private static final String NEW_USERNAME = "newUsername";
 
-    /* ---------- updateProfile() ---------- */
     @Test
-    void updateProfile_shouldUpdateUser_whenDataIsValid() {
+    void updateProfile_shouldUpdateBothFields_whenDataIsValid() {
         User user = User.create(USERNAME, EMAIL, "password");
 
         when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(user));
         when(userRepository.existsByEmail(NEW_EMAIL)).thenReturn(false);
 
-        // Act
         profileService.updateProfile("User@email.com", NEW_USERNAME, "New@email.com");
 
-        // Assert
         assertThat(user.getUsername()).isEqualTo(NEW_USERNAME);
         assertThat(user.getEmail()).isEqualTo(NEW_EMAIL);
 
         verify(userRepository).findByEmail(EMAIL);
         verify(userRepository).existsByEmail(NEW_EMAIL);
         verifyNoMoreInteractions(userRepository);
-
     }
 
     @ParameterizedTest
@@ -60,7 +56,7 @@ class ProfileServiceImplTest {
     @ValueSource(strings = {"", "   "})
     void updateProfile_shouldThrow_whenCurrentEmailInvalid(String email) {
         assertThatThrownBy(() -> profileService.updateProfile(email, NEW_USERNAME, NEW_EMAIL))
-                .isInstanceOf(InvalidProfileUpdateParameterException.class);
+                .isInstanceOf(InvalidEmailException.class);
         verifyNoInteractions(userRepository);
     }
 
@@ -68,9 +64,13 @@ class ProfileServiceImplTest {
     @NullSource
     @ValueSource(strings = {"", "   "})
     void updateProfile_shouldThrow_whenNewUsernameInvalid(String username) {
+        User user = User.create(USERNAME, EMAIL, "password");
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(user));
+
         assertThatThrownBy(() -> profileService.updateProfile(EMAIL, username, NEW_EMAIL))
-                .isInstanceOf(InvalidProfileUpdateParameterException.class);
-        verifyNoInteractions(userRepository);
+                .isInstanceOf(InvalidUserFieldException.class);
+
+        verify(userRepository).findByEmail(EMAIL);
     }
 
     @ParameterizedTest
@@ -78,66 +78,67 @@ class ProfileServiceImplTest {
     @ValueSource(strings = {"", "   "})
     void updateProfile_shouldThrow_whenNewEmailInvalid(String email) {
         assertThatThrownBy(() -> profileService.updateProfile(EMAIL, NEW_USERNAME, email))
-                .isInstanceOf(InvalidProfileUpdateParameterException.class);
+                .isInstanceOf(InvalidEmailException.class);
         verifyNoInteractions(userRepository);
     }
 
     @Test
     void updateProfile_shouldThrow_whenUserNotFound() {
-        String userEmail = EMAIL;
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.empty());
 
-        when(userRepository.findByEmail(userEmail)).thenReturn(Optional.empty());
-
-        // Act + Assert
-        assertThatThrownBy(() -> profileService.updateProfile(userEmail, NEW_USERNAME, NEW_EMAIL))
+        assertThatThrownBy(() -> profileService.updateProfile(EMAIL, NEW_USERNAME, NEW_EMAIL))
                 .isInstanceOf(UserAccountNotFoundException.class);
 
-        verify(userRepository).findByEmail(userEmail);
+        verify(userRepository).findByEmail(EMAIL);
         verifyNoMoreInteractions(userRepository);
     }
 
     @Test
-    void updateProfile_shouldNotSave_whenNoChanges_caseInsensitiveEmail() {
+    void updateProfile_shouldNotCheckEmailExistence_whenEmailNotChanged() {
         User user = User.create(USERNAME, EMAIL, "password");
-
         when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(user));
 
         profileService.updateProfile("User@Email.com", USERNAME, "USER@EMAIL.COM");
 
+        assertThat(user.getUsername()).isEqualTo(USERNAME);
+        assertThat(user.getEmail()).isEqualTo(EMAIL);
+
         verify(userRepository).findByEmail(EMAIL);
         verify(userRepository, never()).existsByEmail(anyString());
-        verify(userRepository, never()).save(any());
     }
 
     @Test
-    void updateProfile_shouldSave_whenOnlyUsernameChanges() {
+    void updateProfile_shouldUpdateUsername_whenOnlyUsernameChanges() {
         User user = User.create(USERNAME, EMAIL, "password");
-
         when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(user));
 
         profileService.updateProfile(EMAIL, NEW_USERNAME, EMAIL);
 
+        assertThat(user.getUsername()).isEqualTo(NEW_USERNAME);
+        assertThat(user.getEmail()).isEqualTo(EMAIL);
+
         verify(userRepository).findByEmail(EMAIL);
         verify(userRepository, never()).existsByEmail(anyString());
     }
 
     @Test
-    void updateProfile_shouldSave_whenOnlyEmailChanges_andAvailable() {
+    void updateProfile_shouldUpdateEmail_whenOnlyEmailChanges_andAvailable() {
         User user = User.create(USERNAME, EMAIL, "password");
-
         when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(user));
         when(userRepository.existsByEmail(NEW_EMAIL)).thenReturn(false);
 
         profileService.updateProfile(EMAIL, USERNAME, NEW_EMAIL);
+
+        assertThat(user.getUsername()).isEqualTo(USERNAME);
+        assertThat(user.getEmail()).isEqualTo(NEW_EMAIL);
 
         verify(userRepository).findByEmail(EMAIL);
         verify(userRepository).existsByEmail(NEW_EMAIL);
     }
 
     @Test
-    void updateProfile_shouldThrow_whenEmailTaken() {
+    void updateProfile_shouldThrow_whenEmailAlreadyTaken() {
         User user = User.create(USERNAME, EMAIL, "password");
-
         when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(user));
         when(userRepository.existsByEmail(NEW_EMAIL)).thenReturn(true);
 
@@ -146,6 +147,15 @@ class ProfileServiceImplTest {
 
         verify(userRepository).findByEmail(EMAIL);
         verify(userRepository).existsByEmail(NEW_EMAIL);
-        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void updateProfile_shouldTrimWhitespace_whenUpdatingUsername() {
+        User user = User.create(USERNAME, EMAIL, "password");
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(user));
+
+        profileService.updateProfile(EMAIL, "  trimmedUsername  ", EMAIL);
+
+        assertThat(user.getUsername()).isEqualTo("trimmedUsername");
     }
 }
