@@ -22,7 +22,7 @@ public class ProfileServiceImpl implements ProfileService {
     public void updateProfile(String currentEmail, String newUsername, String newEmail) {
 
         String currentEmailNormalized = EmailNormalizer.normalize(currentEmail);
-        String newEmailNormalized  = EmailNormalizer.normalize(newEmail);
+        String newEmailNormalized = EmailNormalizer.normalize(newEmail);
 
         User user = getUserByNormalizedEmail(currentEmailNormalized);
 
@@ -36,7 +36,6 @@ public class ProfileServiceImpl implements ProfileService {
         if (emailChanged) {
             user.changeEmail(newEmail);
         }
-
     }
 
     private User getUserByNormalizedEmail(String normalizedEmail) {
