@@ -1,17 +1,25 @@
 package com.paymybuddy.domain.utils;
 
-import com.paymybuddy.domain.exception.InvalidUserFieldException;
+import com.paymybuddy.domain.exception.InvalidEmailException;
+
+import java.util.regex.Pattern;
 
 public class EmailNormalizer {
 
-    /**
-     * Normalizes an email address.
-     * The returned value is never null.
-     * The returned value is always lowercase. */
+    private static final Pattern EMAIL_PATTERN =
+            Pattern.compile("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
+
     public static String normalize(String email) {
         if (email == null || email.isBlank()) {
-            throw new InvalidUserFieldException("Email");
+            throw new InvalidEmailException("Email must not be null or blank");
         }
-        return email.trim().toLowerCase();
+
+        String normalized = email.trim().toLowerCase();
+
+        if (!EMAIL_PATTERN.matcher(normalized).matches()) {
+            throw new InvalidEmailException("Invalid email format");
+        }
+
+        return normalized;
     }
 }
