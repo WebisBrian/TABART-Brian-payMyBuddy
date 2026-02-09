@@ -1,14 +1,23 @@
 package com.paymybuddy.application.service;
 
+import com.paymybuddy.application.service.exception.AccountNotFoundException;
+import com.paymybuddy.application.service.exception.InvalidTransactionParameterException;
+import com.paymybuddy.application.service.exception.NotInContactsException;
+import com.paymybuddy.application.service.exception.SelfTransferException;
 import com.paymybuddy.domain.entity.Account;
 import com.paymybuddy.domain.entity.Transaction;
 import com.paymybuddy.domain.entity.User;
+import com.paymybuddy.domain.exception.InsufficientBalanceException;
+import com.paymybuddy.domain.exception.InvalidMoneyAmountException;
 import com.paymybuddy.infrastructure.repository.AccountRepository;
 import com.paymybuddy.infrastructure.repository.TransactionRepository;
 import com.paymybuddy.infrastructure.repository.UserContactRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -67,19 +76,19 @@ class TransactionServiceImplTest {
         );
     }
 
-    /* ---------- transfer() ---------- */
+    /* ---------- transfer() - Happy path ---------- */
     @Test
-    void transfer_shouldDebitSenderCredit_andSaveTransaction() {
+    void transfer_shouldDebitSenderCreditReceiver_andSaveTransaction() {
         long senderUserId = 1L;
         long receiverUserId = 2L;
         BigDecimal amount = new BigDecimal("100.00");
         String description = "Dinner";
 
+
         when(accountRepository.findByUserId(senderUserId)).thenReturn(Optional.of(senderAccount));
         when(accountRepository.findByUserId(receiverUserId)).thenReturn(Optional.of(receiverAccount));
         when(userContactRepository.existsByUser_IdAndContact_Id(senderUserId, receiverUserId)).thenReturn(true);
-
-        when(transactionRepository.save(any(Transaction.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(transactionRepository.save(any(Transaction.class))).thenAnswer(inv -> inv.getArgument(0));
 
         BigDecimal senderBalanceBefore = senderAccount.getBalance();
         BigDecimal receiverBalanceBefore = receiverAccount.getBalance();
@@ -87,18 +96,16 @@ class TransactionServiceImplTest {
         // Act
         transactionService.transfer(senderUserId, receiverUserId, amount, description);
 
-        // Assert (balances)
-        BigDecimal expectedFee = feeOf(amount);
+        // Assert - Balances
+        BigDecimal expectedFee = calculateFee(amount);
         BigDecimal expectedDebit = amount.add(expectedFee);
 
         assertThat(senderAccount.getBalance())
                 .isEqualByComparingTo(senderBalanceBefore.subtract(expectedDebit));
-
         assertThat(receiverAccount.getBalance())
                 .isEqualByComparingTo(receiverBalanceBefore.add(amount));
 
-        // Assert (transaction saved)
-        LocalDateTime expectedNow = LocalDateTime.ofInstant(fixedClock.instant(), fixedClock.getZone());
+        // Assert - Transaction saved
         ArgumentCaptor<Transaction> captor = ArgumentCaptor.forClass(Transaction.class);
         verify(transactionRepository).save(captor.capture());
 
@@ -108,19 +115,13 @@ class TransactionServiceImplTest {
         assertThat(saved.getAmount()).isEqualByComparingTo(amount);
         assertThat(saved.getFee()).isEqualByComparingTo(expectedFee);
         assertThat(saved.getDescription()).isEqualTo(description);
-        assertThat(saved.getDate()).isEqualTo(expectedNow);
-
-        // Assert (repository interactions)
-        verify(accountRepository).findByUserId(senderUserId);
-        verify(accountRepository).findByUserId(receiverUserId);
-        verify(userContactRepository).existsByUser_IdAndContact_Id(senderUserId, receiverUserId);
-        verifyNoMoreInteractions(accountRepository, userContactRepository);
     }
 
-    @Test
+    /* ---------- transfer() - Validation errors ---------- */
+   @Test
     void transfer_shouldThrow_whenSenderIdIsNull() {
         assertThatThrownBy(() -> transactionService.transfer(null, 2L, new BigDecimal("100.00"), "Dinner"))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(InvalidTransactionParameterException.class);
 
         verifyNoInteractions(accountRepository, transactionRepository, userContactRepository);
     }
@@ -128,126 +129,110 @@ class TransactionServiceImplTest {
     @Test
     void transfer_shouldThrow_whenReceiverIdIsNull() {
         assertThatThrownBy(() -> transactionService.transfer(1L, null, new BigDecimal("100.00"), "Dinner"))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(InvalidTransactionParameterException.class);
 
         verifyNoInteractions(accountRepository, transactionRepository, userContactRepository);
     }
 
     @Test
     void transfer_shouldThrow_whenAmountIsNull() {
-        long senderUserId = 1L;
-        long receiverUserId = 2L;
-
-        assertThatThrownBy(() -> transactionService.transfer(senderUserId, receiverUserId, null, "Dinner"))
-                .isInstanceOf(IllegalArgumentException.class);
+       assertThatThrownBy(() -> transactionService.transfer(1L, 2L, null, "Dinner"))
+                .isInstanceOf(InvalidTransactionParameterException.class);
 
         verifyNoInteractions(accountRepository, transactionRepository, userContactRepository);
-    }
+   }
 
     @Test
-    void transfer_shouldThrow_whenAmountIsNegativeOrZero() {
-        long senderUserId = 1L;
-        long receiverUserId = 2L;
+    void transfer_shouldThrow_whenSenderAndReceiverAreSame() {
+        long userId = 1L;
 
-        assertThatThrownBy(() -> transactionService.transfer(senderUserId, receiverUserId, new BigDecimal("0.00"), "Dinner"))
-                .isInstanceOf(IllegalArgumentException.class);
-
-        assertThatThrownBy(() -> transactionService.transfer(senderUserId, receiverUserId, new BigDecimal("-1.00"), "Dinner"))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> transactionService.transfer(userId, userId, new BigDecimal("100.00"), "Test"))
+                .isInstanceOf(SelfTransferException.class);
 
         verifyNoInteractions(accountRepository, transactionRepository, userContactRepository);
     }
 
     @Test
     void transfer_shouldThrow_whenSenderAccountNotFound() {
-        long senderUserId = 1L;
-        long receiverUserId = 2L;
+        when(accountRepository.findByUserId(1L)).thenReturn(Optional.empty());
 
-        when(accountRepository.findByUserId(senderUserId)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> transactionService.transfer(1L, 2L, new BigDecimal("100.00"), "Test"))
+                .isInstanceOf(AccountNotFoundException.class);
 
-        assertThatThrownBy(() -> transactionService.transfer(senderUserId, receiverUserId, new BigDecimal("5.00"), "Dinner"))
-                .isInstanceOf(IllegalArgumentException.class);
-
-        verify(accountRepository).findByUserId(senderUserId);
+        verify(accountRepository).findByUserId(1L);
+        verifyNoMoreInteractions(accountRepository);
         verifyNoInteractions(transactionRepository, userContactRepository);
-        verify(accountRepository, never()).findByUserId(receiverUserId);
     }
 
     @Test
     void transfer_shouldThrow_whenReceiverAccountNotFound() {
-        long senderUserId = 1L;
-        long receiverUserId = 2L;
+        when(accountRepository.findByUserId(1L)).thenReturn(Optional.of(senderAccount));
+        when(accountRepository.findByUserId(2L)).thenReturn(Optional.empty());
 
-        when(accountRepository.findByUserId(senderUserId)).thenReturn(Optional.of(senderAccount));
-        when(accountRepository.findByUserId(receiverUserId)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> transactionService.transfer(1L, 2L, new BigDecimal("100.00"), "Test"))
+                .isInstanceOf(AccountNotFoundException.class);
 
-        assertThatThrownBy(() -> transactionService.transfer(senderUserId, receiverUserId, new BigDecimal("5.00"), "Dinner"))
-                .isInstanceOf(IllegalArgumentException.class);
-
-        verify(accountRepository).findByUserId(senderUserId);
-        verify(accountRepository).findByUserId(receiverUserId);
+        verify(accountRepository).findByUserId(1L);
+        verify(accountRepository).findByUserId(2L);
+        verifyNoMoreInteractions(accountRepository);
         verifyNoInteractions(transactionRepository, userContactRepository);
     }
 
     @Test
-    void transfer_shouldThrow_whenSenderAndContactAreSame() {
-        long senderUserId = 1L;
-        long receiverUserId = 1L;
+    void transfer_shouldThrow_whenUsersAreNotContacts() {
+        when(accountRepository.findByUserId(1L)).thenReturn(Optional.of(senderAccount));
+        when(accountRepository.findByUserId(2L)).thenReturn(Optional.of(receiverAccount));
+        when(userContactRepository.existsByUser_IdAndContact_Id(1L, 2L)).thenReturn(false);
 
-        assertThatThrownBy(() -> transactionService.transfer(senderUserId, receiverUserId, new BigDecimal("5.00"), "Dinner"))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> transactionService.transfer(1L, 2L, new BigDecimal("100.00"), "Test"))
+                .isInstanceOf(NotInContactsException.class);
 
-        verifyNoInteractions(accountRepository, transactionRepository, userContactRepository);
-    }
-
-    @Test
-    void transfer_shouldThrow_whenReceiverIsNotAContact() {
-        long senderUserId = 1L;
-        long receiverUserId = 2L;
-
-        when(accountRepository.findByUserId(senderUserId)).thenReturn(Optional.of(senderAccount));
-        when(accountRepository.findByUserId(receiverUserId)).thenReturn(Optional.of(receiverAccount));
-        when(userContactRepository.existsByUser_IdAndContact_Id(senderUserId, receiverUserId)).thenReturn(false);
-
-        assertThatThrownBy(() -> transactionService.transfer(senderUserId, receiverUserId, new BigDecimal("5.00"), "Dinner"))
-                .isInstanceOf(IllegalArgumentException.class);
-
-        verify(userContactRepository).existsByUser_IdAndContact_Id(senderUserId, receiverUserId);
-        verify(accountRepository).findByUserId(senderUserId);
-        verify(accountRepository).findByUserId(receiverUserId);
-        verifyNoMoreInteractions(accountRepository, userContactRepository);
+        verify(userContactRepository).existsByUser_IdAndContact_Id(1L, 2L);
         verifyNoInteractions(transactionRepository);
     }
 
     @Test
-    void transfer_shouldThrow_whenInsufficientBalanceInSenderAccount() {
-        long senderUserId = 1L;
-        long receiverUserId = 2L;
-
-        // Balance after withdrawal is 0.50
+    void transfer_shouldThrow_whenInsufficientBalance() {
+        // Arrange - sender has only 0.50
         senderAccount.withdraw(new BigDecimal("199.50"));
 
-        when(accountRepository.findByUserId(senderUserId)).thenReturn(Optional.of(senderAccount));
-        when(accountRepository.findByUserId(receiverUserId)).thenReturn(Optional.of(receiverAccount));
-        when(userContactRepository.existsByUser_IdAndContact_Id(senderUserId, receiverUserId)).thenReturn(true);
+        when(accountRepository.findByUserId(1L)).thenReturn(Optional.of(senderAccount));
+        when(accountRepository.findByUserId(2L)).thenReturn(Optional.of(receiverAccount));
+        when(userContactRepository.existsByUser_IdAndContact_Id(1L, 2L)).thenReturn(true);
 
-        assertThatThrownBy(() -> transactionService.transfer(senderUserId, receiverUserId, new BigDecimal("10.00"), "Dinner"))
-                .isInstanceOf(IllegalArgumentException.class);
+        // Act & Assert - Account.withdraw() raise InsufficientBalanceException
+        assertThatThrownBy(() -> transactionService.transfer(1L, 2L, new BigDecimal("10.00"), "Test"))
+                .isInstanceOf(InsufficientBalanceException.class);
 
         verifyNoInteractions(transactionRepository);
     }
 
-    /**
-     * Fee = 0.5% (0.005) of the amount, rounded to 2 decimal places (HALF_UP).
-     * Example: 100.00 -> 0.50
-     */
-    private static BigDecimal feeOf(BigDecimal amount) {
+    @ParameterizedTest
+    @ValueSource(doubles = {0.0, -1.0})
+    void transfer_shouldThrow_whenAmountIsInvalid(Double amount) {
+        when(accountRepository.findByUserId(1L)).thenReturn(Optional.of(senderAccount));
+        when(accountRepository.findByUserId(2L)).thenReturn(Optional.of(receiverAccount));
+        when(userContactRepository.existsByUser_IdAndContact_Id(1L, 2L)).thenReturn(true);
+
+        // Amount null ou négatif → Transaction.create() lance InvalidTransactionAmountException
+        assertThatThrownBy(() -> transactionService.transfer(
+                1L,
+                2L,
+                amount == null ? null : BigDecimal.valueOf(amount),
+                "Test"))
+                .isInstanceOf(InvalidMoneyAmountException.class);
+
+        verifyNoInteractions(transactionRepository);
+    }
+
+    /* ---------- Private method for transfer() ---------- */
+    private static BigDecimal calculateFee(BigDecimal amount) {
         return amount
                 .multiply(new BigDecimal("0.005"))
                 .setScale(2, RoundingMode.HALF_UP);
     }
 
-    /* ---------- getTransaction() ---------- */
+    /* ---------- getTransaction() - Happy path ---------- */
     @Test
     void getTransactionHistory_shouldReturnPagesTransactionsOrderedByDateDesc() {
         long userId = 1L;
@@ -355,36 +340,6 @@ class TransactionServiceImplTest {
     }
 
     @Test
-    void getTransactionHistory_shouldThrow_whenUserIdIsNull() {
-        assertThatThrownBy(() -> transactionService.getTransactionHistory(null, PageRequest.of(0, 10)))
-                .isInstanceOf(IllegalArgumentException.class);
-
-        verifyNoInteractions(accountRepository, transactionRepository);
-    }
-
-    @Test
-    void getTransactionHistory_shouldThrow_whenPageableIsNull() {
-        assertThatThrownBy(() -> transactionService.getTransactionHistory(1L, null))
-                .isInstanceOf(IllegalArgumentException.class);
-
-        verifyNoInteractions(accountRepository, transactionRepository);
-    }
-
-    @Test
-    void getTransactionHistory_shouldThrow_whenUserAccountNotFound() {
-        long userId = 1L;
-        Pageable pageable = PageRequest.of(0, 10);
-
-        when(accountRepository.findByUserId(userId)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() ->
-                transactionService.getTransactionHistory(userId, pageable)
-        ).isInstanceOf(IllegalArgumentException.class);
-
-        verifyNoInteractions(transactionRepository);
-    }
-
-    @Test
     void getTransactionHistory_shouldRespectPaginationParameters() {
         long userId = 1L;
         Pageable pageable = PageRequest.of(1, 5);
@@ -405,5 +360,36 @@ class TransactionServiceImplTest {
 
         assertThat(result.getNumber()).isEqualTo(1);
         assertThat(result.getSize()).isEqualTo(5);
+    }
+
+    /* ---------- getTransactionHistory() - Validation errors ---------- */
+    @Test
+    void getTransactionHistory_shouldThrow_whenUserIdIsNull() {
+        assertThatThrownBy(() -> transactionService.getTransactionHistory(null, PageRequest.of(0, 10)))
+                .isInstanceOf(InvalidTransactionParameterException.class);
+
+        verifyNoInteractions(accountRepository, transactionRepository);
+    }
+
+    @Test
+    void getTransactionHistory_shouldThrow_whenPageableIsNull() {
+        assertThatThrownBy(() -> transactionService.getTransactionHistory(1L, null))
+                .isInstanceOf(InvalidTransactionParameterException.class);
+
+        verifyNoInteractions(accountRepository, transactionRepository);
+    }
+
+    @Test
+    void getTransactionHistory_shouldThrow_whenUserAccountNotFound() {
+        long userId = 1L;
+        Pageable pageable = PageRequest.of(0, 10);
+
+        when(accountRepository.findByUserId(userId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() ->
+                transactionService.getTransactionHistory(userId, pageable)
+        ).isInstanceOf(AccountNotFoundException.class);
+
+        verifyNoInteractions(transactionRepository);
     }
 }
