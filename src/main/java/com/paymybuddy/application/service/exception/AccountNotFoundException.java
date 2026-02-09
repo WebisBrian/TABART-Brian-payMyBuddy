@@ -1,12 +1,12 @@
 package com.paymybuddy.application.service.exception;
 
-public class UserAccountNotFoundException extends RuntimeException {
+public class AccountNotFoundException extends RuntimeException {
 
-    public UserAccountNotFoundException(Long userId) {
+    public AccountNotFoundException(Long userId) {
         super("Account not found for user ID: " + userId);
     }
 
-    public UserAccountNotFoundException(String email) {
+    public AccountNotFoundException(String email) {
         super("Account not found for user email: " + email);
     }
 }
