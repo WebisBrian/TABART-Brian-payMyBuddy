@@ -1,8 +1,10 @@
 package com.paymybuddy.application.service;
 
 import com.paymybuddy.application.service.exception.EmailAlreadyUsedException;
+import com.paymybuddy.application.service.exception.WeakPasswordException;
 import com.paymybuddy.domain.entity.Account;
 import com.paymybuddy.domain.entity.User;
+import com.paymybuddy.domain.exception.InvalidEmailException;
 import com.paymybuddy.domain.exception.InvalidUserFieldException;
 import com.paymybuddy.infrastructure.repository.AccountRepository;
 import com.paymybuddy.infrastructure.repository.UserRepository;
@@ -73,7 +75,7 @@ class RegistrationServiceImplTest {
     @Test
     void register_shouldThrow_whenEmailIsNull() {
         assertThatThrownBy(() -> registerService.register("user", null, "password"))
-                .isInstanceOf(InvalidUserFieldException.class);
+                .isInstanceOf(InvalidEmailException.class);
 
         verifyNoInteractions(userRepository, accountRepository, passwordEncoder);
     }
@@ -81,7 +83,7 @@ class RegistrationServiceImplTest {
     @Test
     void register_shouldThrow_whenPasswordIsNull() {
         assertThatThrownBy(() -> registerService.register("user", "user@email.com", null))
-                .isInstanceOf(InvalidUserFieldException.class);
+                .isInstanceOf(WeakPasswordException.class);
 
         verifyNoInteractions(accountRepository);
     }
