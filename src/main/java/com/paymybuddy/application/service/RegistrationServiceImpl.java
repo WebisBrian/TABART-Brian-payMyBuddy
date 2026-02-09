@@ -3,6 +3,7 @@ package com.paymybuddy.application.service;
 import com.paymybuddy.application.service.exception.EmailAlreadyUsedException;
 import com.paymybuddy.domain.entity.Account;
 import com.paymybuddy.domain.entity.User;
+import com.paymybuddy.domain.utils.EmailNormalizer;
 import com.paymybuddy.infrastructure.repository.AccountRepository;
 import com.paymybuddy.infrastructure.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,18 +28,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Override
     @Transactional
     public void register(String username, String email, String password) {
-        if (username == null) {
-            throw new IllegalArgumentException("Username must not be null.");
-        }
-
-        if (email == null) {
-            throw new IllegalArgumentException("Email must not be null.");
-        }
-
-        if (password == null) {
-            throw new IllegalArgumentException("Password must not be null.");
-        }
-        String normalizedEmail = email.trim().toLowerCase();
+        String normalizedEmail = EmailNormalizer.normalize(email);
 
         if (userRepository.existsByEmail(normalizedEmail)) {
             throw new EmailAlreadyUsedException(normalizedEmail);

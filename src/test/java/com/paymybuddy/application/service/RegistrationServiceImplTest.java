@@ -3,6 +3,7 @@ package com.paymybuddy.application.service;
 import com.paymybuddy.application.service.exception.EmailAlreadyUsedException;
 import com.paymybuddy.domain.entity.Account;
 import com.paymybuddy.domain.entity.User;
+import com.paymybuddy.domain.exception.InvalidUserFieldException;
 import com.paymybuddy.infrastructure.repository.AccountRepository;
 import com.paymybuddy.infrastructure.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -64,15 +65,15 @@ class RegistrationServiceImplTest {
     @Test
     void register_shouldThrow_whenUsernameIsNull() {
         assertThatThrownBy(() -> registerService.register(null, "user@email.com", "password"))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(InvalidUserFieldException.class);
 
-        verifyNoInteractions(userRepository, accountRepository, passwordEncoder);
+        verifyNoInteractions(accountRepository);
     }
 
     @Test
     void register_shouldThrow_whenEmailIsNull() {
         assertThatThrownBy(() -> registerService.register("user", null, "password"))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(InvalidUserFieldException.class);
 
         verifyNoInteractions(userRepository, accountRepository, passwordEncoder);
     }
@@ -80,9 +81,9 @@ class RegistrationServiceImplTest {
     @Test
     void register_shouldThrow_whenPasswordIsNull() {
         assertThatThrownBy(() -> registerService.register("user", "user@email.com", null))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(InvalidUserFieldException.class);
 
-        verifyNoInteractions(userRepository, accountRepository, passwordEncoder);
+        verifyNoInteractions(accountRepository);
     }
 
     @Test
