@@ -1,5 +1,9 @@
 package com.paymybuddy.application.service;
 
+import com.paymybuddy.application.service.exception.AccountNotFoundException;
+import com.paymybuddy.application.service.exception.InvalidTransactionParameterException;
+import com.paymybuddy.application.service.exception.NotInContactsException;
+import com.paymybuddy.application.service.exception.SelfTransferException;
 import com.paymybuddy.domain.entity.Account;
 import com.paymybuddy.domain.entity.Transaction;
 import com.paymybuddy.infrastructure.repository.AccountRepository;
@@ -18,7 +22,8 @@ import java.time.LocalDateTime;
 @Service
 public class TransactionServiceImpl implements TransactionService {
 
-//    TODO : implements constant for fee
+    private static final BigDecimal FEE_RATE = new BigDecimal("0.005");
+
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
     private final UserContactRepository userContactRepository;
@@ -35,21 +40,21 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     /* ---------- transfer() ---------- */
+    @Override
     @Transactional
     public void transfer(Long senderId, Long receiverId, BigDecimal amount, String description) {
-
         validateInput(senderId, receiverId, amount);
 
-        Account senderAccount = loadAccountByUserId(senderId, "Sender account not found.");
-        Account receiverAccount = loadAccountByUserId(receiverId, "Receiver account not found.");
+        Account senderAccount = loadAccountByUserId(senderId);
+        Account receiverAccount = loadAccountByUserId(receiverId);
 
         ensureUsersAreContacts(senderId, receiverId);
 
-        BigDecimal fee = feeOf(amount);
+        // Fee calculation
+        BigDecimal fee = calculateFee(amount);
         BigDecimal totalDebit = amount.add(fee);
 
-        ensureSufficientBalance(senderAccount, totalDebit);
-
+        // Amount debited from sender
         senderAccount.withdraw(totalDebit);
         receiverAccount.deposit(amount);
 
@@ -66,62 +71,54 @@ public class TransactionServiceImpl implements TransactionService {
         transactionRepository.save(transaction);
     }
 
-    private void validateInput(Long senderId, Long receiverId, BigDecimal amount) {
-        if (senderId == null || receiverId == null) {
-            throw new IllegalArgumentException("Sender and receiver IDs must not be null.");
-        }
-
-        if (senderId.equals(receiverId)) {
-            throw new IllegalArgumentException("Sender and receiver must be different users.");
-        }
-
-        if (amount == null || amount.signum() <= 0) {
-            throw new IllegalArgumentException("Amount must be positive.");
-        }
-    }
-
-    private Account loadAccountByUserId(Long userId, String errorMessage) {
-        return accountRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException(errorMessage));
-    }
-
-    private void ensureUsersAreContacts(Long senderId, Long receiverId) {
-        boolean isContact = userContactRepository.existsByUser_IdAndContact_Id(senderId, receiverId);
-        if (!isContact) {
-            throw new IllegalArgumentException("Sender and receiver must be contacts.");
-        }
-    }
-
-    private static void ensureSufficientBalance(Account senderAccount, BigDecimal totalDebit) {
-        if (senderAccount.getBalance().compareTo(totalDebit) < 0) {
-            throw new IllegalArgumentException("Insufficient balance in sender account.");
-        }
-    }
-
-    /**
-     * Fee = 0.5% (0.005) of the amount, rounded to 2 decimal places (HALF_UP).
-     * Example: 100.00 -> 0.50
-     */
-    private static BigDecimal feeOf(BigDecimal amount) {
-        return amount
-                .multiply(new BigDecimal("0.005"))
-                .setScale(2, RoundingMode.HALF_UP);
-    }
-
     /* ---------- getTransaction() ---------- */
     @Override
     @Transactional(readOnly = true)
     public Page<Transaction> getTransactionHistory(Long userId, Pageable pageable) {
-        if (userId == null) {
-            throw new IllegalArgumentException("User ID must not be null.");
-        }
+        requireNonNull(userId, "User ID");
+        requireNonNull(pageable, "Pageable");
 
-        if (pageable == null) {
-            throw new IllegalArgumentException("Pageable must not be null.");
-        }
-
-        Account account = loadAccountByUserId(userId, "Account not found.");
+        Account account = loadAccountByUserId(userId);
 
         return transactionRepository.findTransactionHistory(account.getId(), pageable);
+    }
+
+    /* ---------- Helpers ---------- */
+    private void validateInput(Long senderId, Long receiverId, BigDecimal amount) {
+        requireNonNull(senderId, "Sender ID");
+        requireNonNull(receiverId, "Receiver ID");
+        requireNonNull(amount, "Amount");
+
+        if (senderId.equals(receiverId)) {
+            throw new SelfTransferException();
+        }
+    }
+
+    private Account loadAccountByUserId(Long userId) {
+        return accountRepository.findByUserId(userId)
+                .orElseThrow(() -> new AccountNotFoundException(userId));
+    }
+
+    private void ensureUsersAreContacts(Long senderId, Long receiverId) {
+        if (!userContactRepository.existsByUser_IdAndContact_Id(senderId, receiverId)) {
+            throw new NotInContactsException();
+        }
+    }
+
+    /**
+     * Example:
+     * If Fee = 0.5% (0.005) of the amount, rounded to 2 decimal places (HALF_UP).
+     * 100.00 -> 0.50
+     */
+    private static BigDecimal calculateFee(BigDecimal amount) {
+        return amount
+                .multiply(FEE_RATE)
+                .setScale(2, RoundingMode.HALF_UP);
+    }
+
+    private static void requireNonNull(Object value, String label) {
+        if (value == null) {
+            throw new InvalidTransactionParameterException(label);
+        }
     }
 }
