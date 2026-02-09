@@ -34,6 +34,7 @@ class ProfileServiceImplTest {
     private static final String USERNAME = "oldUsername";
     private static final String NEW_USERNAME = "newUsername";
 
+    /* ---------- updateProfile() - Happy path ---------- */
     @Test
     void updateProfile_shouldUpdateBothFields_whenDataIsValid() {
         User user = User.create(USERNAME, EMAIL, "password");
@@ -51,6 +52,7 @@ class ProfileServiceImplTest {
         verifyNoMoreInteractions(userRepository);
     }
 
+    /* ---------- create() - Validation errors ---------- */
     @ParameterizedTest
     @NullSource
     @ValueSource(strings = {"", "   "})
