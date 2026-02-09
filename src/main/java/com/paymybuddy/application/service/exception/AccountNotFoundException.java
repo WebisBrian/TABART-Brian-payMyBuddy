@@ -6,7 +6,4 @@ public class AccountNotFoundException extends RuntimeException {
         super("Account not found for user ID: " + userId);
     }
 
-    public AccountNotFoundException(String email) {
-        super("Account not found for user email: " + email);
-    }
 }
