@@ -36,7 +36,7 @@ public class User {
     public static User create(String username, String email, String passwordHash) {
         return new User(
                 requireNonBlank(username, "Username"),
-                EmailNormalizer.normalize(requireNonBlank(email, "Email")),
+                EmailNormalizer.normalize(email),
                 requireNonBlank(passwordHash, "Password")
         );
     }
