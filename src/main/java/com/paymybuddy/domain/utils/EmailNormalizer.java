@@ -10,7 +10,7 @@ public class EmailNormalizer {
      * The returned value is always lowercase. */
     public static String normalize(String email) {
         if (email == null || email.isBlank()) {
-            throw new InvalidUserFieldException(email);
+            throw new InvalidUserFieldException("Email");
         }
         return email.trim().toLowerCase();
     }
