@@ -1,7 +1,7 @@
 package com.paymybuddy.application.service;
 
 import com.paymybuddy.application.service.exception.InvalidUserIdException;
-import com.paymybuddy.application.service.exception.UserAccountNotFoundException;
+import com.paymybuddy.application.service.exception.AccountNotFoundException;
 import com.paymybuddy.domain.entity.Account;
 import com.paymybuddy.domain.entity.User;
 import com.paymybuddy.domain.exception.InsufficientBalanceException;
@@ -56,7 +56,7 @@ class AccountServiceImplTest {
         when(accountRepository.findByUserId(userId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> accountService.getBalance(userId))
-                .isInstanceOf(UserAccountNotFoundException.class);
+                .isInstanceOf(AccountNotFoundException.class);
 
         verify(accountRepository).findByUserId(userId);
         verifyNoMoreInteractions(accountRepository);
@@ -101,7 +101,7 @@ class AccountServiceImplTest {
         when(accountRepository.findByUserId(userId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> accountService.deposit(userId, new BigDecimal("95.00")))
-                .isInstanceOf(UserAccountNotFoundException.class);
+                .isInstanceOf(AccountNotFoundException.class);
 
         verify(accountRepository).findByUserId(userId);
         verifyNoMoreInteractions(accountRepository);
@@ -163,7 +163,7 @@ class AccountServiceImplTest {
         when(accountRepository.findByUserId(userId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> accountService.withdraw(userId, new BigDecimal("95.00")))
-                .isInstanceOf(UserAccountNotFoundException.class);
+                .isInstanceOf(AccountNotFoundException.class);
 
         verify(accountRepository).findByUserId(userId);
         verifyNoMoreInteractions(accountRepository);

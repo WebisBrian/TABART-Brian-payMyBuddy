@@ -1,7 +1,7 @@
 package com.paymybuddy.application.service;
 
 import com.paymybuddy.application.service.exception.InvalidUserIdException;
-import com.paymybuddy.application.service.exception.UserAccountNotFoundException;
+import com.paymybuddy.application.service.exception.AccountNotFoundException;
 import com.paymybuddy.domain.entity.Account;
 import com.paymybuddy.infrastructure.repository.AccountRepository;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ public class AccountServiceImpl implements AccountService {
         ensureUserIdNotNull(userId);
 
         Account account = accountRepository.findByUserId(userId)
-                .orElseThrow(() -> new UserAccountNotFoundException(userId));
+                .orElseThrow(() -> new AccountNotFoundException(userId));
 
         return account.getBalance();
     }
@@ -35,7 +35,7 @@ public class AccountServiceImpl implements AccountService {
         ensureUserIdNotNull(userId);
 
         accountRepository.findByUserId(userId)
-                .orElseThrow(() -> new UserAccountNotFoundException(userId))
+                .orElseThrow(() -> new AccountNotFoundException(userId))
                 .deposit(amount);
     }
 
@@ -45,7 +45,7 @@ public class AccountServiceImpl implements AccountService {
         ensureUserIdNotNull(userId);
 
         accountRepository.findByUserId(userId)
-                .orElseThrow(() -> new UserAccountNotFoundException(userId))
+                .orElseThrow(() -> new AccountNotFoundException(userId))
                 .withdraw(amount);
     }
 

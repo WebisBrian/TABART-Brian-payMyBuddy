@@ -1,7 +1,7 @@
 package com.paymybuddy.application.service;
 
 import com.paymybuddy.application.service.exception.EmailAlreadyUsedException;
-import com.paymybuddy.application.service.exception.UserAccountNotFoundException;
+import com.paymybuddy.application.service.exception.AccountNotFoundException;
 import com.paymybuddy.domain.entity.User;
 import com.paymybuddy.domain.exception.InvalidEmailException;
 import com.paymybuddy.domain.exception.InvalidUserFieldException;
@@ -89,7 +89,7 @@ class ProfileServiceImplTest {
         when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> profileService.updateProfile(EMAIL, NEW_USERNAME, NEW_EMAIL))
-                .isInstanceOf(UserAccountNotFoundException.class);
+                .isInstanceOf(AccountNotFoundException.class);
 
         verify(userRepository).findByEmail(EMAIL);
         verifyNoMoreInteractions(userRepository);

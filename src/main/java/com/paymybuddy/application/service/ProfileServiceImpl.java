@@ -1,7 +1,7 @@
 package com.paymybuddy.application.service;
 
 import com.paymybuddy.application.service.exception.EmailAlreadyUsedException;
-import com.paymybuddy.application.service.exception.UserAccountNotFoundException;
+import com.paymybuddy.application.service.exception.AccountNotFoundException;
 import com.paymybuddy.domain.entity.User;
 import com.paymybuddy.domain.utils.EmailNormalizer;
 import com.paymybuddy.infrastructure.repository.UserRepository;
@@ -41,6 +41,6 @@ public class ProfileServiceImpl implements ProfileService {
     /* ---------- Helpers ---------- */
     private User getUserByNormalizedEmail(String normalizedEmail) {
         return userRepository.findByEmail(normalizedEmail)
-                .orElseThrow(() -> new UserAccountNotFoundException(normalizedEmail));
+                .orElseThrow(() -> new AccountNotFoundException(normalizedEmail));
     }
 }
