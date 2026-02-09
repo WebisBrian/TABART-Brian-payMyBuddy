@@ -44,7 +44,11 @@ public class UserContact {
             throw new MissingUserOrContactException(user, contact);
         }
 
-        if (user == contact || (user.getId() != null && user.getId().equals(contact.getId()))) {
+        if (user.getId() != null && contact.getId() != null && user.getId().equals(contact.getId())) {
+            throw new SelfContactNotAllowedException(user);
+        }
+
+        if (user.getId() == null && contact.getId() == null && user.getEmail().equals(contact.getEmail())) {
             throw new SelfContactNotAllowedException(user);
         }
 
