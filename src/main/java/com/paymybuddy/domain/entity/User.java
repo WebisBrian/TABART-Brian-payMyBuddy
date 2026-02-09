@@ -35,7 +35,7 @@ public class User {
     // Factory method
     public static User create(String username, String email, String passwordHash) {
         return new User(
-                requireNonBlank(username, "Username"),
+                requireValidUsername(username),
                 EmailNormalizer.normalize(email),
                 requireNonBlank(passwordHash, "Password")
         );
@@ -43,7 +43,7 @@ public class User {
 
     // Public methods
     public void changeUsername(String username) {
-        this.username = requireNonBlank(username, "Username");
+        this.username = requireValidUsername(username);
     }
 
     public void changeEmail(String email) {
@@ -61,5 +61,15 @@ public class User {
         }
 
         return value.trim();
+    }
+
+    private static String requireValidUsername(String username) {
+        String trimmed = requireNonBlank(username, "Username");
+
+        if (trimmed.length() > 100) {
+            throw new InvalidUserFieldException("Username must not exceed 100 characters.");
+        }
+
+        return trimmed;
     }
 }
