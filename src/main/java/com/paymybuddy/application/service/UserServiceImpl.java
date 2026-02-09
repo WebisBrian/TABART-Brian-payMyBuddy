@@ -1,14 +1,17 @@
 package com.paymybuddy.application.service;
 
+import com.paymybuddy.application.service.exception.ContactAlreadyExistsException;
+import com.paymybuddy.application.service.exception.ContactNotFoundException;
+import com.paymybuddy.application.service.exception.UserNotFoundException;
 import com.paymybuddy.domain.entity.User;
 import com.paymybuddy.domain.entity.UserContact;
+import com.paymybuddy.domain.utils.EmailNormalizer;
 import com.paymybuddy.infrastructure.repository.UserContactRepository;
 import com.paymybuddy.infrastructure.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -21,105 +24,88 @@ public class UserServiceImpl implements UserService {
         this.userContactRepository = userContactRepository;
     }
 
+    /* ---------- getByEmail() ---------- */
     @Override
     @Transactional (readOnly = true)
     public User getByEmail(String email) {
-        if (email == null) {
-            throw new IllegalArgumentException("Email must not be null.");
-        }
-
-        String normalizedEmail = email.trim().toLowerCase();
-        if (normalizedEmail.isEmpty()) {
-            throw new IllegalArgumentException("Email must not be empty.");
-        }
+        String normalizedEmail = EmailNormalizer.normalize(email);
 
         return userRepository.findByEmail(normalizedEmail)
-                .orElseThrow(() -> new IllegalArgumentException("User not found."));
+                .orElseThrow(() -> new UserNotFoundException(email));
     }
 
+    /* ---------- addContact() ---------- */
     @Override
     @Transactional
     public void addContact(Long userId, Long contactId) {
-        if (userId == null || contactId == null) {
-            throw new IllegalArgumentException("User and contact IDs must not be null.");
-        }
+        requireNonNull(userId, "User ID must not be null");
+        requireNonNull(contactId, "Contact ID must not be null");
 
-        if (userId.equals(contactId)) {
-            throw new IllegalArgumentException("Cannot add self as contact");
-        }
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found."));
-
-        User contact = userRepository.findById(contactId)
-                .orElseThrow(() -> new IllegalArgumentException("Contact not found."));
+        User user = findUserById(userId);
+        User contact = findUserById(contactId);
 
         if (userContactRepository.existsByUser_IdAndContact_Id(userId, contactId)) {
-            throw new IllegalArgumentException("User already has this contact.");
+            throw new ContactAlreadyExistsException();
         }
 
         UserContact newContact = UserContact.create(user, contact);
         userContactRepository.save(newContact);
     }
 
+    /* ---------- addContactByEmail() ---------- */
     @Override
     @Transactional
     public void addContactByEmail(Long userId, String contactEmail) {
-        if (userId == null) {
-            throw new IllegalArgumentException("User ID must not be null.");
-        }
+        requireNonNull(userId, "User ID must not be null");
+        String normalizedEmail = EmailNormalizer.normalize(contactEmail);
 
-        if (contactEmail == null) {
-            throw new IllegalArgumentException("Contact email must not be null.");
-        }
+        User user = findUserById(userId);
 
-        String normalizedEmail = contactEmail.trim();
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found."));
-
-        if (user.getEmail().trim().equalsIgnoreCase(normalizedEmail)) {
-            throw new IllegalArgumentException("Cannot add self as contact.");
-        }
-
-        if(userContactRepository.existsByUser_IdAndContact_Email(userId, normalizedEmail)) {
-            throw new IllegalArgumentException("User already has this contact.");
+        if (userContactRepository.existsByUser_IdAndContact_Email(userId, normalizedEmail)) {
+            throw new ContactAlreadyExistsException();
         }
 
         User contact = userRepository.findByEmail(normalizedEmail)
-                .orElseThrow(() -> new IllegalArgumentException("Contact not found."));
+                .orElseThrow(() -> new UserNotFoundException("Contact not found with email: " + normalizedEmail));
 
         UserContact newContact = UserContact.create(user, contact);
         userContactRepository.save(newContact);
     }
 
+    /* ---------- removeContact() ---------- */
     @Override
     @Transactional
     public void removeContact(Long userId, Long contactId) {
-        if (userId == null || contactId == null) {
-            throw new IllegalArgumentException("User and contact IDs must not be null.");
-        }
-
-        if (userId.equals(contactId)) {
-            throw new IllegalArgumentException("Cannot remove self as contact.");
-        }
+        requireNonNull(userId, "User ID must not be null");
+        requireNonNull(contactId, "Contact ID must not be null");
 
         long deleted = userContactRepository.deleteByUser_IdAndContact_Id(userId, contactId);
+
         if (deleted == 0) {
-            throw new IllegalArgumentException("User does not have this contact.");
+            throw new ContactNotFoundException();
         }
     }
 
+    /* ---------- listContacts() ---------- */
     @Override
     @Transactional(readOnly = true)
     public List<User> listContacts(Long userId) {
-        if (userId == null) {
-            throw new IllegalArgumentException("User ID must not be null.");
-        }
+        requireNonNull(userId, "User ID must not be null");
 
-        userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found."));
+        findUserById(userId);
 
         return userContactRepository.findContactsByUserId(userId);
+    }
+
+    /* ---------- Helpers ---------- */
+    private User findUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+    }
+
+    private static void requireNonNull(Object value, String message) {
+        if (value == null) {
+            throw new IllegalArgumentException(message);
+        }
     }
 }
