@@ -3,6 +3,7 @@ package com.paymybuddy.application.service;
 import com.paymybuddy.application.service.exception.EmailAlreadyUsedException;
 import com.paymybuddy.application.service.exception.UserAccountNotFoundException;
 import com.paymybuddy.domain.entity.User;
+import com.paymybuddy.domain.exception.InvalidEmailException;
 import com.paymybuddy.domain.exception.InvalidUserFieldException;
 import com.paymybuddy.infrastructure.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -55,7 +56,7 @@ class ProfileServiceImplTest {
     @ValueSource(strings = {"", "   "})
     void updateProfile_shouldThrow_whenCurrentEmailInvalid(String email) {
         assertThatThrownBy(() -> profileService.updateProfile(email, NEW_USERNAME, NEW_EMAIL))
-                .isInstanceOf(InvalidUserFieldException.class);
+                .isInstanceOf(InvalidEmailException.class);
         verifyNoInteractions(userRepository);
     }
 
@@ -77,7 +78,7 @@ class ProfileServiceImplTest {
     @ValueSource(strings = {"", "   "})
     void updateProfile_shouldThrow_whenNewEmailInvalid(String email) {
         assertThatThrownBy(() -> profileService.updateProfile(EMAIL, NEW_USERNAME, email))
-                .isInstanceOf(InvalidUserFieldException.class);
+                .isInstanceOf(InvalidEmailException.class);
         verifyNoInteractions(userRepository);
     }
 
