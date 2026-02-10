@@ -1,6 +1,5 @@
 package com.paymybuddy.application.service;
 
-import com.paymybuddy.application.service.exception.InvalidUserIdException;
 import com.paymybuddy.application.service.exception.AccountNotFoundException;
 import com.paymybuddy.domain.entity.Account;
 import com.paymybuddy.infrastructure.repository.AccountRepository;
@@ -52,7 +51,7 @@ public class AccountServiceImpl implements AccountService {
     /* ---------- Helpers ---------- */
     private static void ensureUserIdNotNull(Long userId) {
         if (userId == null) {
-            throw new InvalidUserIdException();
+            throw new IllegalArgumentException("User ID must not be null.");
         }
     }
 }

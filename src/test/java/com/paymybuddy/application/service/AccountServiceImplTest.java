@@ -1,6 +1,5 @@
 package com.paymybuddy.application.service;
 
-import com.paymybuddy.application.service.exception.InvalidUserIdException;
 import com.paymybuddy.application.service.exception.AccountNotFoundException;
 import com.paymybuddy.domain.entity.Account;
 import com.paymybuddy.domain.entity.User;
@@ -65,7 +64,7 @@ class AccountServiceImplTest {
     @Test
     void getBalance_shouldThrow_whenUserIdIsNull() {
         assertThatThrownBy(() -> accountService.getBalance(null))
-                .isInstanceOf(InvalidUserIdException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         verifyNoInteractions(accountRepository);
     }
@@ -89,7 +88,7 @@ class AccountServiceImplTest {
     @Test
     void deposit_shouldThrow_whenUserIdIsNull() {
         assertThatThrownBy(() -> accountService.deposit(null, new BigDecimal("95.00")))
-                .isInstanceOf(InvalidUserIdException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         verifyNoInteractions(accountRepository);
     }
@@ -151,7 +150,7 @@ class AccountServiceImplTest {
     @Test
     void withdraw_shouldThrow_whenUserIdIsNull() {
         assertThatThrownBy(() -> accountService.withdraw(null, new BigDecimal("95.00")))
-                .isInstanceOf(InvalidUserIdException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         verifyNoInteractions(accountRepository);
     }
