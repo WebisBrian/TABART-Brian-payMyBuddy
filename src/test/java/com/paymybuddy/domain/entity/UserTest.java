@@ -1,6 +1,5 @@
 package com.paymybuddy.domain.entity;
 
-import com.paymybuddy.domain.exception.InvalidUserFieldException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
@@ -35,7 +34,7 @@ class UserTest {
     @ValueSource(strings = {"", "   "})
     void create_shouldThrow_whenUsernameInvalid(String username) {
         assertThatThrownBy(() -> User.create(username, "user@email.com", "password"))
-                .isInstanceOf(InvalidUserFieldException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Username must not be null or blank");
     }
 
@@ -52,7 +51,7 @@ class UserTest {
     @ValueSource(strings = {"", "   "})
     void create_shouldThrow_whenPasswordInvalid(String password) {
         assertThatThrownBy(() -> User.create("User 1", "user@email.com", password))
-                .isInstanceOf(InvalidUserFieldException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Password must not be null or blank");
     }
 
@@ -73,7 +72,7 @@ class UserTest {
         User user = User.create("User 1", "user@email.com", "hash");
 
         assertThatThrownBy(() -> user.changeUsername(username))
-                .isInstanceOf(InvalidUserFieldException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Username must not be null or blank");
     }
 
@@ -112,7 +111,7 @@ class UserTest {
         User user = User.create("User 1", "user@email.com", "hash");
 
         assertThatThrownBy(() -> user.changePasswordHash(password))
-                .isInstanceOf(InvalidUserFieldException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Password must not be null or blank");
     }
 

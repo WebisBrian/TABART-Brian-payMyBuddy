@@ -6,7 +6,6 @@ import com.paymybuddy.application.service.exception.WeakPasswordException;
 import com.paymybuddy.domain.entity.Account;
 import com.paymybuddy.domain.entity.User;
 import com.paymybuddy.domain.exception.InvalidEmailException;
-import com.paymybuddy.domain.exception.InvalidUserFieldException;
 import com.paymybuddy.infrastructure.repository.AccountRepository;
 import com.paymybuddy.infrastructure.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -183,7 +182,7 @@ class RegistrationServiceImplTest {
 
         // Act & Assert
         assertThatThrownBy(() -> registrationService.register(username, EMAIL, PASSWORD))
-                .isInstanceOf(InvalidUserFieldException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Username");
 
         verify(userRepository).existsByEmail(EMAIL);

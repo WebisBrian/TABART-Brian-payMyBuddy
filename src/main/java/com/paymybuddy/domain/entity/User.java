@@ -1,6 +1,5 @@
 package com.paymybuddy.domain.entity;
 
-import com.paymybuddy.domain.exception.InvalidUserFieldException;
 import com.paymybuddy.domain.utils.EmailNormalizer;
 import jakarta.persistence.*;
 import lombok.*;
@@ -57,7 +56,7 @@ public class User {
     // Private methods
     private static String requireNonBlank(String value, String field) {
         if (value == null || value.trim().isEmpty()) {
-            throw new InvalidUserFieldException(field + " must not be null or blank.");
+            throw new IllegalArgumentException(field + " must not be null or blank.");
         }
 
         return value.trim();
@@ -67,7 +66,7 @@ public class User {
         String trimmed = requireNonBlank(username, "Username");
 
         if (trimmed.length() > 100) {
-            throw new InvalidUserFieldException("Username must not exceed 100 characters.");
+            throw new IllegalArgumentException("Username must not exceed 100 characters.");
         }
 
         return trimmed;
