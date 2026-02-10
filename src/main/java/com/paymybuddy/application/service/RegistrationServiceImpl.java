@@ -1,6 +1,7 @@
 package com.paymybuddy.application.service;
 
 import com.paymybuddy.application.service.exception.EmailAlreadyUsedException;
+import com.paymybuddy.application.service.exception.TooLongPasswordException;
 import com.paymybuddy.application.service.exception.WeakPasswordException;
 import com.paymybuddy.domain.entity.Account;
 import com.paymybuddy.domain.entity.User;
@@ -57,6 +58,10 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         if (password.length() < 8) {
             throw new WeakPasswordException("Password must be at least 8 characters long.");
+        }
+
+        if (password.length() > 70) {
+            throw new TooLongPasswordException("Password must not exceed 70 characters.");
         }
     }
 }

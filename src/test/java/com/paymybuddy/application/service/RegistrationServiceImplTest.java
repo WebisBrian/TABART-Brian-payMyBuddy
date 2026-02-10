@@ -1,6 +1,7 @@
 package com.paymybuddy.application.service;
 
 import com.paymybuddy.application.service.exception.EmailAlreadyUsedException;
+import com.paymybuddy.application.service.exception.TooLongPasswordException;
 import com.paymybuddy.application.service.exception.WeakPasswordException;
 import com.paymybuddy.domain.entity.Account;
 import com.paymybuddy.domain.entity.User;
@@ -117,6 +118,17 @@ class RegistrationServiceImplTest {
         // Act & Assert
         assertThatThrownBy(() -> registrationService.register(USERNAME, EMAIL, password))
                 .isInstanceOf(WeakPasswordException.class);
+
+        verifyNoInteractions(userRepository, accountRepository, passwordEncoder);
+    }
+
+    @Test
+    void register_shouldThrow_whenPasswordTooLong() {
+        String tooLongPassword = "ahfzfazfèaz yfèyaè fazgyfgayzgf ygfazgfgazy gfygaz gfuyag zygfa hfuaiuhfuiaz";
+
+        // Act & Assert
+        assertThatThrownBy(() -> registrationService.register(USERNAME, EMAIL, tooLongPassword))
+                .isInstanceOf(TooLongPasswordException.class);
 
         verifyNoInteractions(userRepository, accountRepository, passwordEncoder);
     }
