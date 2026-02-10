@@ -2,7 +2,6 @@ package com.paymybuddy.domain.entity;
 
 import com.paymybuddy.domain.exception.InsufficientBalanceException;
 import com.paymybuddy.domain.exception.InvalidAmountException;
-import com.paymybuddy.domain.exception.MissingAccountOwnerException;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -35,7 +34,7 @@ public class Account {
     // Factory method
     public static Account create(User user) {
         if (user == null) {
-            throw new MissingAccountOwnerException();
+            throw new IllegalArgumentException("Account must be associated with a user.");
         }
 
         return new Account(user);

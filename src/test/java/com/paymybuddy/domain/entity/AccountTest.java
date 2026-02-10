@@ -2,7 +2,6 @@ package com.paymybuddy.domain.entity;
 
 import com.paymybuddy.domain.exception.InsufficientBalanceException;
 import com.paymybuddy.domain.exception.InvalidAmountException;
-import com.paymybuddy.domain.exception.MissingAccountOwnerException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +25,7 @@ class AccountTest {
 
     @Test
     void create_shouldThrow_whenUserIsNull() {
-        MissingAccountOwnerException ex = assertThrows(MissingAccountOwnerException.class, () ->
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
                 Account.create(null)
         );
         assertTrue(ex.getMessage().contains("Account must be associated with a user."));
