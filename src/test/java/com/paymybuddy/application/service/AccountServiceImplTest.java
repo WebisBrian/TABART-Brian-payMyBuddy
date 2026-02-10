@@ -4,7 +4,7 @@ import com.paymybuddy.application.service.exception.AccountNotFoundException;
 import com.paymybuddy.domain.entity.Account;
 import com.paymybuddy.domain.entity.User;
 import com.paymybuddy.domain.exception.InsufficientBalanceException;
-import com.paymybuddy.domain.exception.InvalidMoneyAmountException;
+import com.paymybuddy.domain.exception.InvalidAmountException;
 import com.paymybuddy.infrastructure.repository.AccountRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -122,7 +122,7 @@ class AccountServiceImplTest {
                 amount == null ? null : BigDecimal.valueOf(amount)
                 )
         )
-                .isInstanceOf(InvalidMoneyAmountException.class);
+                .isInstanceOf(InvalidAmountException.class);
 
         assertThat(account.getBalance()).isEqualByComparingTo("0.00");
         verify(accountRepository).findByUserId(userId);
@@ -185,7 +185,7 @@ class AccountServiceImplTest {
                         amount == null ? null : BigDecimal.valueOf(amount)
                 )
         )
-                .isInstanceOf(InvalidMoneyAmountException.class);
+                .isInstanceOf(InvalidAmountException.class);
 
         assertThat(account.getBalance()).isEqualByComparingTo("150.00");
         verify(accountRepository).findByUserId(userId);

@@ -69,10 +69,10 @@ public class Transaction {
             throw new MissingReceiverAccountException();
         }
         if (amount == null || amount.signum() <= 0) {
-            throw new InvalidTransactionAmountException(amount);
+            throw new InvalidAmountException("Amount must be strictly positive. Provided: " + amount);
         }
         if (fee == null || fee.signum() < 0) {
-            throw new InvalidTransactionFeeException(fee);
+            throw new InvalidAmountException("Fee must be zero or positive. Provided: " + fee);
         }
         if (date == null) {
             throw new MissingTransactionDateException();

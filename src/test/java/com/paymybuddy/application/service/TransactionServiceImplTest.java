@@ -7,7 +7,7 @@ import com.paymybuddy.domain.entity.Account;
 import com.paymybuddy.domain.entity.Transaction;
 import com.paymybuddy.domain.entity.User;
 import com.paymybuddy.domain.exception.InsufficientBalanceException;
-import com.paymybuddy.domain.exception.InvalidMoneyAmountException;
+import com.paymybuddy.domain.exception.InvalidAmountException;
 import com.paymybuddy.infrastructure.repository.AccountRepository;
 import com.paymybuddy.infrastructure.repository.TransactionRepository;
 import com.paymybuddy.infrastructure.repository.UserContactRepository;
@@ -218,7 +218,7 @@ class TransactionServiceImplTest {
                 2L,
                 amount == null ? null : BigDecimal.valueOf(amount),
                 "Test"))
-                .isInstanceOf(InvalidMoneyAmountException.class);
+                .isInstanceOf(InvalidAmountException.class);
 
         verifyNoInteractions(transactionRepository);
     }

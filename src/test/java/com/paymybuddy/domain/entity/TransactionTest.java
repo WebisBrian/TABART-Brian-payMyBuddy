@@ -59,7 +59,7 @@ class TransactionTest {
         Account sender = validAccount("sender@mail.com");
         Account receiver = validAccount("receiver@mail.com");
 
-        InvalidTransactionAmountException ex = assertThrows(InvalidTransactionAmountException.class, () ->
+        InvalidAmountException ex = assertThrows(InvalidAmountException.class, () ->
                 Transaction.create(sender, receiver, null, BigDecimal.ZERO, LocalDateTime.now(), null)
         );
 
@@ -72,13 +72,13 @@ class TransactionTest {
         Account receiver = validAccount("receiver@mail.com");
 
         // Test zero amount
-        InvalidTransactionAmountException exZero = assertThrows(InvalidTransactionAmountException.class, () ->
+        InvalidAmountException exZero = assertThrows(InvalidAmountException.class, () ->
                 Transaction.create(sender, receiver, new BigDecimal("0.00"), BigDecimal.ZERO, LocalDateTime.now(), null)
         );
         assertTrue(exZero.getMessage().contains("Amount must be strictly positive."));
 
         // Test negative amount
-        InvalidTransactionAmountException exNegative = assertThrows(InvalidTransactionAmountException.class, () ->
+        InvalidAmountException exNegative = assertThrows(InvalidAmountException.class, () ->
                 Transaction.create(sender, receiver, new BigDecimal("-1.00"), BigDecimal.ZERO, LocalDateTime.now(), null)
         );
         assertTrue(exNegative.getMessage().contains("Amount must be strictly positive."));
@@ -89,7 +89,7 @@ class TransactionTest {
         Account sender = validAccount("sender@mail.com");
         Account receiver = validAccount("receiver@mail.com");
 
-        InvalidTransactionFeeException ex = assertThrows(InvalidTransactionFeeException.class, () ->
+        InvalidAmountException ex = assertThrows(InvalidAmountException.class, () ->
                 Transaction.create(sender, receiver, new BigDecimal("10.00"), null, LocalDateTime.now(), null)
         );
 
@@ -101,7 +101,7 @@ class TransactionTest {
         Account sender = validAccount("sender@mail.com");
         Account receiver = validAccount("receiver@mail.com");
 
-        InvalidTransactionFeeException ex = assertThrows(InvalidTransactionFeeException.class, () ->
+        InvalidAmountException ex = assertThrows(InvalidAmountException.class, () ->
                 Transaction.create(sender, receiver, new BigDecimal("10.00"), new BigDecimal("-0.01"), LocalDateTime.now(), null)
         );
 
