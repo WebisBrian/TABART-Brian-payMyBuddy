@@ -1,7 +1,6 @@
 package com.paymybuddy.application.service;
 
 import com.paymybuddy.application.service.exception.AccountNotFoundException;
-import com.paymybuddy.application.service.exception.InvalidTransactionParameterException;
 import com.paymybuddy.application.service.exception.NotInContactsException;
 import com.paymybuddy.application.service.exception.SelfTransferException;
 import com.paymybuddy.domain.entity.Account;
@@ -118,7 +117,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     private static void requireNonNull(Object value, String label) {
         if (value == null) {
-            throw new InvalidTransactionParameterException(label);
+            throw new IllegalArgumentException(label + " must not be null.");
         }
     }
 }

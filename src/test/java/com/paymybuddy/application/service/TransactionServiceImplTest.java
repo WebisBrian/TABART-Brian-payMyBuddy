@@ -1,7 +1,6 @@
 package com.paymybuddy.application.service;
 
 import com.paymybuddy.application.service.exception.AccountNotFoundException;
-import com.paymybuddy.application.service.exception.InvalidTransactionParameterException;
 import com.paymybuddy.application.service.exception.NotInContactsException;
 import com.paymybuddy.application.service.exception.SelfTransferException;
 import com.paymybuddy.domain.entity.Account;
@@ -16,7 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -121,7 +119,7 @@ class TransactionServiceImplTest {
    @Test
     void transfer_shouldThrow_whenSenderIdIsNull() {
         assertThatThrownBy(() -> transactionService.transfer(null, 2L, new BigDecimal("100.00"), "Dinner"))
-                .isInstanceOf(InvalidTransactionParameterException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         verifyNoInteractions(accountRepository, transactionRepository, userContactRepository);
     }
@@ -129,7 +127,7 @@ class TransactionServiceImplTest {
     @Test
     void transfer_shouldThrow_whenReceiverIdIsNull() {
         assertThatThrownBy(() -> transactionService.transfer(1L, null, new BigDecimal("100.00"), "Dinner"))
-                .isInstanceOf(InvalidTransactionParameterException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         verifyNoInteractions(accountRepository, transactionRepository, userContactRepository);
     }
@@ -137,7 +135,7 @@ class TransactionServiceImplTest {
     @Test
     void transfer_shouldThrow_whenAmountIsNull() {
        assertThatThrownBy(() -> transactionService.transfer(1L, 2L, null, "Dinner"))
-                .isInstanceOf(InvalidTransactionParameterException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         verifyNoInteractions(accountRepository, transactionRepository, userContactRepository);
    }
@@ -366,7 +364,7 @@ class TransactionServiceImplTest {
     @Test
     void getTransactionHistory_shouldThrow_whenUserIdIsNull() {
         assertThatThrownBy(() -> transactionService.getTransactionHistory(null, PageRequest.of(0, 10)))
-                .isInstanceOf(InvalidTransactionParameterException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         verifyNoInteractions(accountRepository, transactionRepository);
     }
@@ -374,7 +372,7 @@ class TransactionServiceImplTest {
     @Test
     void getTransactionHistory_shouldThrow_whenPageableIsNull() {
         assertThatThrownBy(() -> transactionService.getTransactionHistory(1L, null))
-                .isInstanceOf(InvalidTransactionParameterException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         verifyNoInteractions(accountRepository, transactionRepository);
     }
