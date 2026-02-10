@@ -1,6 +1,5 @@
 package com.paymybuddy.domain.entity;
 
-import com.paymybuddy.domain.exception.MissingUserOrContactException;
 import com.paymybuddy.domain.exception.SelfContactNotAllowedException;
 import org.junit.jupiter.api.Test;
 
@@ -27,22 +26,22 @@ class UserContactTest {
     void create_shouldThrow_whenUserIsNull() {
         User contact = validUser("contact@mail.com");
 
-        MissingUserOrContactException ex = assertThrows(MissingUserOrContactException.class, () ->
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
                 UserContact.create(null, contact)
         );
 
-        assertTrue(ex.getMessage().contains("User or contact must not be null"));
+        assertTrue(ex.getMessage().contains("User and contact must not be null."));
     }
 
     @Test
     void create_shouldThrow_whenContactIsNull() {
         User user = validUser("user@mail.com");
 
-        MissingUserOrContactException ex = assertThrows(MissingUserOrContactException.class, () ->
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
                 UserContact.create(user, null)
         );
 
-        assertTrue(ex.getMessage().contains("User or contact must not be null"));
+        assertTrue(ex.getMessage().contains("User and contact must not be null."));
     }
 
     @Test

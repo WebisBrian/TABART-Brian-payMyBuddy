@@ -36,7 +36,7 @@ class TransactionTest {
     void create_shouldThrow_whenSenderAccountIsNull() {
         Account receiver = validAccount("receiver@mail.com");
 
-        MissingSenderAccountException ex = assertThrows(MissingSenderAccountException.class, () ->
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
                 Transaction.create(null, receiver, new BigDecimal("10.00"), BigDecimal.ZERO, LocalDateTime.now(), null)
         );
 
@@ -47,7 +47,7 @@ class TransactionTest {
     void create_shouldThrow_whenReceiverAccountIsNull() {
         Account sender = validAccount("sender@mail.com");
 
-        MissingReceiverAccountException ex = assertThrows(MissingReceiverAccountException.class, () ->
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
                 Transaction.create(sender, null, new BigDecimal("10.00"), BigDecimal.ZERO, LocalDateTime.now(), null)
         );
 
@@ -113,7 +113,7 @@ class TransactionTest {
         Account sender = validAccount("sender@mail.com");
         Account receiver = validAccount("receiver@mail.com");
 
-        MissingTransactionDateException ex = assertThrows(MissingTransactionDateException.class, () ->
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
                 Transaction.create(sender, receiver, new BigDecimal("10.00"), BigDecimal.ZERO, null, null)
         );
 
