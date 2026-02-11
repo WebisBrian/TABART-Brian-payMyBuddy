@@ -16,11 +16,11 @@ jobs :
     runs-on: ubuntu-latest
 
     steps:
-      # 1) Récupère le code du repo sur le runner GitHub
+      # 1) Retrieve the repository code from the GitHub runner
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 2) Installe Java 21 et active le cache Maven (accélère les builds)
+      # 2) Install Java 21 and enable the Maven cache (speeds up builds)
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -28,13 +28,14 @@ jobs :
           java-version: "21"
           cache: maven
 
-      # 3) (Optionnel) Affiche la version de Maven/Java pour debug
+      # 3) (Optional) Displays the Maven/Java version for debugging
       - name: Show Java & Maven versions
         run: |
           java -version
           mvn -version
 
-      # 4) Lance la vérification complète Maven (compile + tests)
-      # -B = batch mode (sortie plus propre pour CI)
+
+      # 4) Run the full Maven verification (compile + tests)
+      # -B = batch mode (cleaner output for CI)
       - name: Build and test
         run: mvn -B verify
