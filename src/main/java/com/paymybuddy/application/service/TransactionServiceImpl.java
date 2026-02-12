@@ -89,7 +89,7 @@ public class TransactionServiceImpl implements TransactionService {
         requireNonNull(amount, "Amount");
 
         if (senderId.equals(receiverId)) {
-            throw new SelfTransferException();
+            throw new SelfTransferException(senderId, receiverId);
         }
     }
 
