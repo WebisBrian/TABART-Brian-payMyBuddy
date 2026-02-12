@@ -61,7 +61,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         if (password.length() > 70) {
-            throw new TooLongPasswordException("Password must not exceed 70 characters.");
+            throw new TooLongPasswordException();
         }
     }
 }

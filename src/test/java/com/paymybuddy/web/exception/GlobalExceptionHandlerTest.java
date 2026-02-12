@@ -157,6 +157,22 @@ class GlobalExceptionHandlerTest {
                         "Le mot de passe doit comporter au moins 8 caractères, ne pas être vide ou composé uniquement d'espaces."));
     }
 
+    @Test
+    void shouldHandleTooLongPasswordException() throws Exception {
+        doThrow(new TooLongPasswordException())
+                .when(registrationService).register(anyString(), anyString(), anyString());
+
+        mockMvc.perform(post("/register")
+                        .with(csrf())
+                        .param("username", "user")
+                        .param("email", "user@email.com")
+                        .param("password", "password")) // normal password to avoid validation error from @Valid
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/register"))
+                .andExpect(flash().attribute("errorMessageFromGEH",
+                        "Le mot de passe ne peut pas dépasser 70 caractères."));
+    }
+
     /* ---------- Domain exceptions ---------- */
 
     @Test

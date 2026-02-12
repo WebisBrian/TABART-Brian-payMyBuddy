@@ -1,7 +1,7 @@
 package com.paymybuddy.application.service.exception;
 
 public class TooLongPasswordException extends RuntimeException {
-    public TooLongPasswordException(String message) {
-        super(message);
+    public TooLongPasswordException() {
+        super("Password must not exceed 70 characters.");
     }
 }

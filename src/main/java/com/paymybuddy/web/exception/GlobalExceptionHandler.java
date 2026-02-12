@@ -77,6 +77,14 @@ public class GlobalExceptionHandler {
         return "redirect:/register";
     }
 
+    @ExceptionHandler(TooLongPasswordException.class)
+    public String handleTooLongPasswordException(TooLongPasswordException ex,
+                                                 RedirectAttributes redirectAttributes) {
+        logger.warn(ex.getMessage());
+        redirectAttributes.addFlashAttribute("errorMessageFromGEH", "Le mot de passe ne peut pas dépasser 70 caractères.");
+        return "redirect:/register";
+    }
+
     /* ---------- Domain specifics exceptions ---------- */
 
     @ExceptionHandler(InsufficientBalanceException.class)
@@ -126,14 +134,6 @@ public class GlobalExceptionHandler {
     }
 
     /* ---------- others ---------- */
-
-    @ExceptionHandler(TooLongPasswordException.class)
-    public String handleTooLongPasswordException(TooLongPasswordException ex,
-                                                 RedirectAttributes redirectAttributes) {
-        logger.warn("Password too long: {}", ex.getMessage());
-        redirectAttributes.addFlashAttribute("error", "Le mot de passe est trop long.");
-        return "redirect:/register";
-    }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public String handleIllegalArgumentException(IllegalArgumentException ex,
