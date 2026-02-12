@@ -80,8 +80,8 @@ class GlobalExceptionHandlerTest {
         Long userId = 1L;
         String contactEmail = "contact@email.com";
         when(userService.getByEmail(anyString())).thenReturn(createMockUser());
-        doThrow(new ContactAlreadyExistsException(userId,contactEmail))
-                .when(userService).addContactByEmail(userId,contactEmail);
+        doThrow(new ContactAlreadyExistsException(userId, contactEmail))
+                .when(userService).addContactByEmail(userId, contactEmail);
 
         mockMvc.perform(post("/contacts/add")
                         .with(csrf())
@@ -173,8 +173,53 @@ class GlobalExceptionHandlerTest {
                         "Le mot de passe ne peut pas dépasser 70 caractères."));
     }
 
-    /* ---------- Domain exceptions ---------- */
+    @Test
+    @WithMockUser(username = "user@email.com")
+    void shouldHandleUserNotFoundException() throws Exception {
+        when(userService.getByEmail(anyString())).thenReturn(createMockUser());
+        doThrow(new UserNotFoundException("unknown@email.com"))
+                .when(userService).addContactByEmail(anyLong(), anyString());
 
+        mockMvc.perform(post("/contacts/add")
+                        .with(csrf())
+                        .param("email", "unknown@email.com"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/contacts"))
+                .andExpect(flash().attribute("errorMessageFromGEH", "Utilisateur non trouvé avec l'adresse email renseignée."));
+    }
+
+    @Test
+    @WithMockUser(username = "user@email.com")
+    void shouldHandleProfileNotFoundException() throws Exception {
+        when(userService.getByEmail(anyString())).thenReturn(createMockUser());
+        doThrow(new ProfileNotFoundException("user@email.com"))
+                .when(profileService).updateProfile(anyString(), anyString(), anyString());
+
+        mockMvc.perform(post("/profile/update")
+                        .with(csrf())
+                        .param("newUsername", "newUsername")
+                        .param("newEmail", "newEmail@email.com"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/profile"))
+                .andExpect(flash().attribute("errorMessageFromGEH", "Profil non trouvé avec l'adresse email renseignée."));
+    }
+
+    @Test
+    @WithMockUser(username = "user@email.com")
+    void shouldHandleContactNotFoundException() throws Exception {
+        when(userService.getByEmail(anyString())).thenReturn(createMockUser());
+        doThrow(new ContactNotFoundException())
+                .when(userService).addContactByEmail(anyLong(), anyString());
+
+        mockMvc.perform(post("/contacts/add")
+                        .with(csrf())
+                        .param("email", "contact@email.com"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/contacts"))
+                .andExpect(flash().attribute("errorMessageFromGEH", "Contact non trouvé."));
+    }
+
+    /* ---------- Domain exceptions ---------- */
     @Test
     @WithMockUser(username = "user@email.com")
     void shouldHandleInsufficientBalanceException() throws Exception {
@@ -253,38 +298,6 @@ class GlobalExceptionHandlerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/register"))
                 .andExpect(flash().attribute("errorMessageFromGEH", "Requête invalide."));
-    }
-
-    /* ---------- others ---------- */
-
-    @Test
-    @WithMockUser(username = "user@email.com")
-    void shouldHandleUserNotFoundException() throws Exception {
-        when(userService.getByEmail(anyString())).thenReturn(createMockUser());
-        doThrow(new UserNotFoundException("unknown@email.com"))
-                .when(userService).addContactByEmail(anyLong(), anyString());
-
-        mockMvc.perform(post("/contacts/add")
-                        .with(csrf())
-                        .param("email", "unknown@email.com"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/contacts"))
-                .andExpect(flash().attribute("error", "Utilisateur non trouvé."));
-    }
-
-    @Test
-    @WithMockUser(username = "user@email.com")
-    void shouldHandleContactNotFoundException() throws Exception {
-        when(userService.getByEmail(anyString())).thenReturn(createMockUser());
-        doThrow(new ContactNotFoundException())
-                .when(userService).addContactByEmail(anyLong(), anyString());
-
-        mockMvc.perform(post("/contacts/add")
-                        .with(csrf())
-                        .param("email", "contact@email.com"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/contacts"))
-                .andExpect(flash().attribute("error", "Contact non trouvé."));
     }
 
     /* ---------- Helper methods ---------- */

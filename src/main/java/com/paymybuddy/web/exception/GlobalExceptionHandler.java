@@ -3,7 +3,6 @@ package com.paymybuddy.web.exception;
 import com.paymybuddy.application.service.exception.*;
 import com.paymybuddy.domain.exception.*;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -87,16 +86,29 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
     public String handleUserNotFoundException(UserNotFoundException ex,
-                                              RedirectAttributes redirectAttributes,
-                                              HttpServletResponse response) {
-        logger.warn("User not found: {}", ex.getMessage());
-        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        redirectAttributes.addFlashAttribute("error", "Utilisateur non trouvé.");
+                                              RedirectAttributes redirectAttributes) {
+        logger.warn(ex.getMessage());
+        redirectAttributes.addFlashAttribute("errorMessageFromGEH", "Utilisateur non trouvé avec l'adresse email renseignée.");
+        return "redirect:/contacts";
+    }
+
+    @ExceptionHandler(ProfileNotFoundException.class)
+    public String handleProfileNotFoundException(ProfileNotFoundException ex,
+                                                 RedirectAttributes redirectAttributes) {
+        logger.warn(ex.getMessage());
+        redirectAttributes.addFlashAttribute("errorMessageFromGEH", "Profil non trouvé avec l'adresse email renseignée.");
+        return "redirect:/profile";
+    }
+
+    @ExceptionHandler(ContactNotFoundException.class)
+    public String handleContactNotFoundException(ContactNotFoundException ex,
+                                                 RedirectAttributes redirectAttributes) {
+        logger.warn(ex.getMessage());
+        redirectAttributes.addFlashAttribute("errorMessageFromGEH", "Contact non trouvé.");
         return "redirect:/contacts";
     }
 
     /* ---------- Domain specifics exceptions ---------- */
-
     @ExceptionHandler(InsufficientBalanceException.class)
     public String handleInsufficientBalanceException(InsufficientBalanceException ex,
                                                      RedirectAttributes redirectAttributes) {
@@ -142,13 +154,13 @@ public class GlobalExceptionHandler {
         redirectAttributes.addFlashAttribute("errorMessageFromGEH", "Vous ne pouvez pas vous ajouter comme contact.");
         return "redirect:/contacts";
     }
-    /* ---------- Generic exceptions ---------- */
 
+    /* ---------- Generic exceptions ---------- */
     @ExceptionHandler(IllegalArgumentException.class)
     public String handleIllegalArgumentException(IllegalArgumentException ex,
                                                  RedirectAttributes redirectAttributes,
                                                  HttpServletRequest request
-                                                 ) {
+    ) {
         String path = request.getRequestURI();
 
         logger.warn("Invalid argument. Detail = ({})", ex.getMessage());
@@ -175,28 +187,5 @@ public class GlobalExceptionHandler {
         }
 
         return "redirect:/";
-    }
-
-
-    /* ---------- others ---------- */
-
-    @ExceptionHandler(ProfileNotFoundException.class)
-    public String handleProfileNotFoundException(ProfileNotFoundException ex,
-                                                 RedirectAttributes redirectAttributes,
-                                                 HttpServletResponse response) {
-        logger.warn("Profile not found: {}", ex.getMessage());
-        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        redirectAttributes.addFlashAttribute("error", "Profil non trouvé.");
-        return "redirect:/profile";
-    }
-
-    @ExceptionHandler(ContactNotFoundException.class)
-    public String handleContactNotFoundException(ContactNotFoundException ex,
-                                                 RedirectAttributes redirectAttributes,
-                                                 HttpServletResponse response) {
-        logger.warn("Contact not found: {}", ex.getMessage());
-        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        redirectAttributes.addFlashAttribute("error", "Contact non trouvé.");
-        return "redirect:/contacts";
     }
 }
