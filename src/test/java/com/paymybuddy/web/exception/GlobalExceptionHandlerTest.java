@@ -239,6 +239,23 @@ class GlobalExceptionHandlerTest {
                 .andExpect(flash().attribute("errorMessageFromGEH", "Vous ne pouvez pas vous ajouter comme contact."));
     }
 
+    /* ---------- Generic exceptions ---------- */
+    @Test
+    void shouldHandleIllegalArgumentExceptionFromRegistration() throws Exception {
+        // registration endpoint does not catch IllegalArgumentException
+        doThrow(new IllegalArgumentException("Invalid registration data"))
+                .when(registrationService).register(anyString(), anyString(), anyString());
+
+        mockMvc.perform(post("/register")
+                        .with(csrf())
+                        .param("username", "newuser")
+                        .param("email", "newuser@example.com")
+                        .param("password", "strongpassword"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/transactions"))
+                .andExpect(flash().attribute("error", "Invalid registration data"));
+    }
+
     /* ---------- others ---------- */
 
     @Test
@@ -269,22 +286,6 @@ class GlobalExceptionHandlerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/contacts"))
                 .andExpect(flash().attribute("error", "Contact non trouvé."));
-    }
-
-    @Test
-    void shouldHandleIllegalArgumentExceptionFromRegistration() throws Exception {
-        // registration endpoint does not catch IllegalArgumentException
-        doThrow(new IllegalArgumentException("Invalid registration data"))
-                .when(registrationService).register(anyString(), anyString(), anyString());
-
-        mockMvc.perform(post("/register")
-                        .with(csrf())
-                        .param("username", "newuser")
-                        .param("email", "newuser@example.com")
-                        .param("password", "strongpassword"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/transactions"))
-                .andExpect(flash().attribute("error", "Invalid registration data"));
     }
 
     /* ---------- Helper methods ---------- */

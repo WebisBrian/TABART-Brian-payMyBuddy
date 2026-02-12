@@ -2,6 +2,7 @@ package com.paymybuddy.web.controller;
 
 import com.paymybuddy.application.service.UserService;
 import com.paymybuddy.domain.entity.User;
+import com.paymybuddy.domain.exception.SelfContactNotAllowedException;
 import com.paymybuddy.infrastructure.security.SecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,7 +103,7 @@ class ContactControllerTest {
         when(userService.listContacts(eq(1L)))
                 .thenReturn(List.of());
 
-        doThrow(new IllegalArgumentException("Cannot add self as contact."))
+        doThrow(new SelfContactNotAllowedException(1L))
                 .when(userService)
                 .addContactByEmail(
                         eq(1L),
@@ -114,11 +115,11 @@ class ContactControllerTest {
                         .with(csrf())
                         .param("email", "user@email.com")
                 )
-                .andExpect(status().isOk())
-                .andExpect(view().name("contacts"))
-                .andExpect(model().attributeExists("addContactForm"))
-                .andExpect(model().attributeExists("contacts"))
-                .andExpect(model().attribute("addContactError", "Cannot add self as contact."));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/contacts"))
+                .andExpect(flash().attribute("errorMessageFromGEH", "Vous ne pouvez pas vous ajouter comme contact."));
+        ;
+
 
         verify(userService).getByEmail("user@email.com");
     }

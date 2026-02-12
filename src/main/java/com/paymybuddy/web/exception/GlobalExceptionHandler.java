@@ -133,8 +133,7 @@ public class GlobalExceptionHandler {
         return "redirect:/contacts";
     }
 
-    /* ---------- others ---------- */
-
+    /* ---------- Generic exceptions ---------- */
     @ExceptionHandler(IllegalArgumentException.class)
     public String handleIllegalArgumentException(IllegalArgumentException ex,
                                                  RedirectAttributes redirectAttributes,
@@ -145,6 +144,9 @@ public class GlobalExceptionHandler {
         redirectAttributes.addFlashAttribute("error", msg);
         return "redirect:/transactions";
     }
+
+
+    /* ---------- others ---------- */
 
     @ExceptionHandler(UserNotFoundException.class)
     public String handleUserNotFoundException(UserNotFoundException ex,
