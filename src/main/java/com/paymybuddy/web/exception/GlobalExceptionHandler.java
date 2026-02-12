@@ -57,15 +57,7 @@ public class GlobalExceptionHandler {
         logger.warn(ex.getMessage());
         redirectAttributes.addFlashAttribute("errorMessageFromGEH", "Cette adresse email est déjà utilisée.");
 
-        if (path.startsWith("/register")) {
-            return "redirect:/register";
-        }
-
-        if (path.startsWith("/profile")) {
-            return "redirect:/profile";
-        }
-
-        return "redirect:/profile";
+        return determineRedirectUrl(request);
     }
 
     @ExceptionHandler(WeakPasswordException.class)
@@ -134,17 +126,7 @@ public class GlobalExceptionHandler {
         logger.warn(ex.getMessage());
         redirectAttributes.addFlashAttribute("errorMessageFromGEH", "Adresse email invalide.");
 
-        if (path.startsWith("/contacts")) {
-            return "redirect:/contacts";
-        }
-        if (path.startsWith("/login")) {
-            return "redirect:/login";
-        }
-        if (path.startsWith("/register")) {
-            return "redirect:/register";
-        }
-
-        return "redirect:/";
+        return determineRedirectUrl(request);
     }
 
     @ExceptionHandler(SelfContactNotAllowedException.class)
@@ -166,26 +148,43 @@ public class GlobalExceptionHandler {
         logger.warn("Invalid argument. Detail = ({})", ex.getMessage());
         redirectAttributes.addFlashAttribute("errorMessageFromGEH", "Requête invalide.");
 
+        return determineRedirectUrl(request);
+    }
+
+    /**
+     * Fallback for any unhandled exceptions to prevent application crashes
+     * and provide user-friendly feedback. (NPE, SQLExceptions, etc.)
+     */
+    @ExceptionHandler(Exception.class)
+    public String handleGenericException(Exception ex,
+                                         HttpServletRequest request,
+                                         RedirectAttributes redirectAttributes) {
+        logger.error("Unexpected error at {}: ", request.getRequestURI(), ex);
+
+        redirectAttributes.addFlashAttribute("errorMessageFromGEH",
+                "Une erreur inattendue s'est produite. Veuillez réessayer.");
+
+        String path = request.getRequestURI();
+
+        return determineRedirectUrl(request);
+    }
+
+    /* ---------- Helpers ---------- */
+    private String determineRedirectUrl(HttpServletRequest request) {
+        String path = request.getRequestURI();
+
         if (path.startsWith("/transactions")) {
             return "redirect:/transactions";
-        }
-
-        if (path.startsWith("/contacts")) {
+        } else if (path.startsWith("/contacts")) {
             return "redirect:/contacts";
-        }
-
-        if (path.startsWith("/profile")) {
+        } else if (path.startsWith("/profile")) {
             return "redirect:/profile";
-        }
-
-        if (path.startsWith("/register")) {
+        } else if (path.startsWith("/register")) {
             return "redirect:/register";
-        }
-
-        if (path.startsWith("/login")) {
+        } else if (path.startsWith("/login")) {
             return "redirect:/login";
         }
 
-        return "redirect:/";
+        return "redirect:/"; // Fallback
     }
 }
