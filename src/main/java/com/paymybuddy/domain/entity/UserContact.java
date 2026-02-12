@@ -44,11 +44,11 @@ public class UserContact {
         }
 
         if (user.getId() != null && contact.getId() != null && user.getId().equals(contact.getId())) {
-            throw new SelfContactNotAllowedException();
+            throw new SelfContactNotAllowedException(user.getId());
         }
 
         if (user.getId() == null && contact.getId() == null && user.getEmail().equals(contact.getEmail())) {
-            throw new SelfContactNotAllowedException();
+            throw new SelfContactNotAllowedException(user.getId());
         }
 
         return new UserContact(user, contact);
