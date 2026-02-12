@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
         User contact = findUserById(contactId);
 
         if (userContactRepository.existsByUser_IdAndContact_Id(userId, contactId)) {
-            throw new ContactAlreadyExistsException();
+            throw new ContactAlreadyExistsException(userId, contactId);
         }
 
         UserContact newContact = UserContact.create(user, contact);
@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
         User user = findUserById(userId);
 
         if (userContactRepository.existsByUser_IdAndContact_Email(userId, normalizedEmail)) {
-            throw new ContactAlreadyExistsException();
+            throw new ContactAlreadyExistsException(userId, normalizedEmail);
         }
 
         User contact = userRepository.findByEmail(normalizedEmail)
