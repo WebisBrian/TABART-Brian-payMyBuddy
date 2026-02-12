@@ -29,6 +29,7 @@ public class ContactController {
         Long userId = userService.getByEmail(email).getId();
 
         model.addAttribute("addContactForm", new AddContactFormDto());
+        // TODO: optimize exposing only few details about contacts instead User entity -> DTO
         model.addAttribute("contacts", userService.listContacts(userId));
 
         return "contacts";
