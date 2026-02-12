@@ -300,6 +300,24 @@ class GlobalExceptionHandlerTest {
                 .andExpect(flash().attribute("errorMessageFromGEH", "Requête invalide."));
     }
 
+    @Test
+    @WithMockUser(username = "user@email.com")
+    void shouldHandleUnexpectedException() throws Exception {
+        when(userService.getByEmail(anyString())).thenReturn(createMockUser());
+
+        doThrow(new NullPointerException("Unexpected NPE"))
+                .when(transactionService).transfer(anyLong(), anyLong(), any(BigDecimal.class), anyString());
+
+        mockMvc.perform(post("/transactions/transfer")
+                        .with(csrf())
+                        .param("receiverId", "2")
+                        .param("amount", "10.00")
+                        .param("description", "Test"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/transactions"))
+                .andExpect(flash().attribute("errorMessageFromGEH", "Une erreur inattendue s'est produite. Veuillez réessayer."));
+    }
+
     /* ---------- Helper methods ---------- */
 
     private User createMockUser() {
