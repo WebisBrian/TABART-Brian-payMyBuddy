@@ -82,9 +82,9 @@ class RegisterControllerTest {
                 .param("email", "brian@email.com")
                 .param("password", "Password123!")
                 )
-                .andExpect(status().isOk())
-                .andExpect(view().name("register"))
-                .andExpect(model().attributeHasFieldErrors("registerForm", "email"));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/register"))
+                .andExpect(flash().attribute("errorMessageFromGEH", "Cette adresse email est déjà utilisée."));
 
         verify(registrationService).register("Brian", "brian@email.com", "Password123!");
     }

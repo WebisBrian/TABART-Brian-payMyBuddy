@@ -33,13 +33,7 @@ public class RegisterController {
             return "register";
         }
 
-        try {
-            registrationService.register(form.getUsername(), form.getEmail(), form.getPassword());
-
-        } catch (EmailAlreadyUsedException e) {
-            bindingResult.rejectValue("email", "emailAlreadyUsed", "Registration failed");
-            return "register";
-        }
+        registrationService.register(form.getUsername(), form.getEmail(), form.getPassword());
 
         return "redirect:/login";
     }
