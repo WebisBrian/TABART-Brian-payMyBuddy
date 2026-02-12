@@ -24,6 +24,11 @@
 <main>
     <h1>Ajouter une relation</h1>
 
+    <!-- Message d'erreur du GlobalExceptionHandler (flash attribute) -->
+    <div th:if="${errorMessageFromGEH}" style="color: red; margin: 10px 0;">
+        <p th:text="${errorMessageFromGEH}"></p>
+    </div>
+
     <!-- Success message -->
     <div th:if="${addContactSuccess}" style="color: green; margin: 10px 0;">
         <p th:text="${addContactSuccess}"></p>

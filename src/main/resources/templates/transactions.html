@@ -25,9 +25,9 @@
 <main>
     <h1>Transférer</h1>
 
-    <!--  Error message  -->
-    <div th:if="${transferError}" style="color: red; margin: 10px 0;">
-        <p th:text="${transferError}"></p>
+    <!-- Message d'erreur du GlobalExceptionHandler (flash attribute) -->
+    <div th:if="${errorMessageFromGEH}" style="color: red; margin: 10px 0;">
+        <p th:text="${errorMessageFromGEH}"></p>
     </div>
 
     <!--  Transfer form  -->
