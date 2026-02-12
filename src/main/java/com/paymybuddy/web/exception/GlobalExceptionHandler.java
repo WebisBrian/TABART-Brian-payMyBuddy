@@ -85,6 +85,16 @@ public class GlobalExceptionHandler {
         return "redirect:/register";
     }
 
+    @ExceptionHandler(UserNotFoundException.class)
+    public String handleUserNotFoundException(UserNotFoundException ex,
+                                              RedirectAttributes redirectAttributes,
+                                              HttpServletResponse response) {
+        logger.warn("User not found: {}", ex.getMessage());
+        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        redirectAttributes.addFlashAttribute("error", "Utilisateur non trouvé.");
+        return "redirect:/contacts";
+    }
+
     /* ---------- Domain specifics exceptions ---------- */
 
     @ExceptionHandler(InsufficientBalanceException.class)
@@ -132,31 +142,43 @@ public class GlobalExceptionHandler {
         redirectAttributes.addFlashAttribute("errorMessageFromGEH", "Vous ne pouvez pas vous ajouter comme contact.");
         return "redirect:/contacts";
     }
-
     /* ---------- Generic exceptions ---------- */
+
     @ExceptionHandler(IllegalArgumentException.class)
     public String handleIllegalArgumentException(IllegalArgumentException ex,
                                                  RedirectAttributes redirectAttributes,
-                                                 HttpServletResponse response) {
-        logger.warn("Invalid argument: {}", ex.getMessage());
-        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        String msg = (ex.getMessage() != null && !ex.getMessage().isBlank()) ? ex.getMessage() : "Requête invalide.";
-        redirectAttributes.addFlashAttribute("error", msg);
-        return "redirect:/transactions";
+                                                 HttpServletRequest request
+                                                 ) {
+        String path = request.getRequestURI();
+
+        logger.warn("Invalid argument. Detail = ({})", ex.getMessage());
+        redirectAttributes.addFlashAttribute("errorMessageFromGEH", "Requête invalide.");
+
+        if (path.startsWith("/transactions")) {
+            return "redirect:/transactions";
+        }
+
+        if (path.startsWith("/contacts")) {
+            return "redirect:/contacts";
+        }
+
+        if (path.startsWith("/profile")) {
+            return "redirect:/profile";
+        }
+
+        if (path.startsWith("/register")) {
+            return "redirect:/register";
+        }
+
+        if (path.startsWith("/login")) {
+            return "redirect:/login";
+        }
+
+        return "redirect:/";
     }
 
 
     /* ---------- others ---------- */
-
-    @ExceptionHandler(UserNotFoundException.class)
-    public String handleUserNotFoundException(UserNotFoundException ex,
-                                              RedirectAttributes redirectAttributes,
-                                              HttpServletResponse response) {
-        logger.warn("User not found: {}", ex.getMessage());
-        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        redirectAttributes.addFlashAttribute("error", "Utilisateur non trouvé.");
-        return "redirect:/contacts";
-    }
 
     @ExceptionHandler(ProfileNotFoundException.class)
     public String handleProfileNotFoundException(ProfileNotFoundException ex,

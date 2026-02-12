@@ -242,18 +242,17 @@ class GlobalExceptionHandlerTest {
     /* ---------- Generic exceptions ---------- */
     @Test
     void shouldHandleIllegalArgumentExceptionFromRegistration() throws Exception {
-        // registration endpoint does not catch IllegalArgumentException
-        doThrow(new IllegalArgumentException("Invalid registration data"))
+        doThrow(new IllegalArgumentException("Requête invalide."))
                 .when(registrationService).register(anyString(), anyString(), anyString());
 
         mockMvc.perform(post("/register")
                         .with(csrf())
-                        .param("username", "newuser")
-                        .param("email", "newuser@example.com")
-                        .param("password", "strongpassword"))
+                        .param("username", "user")
+                        .param("email", "user@example.com")
+                        .param("password", "password"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/transactions"))
-                .andExpect(flash().attribute("error", "Invalid registration data"));
+                .andExpect(redirectedUrl("/register"))
+                .andExpect(flash().attribute("errorMessageFromGEH", "Requête invalide."));
     }
 
     /* ---------- others ---------- */
