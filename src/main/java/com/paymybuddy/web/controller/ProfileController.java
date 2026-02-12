@@ -13,6 +13,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class ProfileController {
@@ -41,19 +42,14 @@ public class ProfileController {
     public String postUpdateProfile(@AuthenticationPrincipal UserDetails userDetails,
                                     @Valid @ModelAttribute("profileForm") ProfileFormDto form,
                                     BindingResult bindingResult,
-                                    Model model) {
+                                    RedirectAttributes redirectAttributes) {
     if (bindingResult.hasErrors()) {
         return "profile";
     }
 
-    String email = userDetails.getUsername();
+    profileService.updateProfile(userDetails.getUsername(), form.getNewUsername(), form.getNewEmail());
 
-    try {
-        profileService.updateProfile(email, form.getNewUsername(), form.getNewEmail());
-    } catch (IllegalArgumentException e) {
-        model.addAttribute("profileError", e.getMessage());
-        return "profile";
-    }
+    redirectAttributes.addFlashAttribute("profileUpdateSuccess", "Profil mis à jour avec succès.");
 
     return "redirect:/profile";
     }

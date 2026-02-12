@@ -2,6 +2,7 @@ package com.paymybuddy.web.controller;
 
 import com.paymybuddy.application.service.ProfileService;
 import com.paymybuddy.application.service.UserService;
+import com.paymybuddy.application.service.exception.EmailAlreadyUsedException;
 import com.paymybuddy.domain.entity.User;
 import com.paymybuddy.infrastructure.security.SecurityConfig;
 import org.junit.jupiter.api.Test;
@@ -88,21 +89,20 @@ class ProfileControllerTest {
 
     @Test
     @WithMockUser(username = "user@email.com")
-    void postUpdateProfile_shouldReturnView_withErrorMessage_whenServiceThrows() throws Exception {
-        doThrow(new IllegalArgumentException("Email already used."))
+    void postUpdateProfile_shouldRedirectWithErrorMessage_whenServiceThrows() throws Exception {
+        doThrow(new EmailAlreadyUsedException("new@email.com"))
                 .when(profileService)
-                .updateProfile("user@email.com", "newUser", "taken@email.com");
+                .updateProfile("user@email.com", "newUser", "new@email.com");
 
         mockMvc.perform(post("/profile/update")
                         .with(csrf())
                         .param("newUsername", "newUser")
-                        .param("newEmail", "taken@email.com"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("profile"))
-                .andExpect(model().attributeExists("profileForm"))
-                .andExpect(model().attribute("profileError", "Email already used."));
+                        .param("newEmail", "new@email.com"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/profile"))
+                .andExpect(flash().attribute("errorMessageFromGEH", "Cette adresse email est déjà utilisée."));
 
-        verify(profileService).updateProfile("user@email.com", "newUser", "taken@email.com");
+        verify(profileService).updateProfile("user@email.com", "newUser", "new@email.com");
     }
 
     private User userWithId(long id, String username, String email) {
