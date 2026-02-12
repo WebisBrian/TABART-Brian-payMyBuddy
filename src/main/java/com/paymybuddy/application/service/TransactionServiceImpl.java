@@ -100,7 +100,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     private void ensureUsersAreContacts(Long senderId, Long receiverId) {
         if (!userContactRepository.existsByUser_IdAndContact_Id(senderId, receiverId)) {
-            throw new NotInContactsException();
+            throw new NotInContactsException(senderId, receiverId);
         }
     }
 
