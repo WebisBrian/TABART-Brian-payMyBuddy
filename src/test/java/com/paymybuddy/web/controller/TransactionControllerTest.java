@@ -131,12 +131,10 @@ class TransactionControllerTest {
                                 .param("receiverId", "2")
                                 .param("amount", "5.00")
                                 .param("description", "Dinner"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("transactions"))
-                .andExpect(model().attributeExists("transferForm"))
-                .andExpect(model().attributeExists("contacts"))
-                .andExpect(model().attributeExists("transactionRows"))
-                .andExpect(model().attribute("transferError", "Insufficient balance in sender account."));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/transactions"))
+                .andExpect(flash().attribute("errorMessageFromGEH", "Requête invalide."));
+
 
         verify(userService).getByEmail("user@email.com");
     }
