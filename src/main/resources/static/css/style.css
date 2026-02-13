@@ -1,0 +1,27 @@
+/* Global page background */
+body {
+    background-color: #f5f5f5;
+}
+
+/* Orange badge used for the "Pay My Buddy" title */
+.brand-badge {
+    display: inline-block;
+    background-color: #f59e0b; /* orange */
+    color: #ffffff;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 6px;
+}
+
+/* Blue button used on login/register */
+.btn-primary-custom {
+    background-color: #2563eb;
+    color: #ffffff;
+    border: none;
+}
+
+.btn-primary-custom:hover,
+.btn-primary-custom:focus {
+    background-color: #1d4ed8;
+    color: #ffffff;
+}

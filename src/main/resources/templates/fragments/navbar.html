@@ -1,0 +1,55 @@
+<div th:fragment="navbar">
+
+    <nav class="navbar navbar-expand-lg bg-white border-bottom">
+        <div class="container">
+
+            <!-- Brand -->
+            <a class="navbar-brand fw-semibold" th:href="@{/transactions}">Pay My Buddy</a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                    aria-controls="mainNavbar" aria-expanded="false" aria-label="Ouvrir le menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <ul class="navbar-nav ms-auto gap-lg-3 align-items-lg-center">
+
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           th:href="@{/transactions}"
+                           th:classappend="${activePage}=='transactions' ? 'active fw-semibold text-primary' : ''">
+                            Transférer
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           th:href="@{/profile}"
+                           th:classappend="${activePage}=='profile' ? 'active fw-semibold text-primary' : ''">
+                            Profil
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           th:href="@{/contacts}"
+                           th:classappend="${activePage}=='contacts' ? 'active fw-semibold text-primary' : ''">
+                            Ajouter relation
+                        </a>
+                    </li>
+
+                    <!-- Logout as POST (Spring Security best practice) -->
+                    <li class="nav-item">
+                        <form th:action="@{/logout}" method="post" class="m-0">
+                            <button type="submit" class="nav-link btn btn-link p-0">
+                                Se déconnecter
+                            </button>
+                        </form>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+</div>

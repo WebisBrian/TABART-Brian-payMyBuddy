@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="fr"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: html(
+            pageTitle='Ajouter une relation - Pay My Buddy',
+            navbar=~{fragments/navbar :: navbar},
+            content=~{::content}
+      )}">
+<body>
+
+<div th:fragment="content" class="container">
+
+    <!-- Page title badge -->
+    <div class="my-4">
+        <span class="brand-badge">Ajouter une relation</span>
+    </div>
+
+    <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+    <!-- Add contact block -->
+    <div class="bg-white border p-4 mb-4">
+        <form th:action="@{/contacts/add(userId=${param.userId})}"
+              th:object="${addContactForm}"
+              method="post"
+              class="row g-3 align-items-end"
+              novalidate>
+
+            <!-- Email -->
+            <div class="col-12 col-md-8">
+                <label for="email" class="form-label">Chercher une relation</label>
+                <input id="email"
+                       type="email"
+                       class="form-control"
+                       th:field="*{email}"
+                       placeholder="Saisir une adresse mail"
+                       autocomplete="email"
+                       required>
+
+                <div class="mt-1 text-danger small" th:if="${#fields.hasErrors('email')}">
+                    <span th:errors="*{email}">Erreur email</span>
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <div class="col-12 col-md-4 d-grid">
+                <button type="submit" class="btn btn-primary-custom">
+                    Ajouter
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- Contacts list -->
+    <div class="bg-white border p-4">
+        <h2 class="h5 mb-3">Mes relations</h2>
+
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead>
+                <tr>
+                    <th scope="col">Nom</th>
+                    <th scope="col">Email</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:if="${contacts == null || contacts.isEmpty()}">
+                    <td colspan="2" class="text-center text-muted py-4">
+                        Aucune relation
+                    </td>
+                </tr>
+
+                <tr th:each="c : ${contacts}">
+                    <td th:text="${c.username}">Nom</td>
+                    <td th:text="${c.email}">email@mail.com</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

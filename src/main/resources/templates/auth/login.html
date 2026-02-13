@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: html(
+            pageTitle='Connexion - Pay My Buddy',
+            navbar=~{},
+            content=~{::content}
+      )}">
+<body>
+
+
+<div th:fragment="content" class="container">
+
+    <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+    <div class="row justify-content-center">
+        <div class="col-10 col-sm-8 col-md-5 col-lg-4">
+
+            <!-- Center vertically -->
+            <div class="d-flex flex-column align-items-center" style="min-height: 70vh; justify-content: center;">
+                <div class="border bg-white p-4" style="width: 100%; max-width: 360px;">
+
+                    <!-- Orange badge/title -->
+                    <div class="text-center mb-4">
+                        <span class="brand-badge">Pay My Buddy</span>
+                    </div>
+
+                    <!-- Login form -->
+                    <form th:action="@{/login}" method="post" novalidate>
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label visually-hidden">Mail</label>
+                            <input id="email"
+                                   name="email"
+                                   type="email"
+                                   class="form-control"
+                                   placeholder="Mail"
+                                   autocomplete="email"
+                                   required>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mb-4">
+                            <label for="password" class="form-label visually-hidden">Mot de passe</label>
+                            <input id="password"
+                                   name="password"
+                                   type="password"
+                                   class="form-control"
+                                   placeholder="Mot de passe"
+                                   autocomplete="current-password"
+                                   required>
+                        </div>
+
+                        <!-- Submit -->
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary-custom px-4">
+                                Se connecter
+                            </button>
+                        </div>
+                    </form>
+
+                    <div th:if="${param.error}">
+                        Échec de la connexion.
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

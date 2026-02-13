@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="fr"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: html(
+            pageTitle='Profil - Pay My Buddy',
+            navbar=~{fragments/navbar :: navbar},
+            content=~{::content}
+      )}">
+<body>
+
+<div th:fragment="content" class="container">
+
+    <!-- Page title badge -->
+    <div class="my-4">
+        <span class="brand-badge">Profil</span>
+    </div>
+
+    <!-- 🔔 Flash alerts (reusable fragment) -->
+    <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+    <!-- Profile block -->
+    <div class="bg-white border p-4">
+        <h1 class="h5 mb-3">Mon profil</h1>
+
+        <form th:action="@{/profile/update}"
+              th:object="${profileForm}"
+              method="post"
+              class="row g-3"
+              novalidate>
+
+            <!-- Username -->
+            <div class="col-12">
+                <label for="newUsername" class="form-label">Nom d’utilisateur</label>
+                <input id="newUsername"
+                       type="text"
+                       class="form-control"
+                       th:field="*{newUsername}"
+                       placeholder="Nom d’utilisateur"
+                       autocomplete="username">
+
+                <div class="mt-1 text-danger small" th:if="${#fields.hasErrors('newUsername')}">
+                    <span th:errors="*{newUsername}">Erreur nom</span>
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="col-12">
+                <label for="newEmail" class="form-label">Email</label>
+                <input id="newEmail"
+                       type="email"
+                       class="form-control"
+                       th:field="*{newEmail}"
+                       placeholder="email@example.com"
+                       autocomplete="email">
+
+                <div class="mt-1 text-danger small" th:if="${#fields.hasErrors('newEmail')}">
+                    <span th:errors="*{newEmail}">Erreur email</span>
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <div class="col-12 d-grid d-sm-flex justify-content-sm-end">
+                <button type="submit" class="btn btn-primary-custom px-4">
+                    Mettre à jour
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+
+</body>
+</html>
