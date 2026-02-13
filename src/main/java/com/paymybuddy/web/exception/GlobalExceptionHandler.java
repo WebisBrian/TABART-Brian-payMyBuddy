@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -52,7 +53,6 @@ public class GlobalExceptionHandler {
     public String handleEmailAlreadyUsedException(EmailAlreadyUsedException ex,
                                                   HttpServletRequest request,
                                                   RedirectAttributes redirectAttributes) {
-        String path = request.getRequestURI();
 
         logger.warn(ex.getMessage());
         redirectAttributes.addFlashAttribute("errorMessageFromGEH", "Cette adresse email est déjà utilisée.");
@@ -121,7 +121,6 @@ public class GlobalExceptionHandler {
     public String handleInvalidEmailException(InvalidEmailException ex,
                                               HttpServletRequest request,
                                               RedirectAttributes redirectAttributes) {
-        String path = request.getRequestURI();
 
         logger.warn(ex.getMessage());
         redirectAttributes.addFlashAttribute("errorMessageFromGEH", "Adresse email invalide.");
@@ -143,7 +142,6 @@ public class GlobalExceptionHandler {
                                                  RedirectAttributes redirectAttributes,
                                                  HttpServletRequest request
     ) {
-        String path = request.getRequestURI();
 
         logger.warn("Invalid argument. Detail = ({})", ex.getMessage());
         redirectAttributes.addFlashAttribute("errorMessageFromGEH", "Requête invalide.");
@@ -164,9 +162,17 @@ public class GlobalExceptionHandler {
         redirectAttributes.addFlashAttribute("errorMessageFromGEH",
                 "Une erreur inattendue s'est produite. Veuillez réessayer.");
 
-        String path = request.getRequestURI();
-
         return determineRedirectUrl(request);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public String handleNoResourceFound(NoResourceFoundException ex,
+                                        RedirectAttributes redirectAttributes) {
+
+        logger.warn("Static resource not found: {}", ex.getMessage());
+
+        redirectAttributes.addFlashAttribute("errorMessageFromGEH", "Page demandée introuvable.");
+        return "redirect:/login";
     }
 
     /* ---------- Helpers ---------- */
@@ -185,6 +191,8 @@ public class GlobalExceptionHandler {
             return "redirect:/login";
         }
 
-        return "redirect:/"; // Fallback
+        // Redirect authenticated users to /transactions by default to avoid
+        // having the root path ("/") processed as a static resource request.
+        return "redirect:/transactions";
     }
 }
