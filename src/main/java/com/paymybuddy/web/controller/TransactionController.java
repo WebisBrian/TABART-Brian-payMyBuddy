@@ -18,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -67,7 +68,8 @@ public class TransactionController {
                            @Valid @ModelAttribute("transferForm") TransferFormDto form,
                            BindingResult bindingResult,
                            @PageableDefault(size = 10, sort = "date") Pageable pageable,
-                           Model model) {
+                           Model model,
+                           RedirectAttributes redirectAttributes) {
         String email = userDetails.getUsername();
         Long userId = userService.getByEmail(email).getId();
 
@@ -86,6 +88,8 @@ public class TransactionController {
         }
 
         transactionService.transfer(userId, form.getReceiverId(), form.getAmount(), form.getDescription());
+        redirectAttributes.addFlashAttribute("transferSuccess", "Transfert effectué avec succès.");
+
         return "redirect:/transactions";
     }
 
