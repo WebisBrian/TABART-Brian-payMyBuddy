@@ -33,7 +33,7 @@ public class ContactController {
         this.userService = userService;
     }
 
-    @GetMapping("")
+    @GetMapping
     public String getContacts(@AuthenticationPrincipal UserDetails userDetails,
                               Model model) {
         String email = userDetails.getUsername();
@@ -67,7 +67,7 @@ public class ContactController {
         }
 
         userService.addContactByEmail(userId, form.getEmail());
-        redirectAttributes.addFlashAttribute("addContactSuccess", "Contact ajouté avec succès.");
+        redirectAttributes.addFlashAttribute("success", "Contact ajouté avec succès.");
 
         return "redirect:/contacts";
     }

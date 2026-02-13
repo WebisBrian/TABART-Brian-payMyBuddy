@@ -34,7 +34,7 @@ public class ProfileController {
         this.profileService = profileService;
     }
 
-    @GetMapping("")
+    @GetMapping
     public String getProfile(@AuthenticationPrincipal UserDetails userDetails,
                              Model model) {
         String email = userDetails.getUsername();
@@ -63,7 +63,7 @@ public class ProfileController {
 
         profileService.updateProfile(userDetails.getUsername(), form.getNewUsername(), form.getNewEmail());
 
-        redirectAttributes.addFlashAttribute("profileUpdateSuccess", "Profil mis à jour avec succès.");
+        redirectAttributes.addFlashAttribute("success", "Profil mis à jour avec succès.");
         return "redirect:/profile";
     }
 }

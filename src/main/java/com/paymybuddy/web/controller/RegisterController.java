@@ -28,14 +28,14 @@ public class RegisterController {
         this.registrationService = registrationService;
     }
 
-    @GetMapping("")
+    @GetMapping
     public String register(Model model) {
         logger.debug("GET /register called");
         model.addAttribute("registerForm", new RegisterFormDto());
         return "register";
     }
 
-    @PostMapping("")
+    @PostMapping
     String postRegister(@Valid @ModelAttribute("registerForm") RegisterFormDto form,
                         BindingResult bindingResult,
                         RedirectAttributes redirectAttributes) {
@@ -48,8 +48,9 @@ public class RegisterController {
         }
 
         registrationService.register(form.getUsername(), form.getEmail(), form.getPassword());
-        redirectAttributes.addFlashAttribute("addContactSuccess", "Votre inscription est un succès. Vous pouvez maintenant vous connecter.");
+        redirectAttributes.addFlashAttribute("success", "Votre inscription est un succès. Vous pouvez maintenant vous connecter.");
 
         return "redirect:/login";
     }
 }
+

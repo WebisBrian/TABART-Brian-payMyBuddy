@@ -42,7 +42,7 @@ public class TransactionController {
         this.transactionRowMapper = transactionRowMapper;
     }
 
-    @GetMapping("")
+    @GetMapping
     public String getTransactions(@AuthenticationPrincipal UserDetails userDetails,
                                   @PageableDefault(size = 10, sort = "date") Pageable pageable,
                                   Model model) {
@@ -88,7 +88,7 @@ public class TransactionController {
         }
 
         transactionService.transfer(userId, form.getReceiverId(), form.getAmount(), form.getDescription());
-        redirectAttributes.addFlashAttribute("transferSuccess", "Transfert effectué avec succès.");
+        redirectAttributes.addFlashAttribute("success", "Transfert effectué avec succès.");
 
         return "redirect:/transactions";
     }
