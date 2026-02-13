@@ -73,7 +73,7 @@ public class TransactionController {
         String email = userDetails.getUsername();
         Long userId = userService.getByEmail(email).getId();
 
-        logger.debug("POST /transactions/transfer called: userId={}, receiverId={}, amount={}, description={}",
+        logger.info("POST /transactions/transfer called: userId={}, receiverId={}, amount={}, description={}",
                 userId, form.getReceiverId(), form.getAmount(), form.getDescription());
 
         if (bindingResult.hasErrors()) {

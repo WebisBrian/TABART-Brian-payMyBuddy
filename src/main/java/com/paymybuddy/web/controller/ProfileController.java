@@ -54,7 +54,7 @@ public class ProfileController {
                                     BindingResult bindingResult,
                                     RedirectAttributes redirectAttributes) {
         String currentEmail = userDetails.getUsername();
-        logger.debug("POST /profile/update called: userEmail={}, newEmail={}",
+        logger.info("POST /profile/update called: userEmail={}, newEmail={}",
                 maskEmail(currentEmail), maskEmail(form.getNewEmail()));
 
         if (bindingResult.hasErrors()) {

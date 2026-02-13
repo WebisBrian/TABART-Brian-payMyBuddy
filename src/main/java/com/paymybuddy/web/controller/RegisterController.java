@@ -39,7 +39,7 @@ public class RegisterController {
     String postRegister(@Valid @ModelAttribute("registerForm") RegisterFormDto form,
                         BindingResult bindingResult,
                         RedirectAttributes redirectAttributes) {
-        logger.debug("POST /register called: usernamePresent={}, email={}",
+        logger.info("POST /register called: usernamePresent={}, email={}",
                 form.getUsername() != null && !form.getUsername().isBlank(),
                 maskEmail(form.getEmail()));
 

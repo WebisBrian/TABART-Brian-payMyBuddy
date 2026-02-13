@@ -56,7 +56,7 @@ public class ContactController {
         String email = userDetails.getUsername();
         Long userId = userService.getByEmail(email).getId();
 
-        logger.debug("POST /contacts/add called: userId={}, contactEmail={}",
+        logger.info("POST /contacts/add called: userId={}, contactEmail={}",
                 userId, maskEmail(form.getEmail()));
 
         if (bindingResult.hasErrors()) {
