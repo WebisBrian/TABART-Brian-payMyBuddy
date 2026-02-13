@@ -32,7 +32,7 @@ public class RegisterController {
     public String register(Model model) {
         logger.debug("GET /register called");
         model.addAttribute("registerForm", new RegisterFormDto());
-        return "register";
+        return "auth/register";
     }
 
     @PostMapping
@@ -44,7 +44,7 @@ public class RegisterController {
                 maskEmail(form.getEmail()));
 
         if (bindingResult.hasErrors()) {
-            return "register";
+            return "auth/register";
         }
 
         registrationService.register(form.getUsername(), form.getEmail(), form.getPassword());
@@ -53,4 +53,3 @@ public class RegisterController {
         return "redirect:/login";
     }
 }
-

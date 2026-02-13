@@ -44,8 +44,9 @@ public class ProfileController {
 
         model.addAttribute("profileForm",
                 new ProfileFormDto(user.getUsername(), user.getEmail()));
+        model.addAttribute("activePage", "profile");
 
-        return "profile";
+        return "app/profile";
     }
 
     @PostMapping("/update")
@@ -58,7 +59,7 @@ public class ProfileController {
                 maskEmail(currentEmail), maskEmail(form.getNewEmail()));
 
         if (bindingResult.hasErrors()) {
-            return "profile";
+            return "app/profile";
         }
 
         profileService.updateProfile(userDetails.getUsername(), form.getNewUsername(), form.getNewEmail());

@@ -54,13 +54,15 @@ public class TransactionController {
 
         model.addAttribute("transferForm", new TransferFormDto());
         model.addAttribute("contacts", contacts);
+        // Indique à la vue quelle page est active pour la navbar
+        model.addAttribute("activePage", "transactions");
 
         Page<TransactionRowDto> rows = transactionService.getTransactionHistory(userId, pageable)
                 .map(tx -> transactionRowMapper.toRowDto(tx, userId));
 
         model.addAttribute("transactionRows", rows);
 
-        return "transactions";
+        return "app/transactions";
     }
 
     @PostMapping("/transfer")
@@ -78,13 +80,14 @@ public class TransactionController {
 
         if (bindingResult.hasErrors()) {
             List<ContactViewDto> contacts = mapToContactViewDtos(userId);
+            model.addAttribute("activePage", "transactions");
             model.addAttribute("contacts", contacts);
 
             Page<TransactionRowDto> rows = transactionService.getTransactionHistory(userId, pageable)
                     .map(tx -> transactionRowMapper.toRowDto(tx, userId));
             model.addAttribute("transactionRows", rows);
 
-            return "transactions";
+            return "app/transactions";
         }
 
         transactionService.transfer(userId, form.getReceiverId(), form.getAmount(), form.getDescription());

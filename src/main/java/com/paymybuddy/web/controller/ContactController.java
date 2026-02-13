@@ -44,8 +44,9 @@ public class ContactController {
 
         model.addAttribute("addContactForm", new AddContactFormDto());
         model.addAttribute("contacts", contacts);
+        model.addAttribute("activePage", "contacts");
 
-        return "contacts";
+        return "app/contacts";
     }
 
     @PostMapping("/add")
@@ -63,7 +64,7 @@ public class ContactController {
             List<ContactViewDto> contacts = mapToContactViewDtos(userId);
             model.addAttribute("contacts", contacts);
 
-            return "contacts";
+            return "app/contacts";
         }
 
         userService.addContactByEmail(userId, form.getEmail());
