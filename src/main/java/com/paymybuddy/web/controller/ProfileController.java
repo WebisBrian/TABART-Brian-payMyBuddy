@@ -5,6 +5,8 @@ import com.paymybuddy.application.service.UserService;
 import com.paymybuddy.domain.entity.User;
 import com.paymybuddy.web.dto.ProfileFormDto;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -13,10 +15,16 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import static com.paymybuddy.common.logging.SensitiveDataMasker.maskEmail;
+
 @Controller
+@RequestMapping("/profile")
 public class ProfileController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProfileController.class);
 
     private final UserService userService;
     private final ProfileService profileService;
@@ -26,10 +34,12 @@ public class ProfileController {
         this.profileService = profileService;
     }
 
-    @GetMapping("/profile")
+    @GetMapping("")
     public String getProfile(@AuthenticationPrincipal UserDetails userDetails,
                              Model model) {
         String email = userDetails.getUsername();
+        logger.debug("GET /profile called: userEmail={}", maskEmail(email));
+
         User user = userService.getByEmail(email);
 
         model.addAttribute("profileForm",
@@ -38,19 +48,22 @@ public class ProfileController {
         return "profile";
     }
 
-    @PostMapping("/profile/update")
+    @PostMapping("/update")
     public String postUpdateProfile(@AuthenticationPrincipal UserDetails userDetails,
                                     @Valid @ModelAttribute("profileForm") ProfileFormDto form,
                                     BindingResult bindingResult,
                                     RedirectAttributes redirectAttributes) {
-    if (bindingResult.hasErrors()) {
-        return "profile";
-    }
+        String currentEmail = userDetails.getUsername();
+        logger.debug("POST /profile/update called: userEmail={}, newEmail={}",
+                maskEmail(currentEmail), maskEmail(form.getNewEmail()));
 
-    profileService.updateProfile(userDetails.getUsername(), form.getNewUsername(), form.getNewEmail());
+        if (bindingResult.hasErrors()) {
+            return "profile";
+        }
 
-    redirectAttributes.addFlashAttribute("profileUpdateSuccess", "Profil mis à jour avec succès.");
+        profileService.updateProfile(userDetails.getUsername(), form.getNewUsername(), form.getNewEmail());
 
-    return "redirect:/profile";
+        redirectAttributes.addFlashAttribute("profileUpdateSuccess", "Profil mis à jour avec succès.");
+        return "redirect:/profile";
     }
 }
