@@ -43,7 +43,7 @@ class ProfileControllerTest {
 
         mockMvc.perform(get("/profile"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("profile"))
+                .andExpect(view().name("app/profile"))
                 .andExpect(model().attributeExists("profileForm"))
                 // verify that the form is pre-filled
                 .andExpect(model().attribute("profileForm", allOf(
@@ -81,7 +81,7 @@ class ProfileControllerTest {
                         .with(csrf())
                         .param("newEmail", "new@email.com"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("profile"))
+                .andExpect(view().name("app/profile"))
                 .andExpect(model().attributeHasFieldErrors("profileForm", "newUsername"));
 
         verifyNoInteractions(profileService);

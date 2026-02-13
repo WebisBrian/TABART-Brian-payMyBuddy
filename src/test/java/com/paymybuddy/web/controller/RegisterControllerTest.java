@@ -29,7 +29,7 @@ class RegisterControllerTest {
     void getRegister_shouldReturnRegisterView() throws Exception {
         mockMvc.perform(get("/register"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("register"));
+                .andExpect(view().name("auth/register"));
     }
 
     @Test
@@ -64,7 +64,7 @@ class RegisterControllerTest {
                 .param("password", "123")
                 )
                 .andExpect(status().isOk())
-                .andExpect(view().name("register"))
+                .andExpect(view().name("auth/register"))
                 .andExpect(model().attributeHasFieldErrors("registerForm", "username", "email", "password"));
 
         verify(registrationService, never()).register(anyString(), anyString(), anyString());

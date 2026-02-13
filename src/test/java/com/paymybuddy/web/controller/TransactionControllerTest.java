@@ -57,7 +57,7 @@ class TransactionControllerTest {
         // Act + Assert
         mockMvc.perform(get("/transactions"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("transactions"))
+                .andExpect(view().name("app/transactions"))
                 .andExpect(model().attributeExists("transferForm"))
                 .andExpect(model().attributeExists("contacts"))
                 .andExpect(model().attributeExists("transactionRows"));
@@ -105,7 +105,7 @@ class TransactionControllerTest {
                                 // amount is missing
                                 .param("description", "Dinner"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("transactions"))
+                .andExpect(view().name("app/transactions"))
                 .andExpect(model().attributeHasFieldErrors("transferForm", "amount"))
                 .andExpect(model().attributeExists("contacts"))
                 .andExpect(model().attributeExists("transactionRows"));

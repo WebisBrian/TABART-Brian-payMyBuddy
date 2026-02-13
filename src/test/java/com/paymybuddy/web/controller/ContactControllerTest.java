@@ -46,7 +46,7 @@ class ContactControllerTest {
                         .with(csrf())
                 )
                 .andExpect(status().isOk())
-                .andExpect(view().name("contacts"))
+                .andExpect(view().name("app/contacts"))
                 .andExpect(model().attributeExists("addContactForm"))
                 .andExpect(model().attributeExists("contacts"));
 
@@ -88,7 +88,7 @@ class ContactControllerTest {
                         // the email is missing
                 )
                 .andExpect(status().isOk())
-                .andExpect(view().name("contacts"))
+                .andExpect(view().name("app/contacts"))
                 .andExpect(model().attributeHasFieldErrors("addContactForm", "email"))
                 .andExpect(model().attributeExists("contacts"));
 
