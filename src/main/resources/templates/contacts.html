@@ -30,13 +30,8 @@
     </div>
 
     <!-- Success message -->
-    <div th:if="${addContactSuccess}" style="color: green; margin: 10px 0;">
-        <p th:text="${addContactSuccess}"></p>
-    </div>
-
-    <!-- Error message -->
-    <div th:if="${addContactError}" style="color: red; margin: 10px 0;">
-        <p th:text="${addContactError}"></p>
+    <div th:if="${success}" style="color: green; margin: 10px 0;">
+        <p th:text="${success}"></p>
     </div>
 
     <!-- Add contact form -->

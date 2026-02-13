@@ -31,9 +31,9 @@
         <p th:text="${errorMessageFromGEH}"></p>
     </div>
 
-    <!-- Global error message -->
-    <div th:if="${profileError}" style="color: red; margin: 10px 0;">
-        <p th:text="${profileError}">Erreur profil</p>
+    <!-- Success message -->
+    <div th:if="${success}" style="color: green; margin: 10px 0;">
+        <p th:text="${success}"></p>
     </div>
 
     <!-- Profile form -->

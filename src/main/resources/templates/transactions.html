@@ -30,6 +30,11 @@
         <p th:text="${errorMessageFromGEH}"></p>
     </div>
 
+    <!-- Success message -->
+    <div th:if="${success}" style="color: green; margin: 10px 0;">
+        <p th:text="${success}"></p>
+    </div>
+
     <!--  Transfer form  -->
     <form th:action="@{/transactions/transfer(userId=${param.userId})}"
           th:object="${transferForm}"
