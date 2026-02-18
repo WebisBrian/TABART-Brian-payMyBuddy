@@ -12,7 +12,7 @@
 
     <!-- Page title badge -->
     <div class="my-4">
-        <span class="brand-badge">Profil</span>
+        <span class="brand-badge">Mon profil</span>
     </div>
 
     <!-- 🔔 Flash alerts (reusable fragment) -->
@@ -20,8 +20,6 @@
 
     <!-- Profile block -->
     <div class="bg-white border p-4">
-        <h1 class="h5 mb-3">Mon profil</h1>
-
         <form th:action="@{/profile/update}"
               th:object="${profileForm}"
               method="post"

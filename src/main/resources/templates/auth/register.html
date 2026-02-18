@@ -48,7 +48,8 @@
                                    class="form-control"
                                    placeholder="Nom d'utilisateur"
                                    required>
-                            <div th:if="${#fields.hasErrors('username')}"
+                            <div class="mt-1 text-danger small"
+                                 th:if="${#fields.hasErrors('username')}"
                                  th:errors="*{username}"></div>
                         </div>
 
@@ -65,7 +66,8 @@
                                    class="form-control"
                                    placeholder="Mail"
                                    required>
-                            <div th:if="${#fields.hasErrors('email')}"
+                            <div class="mt-1 text-danger small"
+                                 th:if="${#fields.hasErrors('email')}"
                                  th:errors="*{email}"></div>
 
                         </div>
@@ -83,7 +85,8 @@
                                    class="form-control"
                                    placeholder="Mot de passe"
                                    required>
-                            <div th:if="${#fields.hasErrors('password')}"
+                            <div class="mt-1 text-danger small"
+                                 th:if="${#fields.hasErrors('password')}"
                                  th:errors="*{password}"></div>
 
                         </div>
@@ -98,6 +101,12 @@
 
                     </form>
 
+                </div>
+
+                <div class="mt-4 text-center">
+                    <a th:href="@{/login}">
+                        Déjà inscrit ? Connectez-vous !
+                    </a>
                 </div>
             </div>
 

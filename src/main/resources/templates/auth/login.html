@@ -60,11 +60,17 @@
                         </div>
                     </form>
 
-                    <div th:if="${param.error}">
-                        Échec de la connexion.
+                    <div class="mt- text-danger small" th:if="${param.error}">
+                        Identifiants invalides.
                     </div>
 
                 </div>
+                <div class="mt-4 text-center">
+                    <a th:href="@{/register}">
+                        Pas encore de compte ? Inscrivez-vous !
+                    </a>
+                </div>
+
             </div>
 
         </div>
