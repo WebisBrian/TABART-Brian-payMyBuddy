@@ -2,21 +2,25 @@ package com.paymybuddy.web.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class RegisterFormDto {
 
-    @NotBlank
+    @NotNull(message = "Le nom d'utilisateur est requis.")
+    @NotBlank(message = "Le nom d'utilisateur ne peut pas être vide.")
     @Size(max = 100)
     private String username;
 
-    @NotBlank
-    @Email
-    @Size(max = 255)
+    @NotNull(message = "L' adresse email est requise.")
+    @NotBlank(message = "L' adresse email ne peut pas être vide.")
+    @Email(message = "L' adresse email doit être valide.")
+    @Size(max = 255, message = "L' adresse email ne peut pas dépasser 255 caractères.")
     private String email;
 
-    @NotBlank
-    @Size(min = 6, max = 72)
+    @NotNull(message = "Le mot de passe est requis.")
+    @NotBlank(message = "Le mot de passe ne peut pas être vide.")
+    @Size(min = 8, max = 72, message = "Le mot de passe doit comporter entre 8 et 72 caractères.")
     private String password;
 
     public String getUsername() {

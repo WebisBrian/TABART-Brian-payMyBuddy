@@ -2,6 +2,7 @@ package com.paymybuddy.web.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,8 +13,9 @@ import lombok.Setter;
 @NoArgsConstructor
 public class AddContactFormDto {
 
-    @NotBlank(message = "Contact's email is required.")
-    @Email(message = "Contact's email must be a valid email address.")
-    @Size(max = 255, message = "Contact's email must not exceed 255 characters.")
+    @NotNull(message = "L' adresse email du contact est requis.")
+    @NotBlank(message = "L' adresse email du contact est requis.")
+    @Email(message = "L' adresse email doit être valide.")
+    @Size(max = 255, message = "L' adresse email ne peut pas dépasser 255 caractères.")
     private String email;
 }
