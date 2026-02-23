@@ -121,9 +121,8 @@
 
                 <!-- Rows -->
                 <tr th:each="row : ${transactionRows.content}">
-                    <td th:text="${row.date}">2026-01-01T12:00</td>
+                    <td th:text="${#temporals.format(row.date, 'dd//MM/yyyy')}"></td>
                     <td th:text="${row.counterpartyLabel}">Alice (alice@mail.com)</td>
-                    <td th:text="${row.directionLabel}">Envoyé</td>
                     <td th:text="${row.description}">Description</td>
 
                     <td class="text-end fw-semibold"
