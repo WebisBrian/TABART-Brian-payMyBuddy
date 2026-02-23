@@ -15,6 +15,12 @@
         <span class="brand-badge">Transfert à un contact</span>
     </div>
 
+    <!-- Balance -->
+    <div class="mb-3">
+        <span class="text-muted">Solde du compte :</span>
+        <span class="fw-semibold ms-2" th:text="${balance} + ' €'">0.00 €</span>
+    </div>
+
     <div th:replace="~{fragments/alerts :: alerts}"></div>
 
     <!-- Send money block -->

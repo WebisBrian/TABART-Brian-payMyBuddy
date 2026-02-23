@@ -1,5 +1,6 @@
 package com.paymybuddy.web.controller;
 
+import com.paymybuddy.application.service.AccountService;
 import com.paymybuddy.application.service.TransactionService;
 import com.paymybuddy.application.service.UserService;
 import com.paymybuddy.web.dto.ContactViewDto;
@@ -20,6 +21,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static com.paymybuddy.common.logging.SensitiveDataMasker.maskEmail;
@@ -33,12 +35,15 @@ public class TransactionController {
     private final TransactionService transactionService;
     private final UserService userService;
     private final TransactionRowMapper transactionRowMapper;
+    private final AccountService accountService;
 
     public TransactionController(TransactionService transactionService,
                                  UserService userService,
+                                 AccountService accountService,
                                  TransactionRowMapper transactionRowMapper) {
         this.transactionService = transactionService;
         this.userService = userService;
+        this.accountService = accountService;
         this.transactionRowMapper = transactionRowMapper;
     }
 
@@ -51,11 +56,13 @@ public class TransactionController {
 
         Long userId = userService.getByEmail(email).getId();
         List<ContactViewDto> contacts = mapToContactViewDtos(userId);
+        BigDecimal balance = accountService.getBalance(userId);
 
         model.addAttribute("transferForm", new TransferFormDto());
         model.addAttribute("contacts", contacts);
         // Indique à la vue quelle page est active pour la navbar
         model.addAttribute("activePage", "transactions");
+        model.addAttribute("balance", balance);
 
         Page<TransactionRowDto> rows = transactionService.getTransactionHistory(userId, pageable)
                 .map(tx -> transactionRowMapper.toRowDto(tx, userId));

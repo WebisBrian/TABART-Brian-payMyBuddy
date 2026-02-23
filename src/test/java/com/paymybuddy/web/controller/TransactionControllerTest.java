@@ -1,5 +1,6 @@
 package com.paymybuddy.web.controller;
 
+import com.paymybuddy.application.service.AccountService;
 import com.paymybuddy.application.service.TransactionService;
 import com.paymybuddy.application.service.UserService;
 import com.paymybuddy.domain.entity.User;
@@ -31,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(TransactionController.class)
 @AutoConfigureMockMvc(addFilters = true)
 @Import(SecurityConfig.class)
+
 class TransactionControllerTest {
 
     @Autowired
@@ -41,6 +43,9 @@ class TransactionControllerTest {
 
     @MockitoBean
     private UserService userService;
+
+    @MockitoBean
+    private AccountService accountService;
 
     @MockitoBean
     private TransactionRowMapper transactionRowMapper;

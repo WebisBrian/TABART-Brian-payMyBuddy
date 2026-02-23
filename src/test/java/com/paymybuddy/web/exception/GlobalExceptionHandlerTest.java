@@ -1,9 +1,6 @@
 package com.paymybuddy.web.exception;
 
-import com.paymybuddy.application.service.ProfileService;
-import com.paymybuddy.application.service.RegistrationService;
-import com.paymybuddy.application.service.TransactionService;
-import com.paymybuddy.application.service.UserService;
+import com.paymybuddy.application.service.*;
 import com.paymybuddy.application.service.exception.*;
 import com.paymybuddy.domain.entity.User;
 import com.paymybuddy.domain.exception.*;
@@ -52,6 +49,9 @@ class GlobalExceptionHandlerTest {
 
     @MockitoBean
     private RegistrationService registrationService;
+
+    @MockitoBean
+    private AccountService accountService;
 
     @MockitoBean
     private TransactionRowMapper transactionRowMapper;
