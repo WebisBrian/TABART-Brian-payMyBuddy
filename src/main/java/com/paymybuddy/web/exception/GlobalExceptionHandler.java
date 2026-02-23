@@ -105,7 +105,7 @@ public class GlobalExceptionHandler {
     public String handleInsufficientBalanceException(InsufficientBalanceException ex,
                                                      RedirectAttributes redirectAttributes) {
         logger.info(ex.getMessage());
-        redirectAttributes.addFlashAttribute("errorMessageFromGEH", "Solde insuffisant.");
+        redirectAttributes.addFlashAttribute("errorMessageFromGEH", "Solde insuffisant pour assurer la transaction et les frais d'envoi.");
         return "redirect:/transactions";
     }
 
