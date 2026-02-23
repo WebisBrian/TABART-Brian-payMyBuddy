@@ -46,7 +46,7 @@ class TransactionRowMapperTest {
         // Assert
         assertEquals(TransactionRowDto.Direction.SENT, dto.direction());
         assertEquals("Envoyé", dto.directionLabel());
-        assertEquals("Jason (jason@email.com)", dto.counterpartyLabel());
+        assertEquals("Jason", dto.counterpartyLabel());
         assertEquals(new BigDecimal("-10.00"), dto.signedAmount());
     }
 
@@ -79,7 +79,7 @@ class TransactionRowMapperTest {
         // Assert
         assertEquals(TransactionRowDto.Direction.RECEIVED, dto.direction());
         assertEquals("Reçu", dto.directionLabel());
-        assertEquals("Jenny (jenny@mail.com)", dto.counterpartyLabel());
+        assertEquals("Jenny", dto.counterpartyLabel());
         assertEquals(new BigDecimal("15.00"), dto.signedAmount());
     }
 }

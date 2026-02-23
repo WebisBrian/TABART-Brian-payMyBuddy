@@ -45,7 +45,7 @@ public interface TransactionRowMapper {
                 ? receiver.getUser()
                 : sender.getUser();
 
-        return counterparty.getUsername() + " (" + counterparty.getEmail() + ")";
+        return counterparty.getUsername();
     }
 
     default BigDecimal signedAmountOf(Transaction transaction, Long userId) {
