@@ -234,7 +234,7 @@ class GlobalExceptionHandlerTest {
                         .param("description", "Test"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/transactions"))
-                .andExpect(flash().attribute("errorMessageFromGEH", "Solde insuffisant."));
+                .andExpect(flash().attribute("errorMessageFromGEH", "Solde insuffisant pour assurer la transaction et les frais d'envoi."));
     }
 
     @Test
