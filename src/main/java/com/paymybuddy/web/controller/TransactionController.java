@@ -81,6 +81,7 @@ public class TransactionController {
                            RedirectAttributes redirectAttributes) {
         String email = userDetails.getUsername();
         Long userId = userService.getByEmail(email).getId();
+        BigDecimal balance = accountService.getBalance(userId);
 
         logger.info("POST /transactions/transfer called: userId={}, receiverId={}, amount={}, description={}",
                 userId, form.getReceiverId(), form.getAmount(), form.getDescription());
@@ -89,6 +90,7 @@ public class TransactionController {
             List<ContactViewDto> contacts = mapToContactViewDtos(userId);
             model.addAttribute("activePage", "transactions");
             model.addAttribute("contacts", contacts);
+            model.addAttribute("balance", balance);
 
             Page<TransactionRowDto> rows = transactionService.getTransactionHistory(userId, pageable)
                     .map(tx -> transactionRowMapper.toRowDto(tx, userId));

@@ -10,16 +10,13 @@
 
 <div th:fragment="content" class="container">
 
-    <!-- Page title badge -->
-    <div class="my-4">
-        <span class="brand-badge">Mon profil</span>
-    </div>
+    <h2 class="h2 text-center shadow p-2 mb-5 rounded orange-background text-light w-50 mx-auto">Mon profil</h2>
 
     <!-- 🔔 Flash alerts (reusable fragment) -->
     <div th:replace="~{fragments/alerts :: alerts}"></div>
 
-    <!-- Profile block -->
     <div class="bg-white border p-4">
+
         <form th:action="@{/profile/update}"
               th:object="${profileForm}"
               method="post"
@@ -64,6 +61,66 @@
             </div>
 
         </form>
+
+        <hr class="my-4"/>
+
+        <form th:action="@{/profile/password}"
+              th:object="${changePasswordForm}"
+              method="post"
+              class="row g-3"
+              novalidate>
+
+            <!-- Current password -->
+            <div class="col-12">
+                <label for="currentPassword" class="form-label">Mot de passe actuel</label>
+                <input id="currentPassword"
+                       type="password"
+                       class="form-control"
+                       th:field="*{currentPassword}"
+                       autocomplete="current-password">
+
+                <div class="mt-1 text-danger small" th:if="${#fields.hasErrors('currentPassword')}">
+                    <span th:errors="*{currentPassword}">Erreur mot de passe actuel</span>
+                </div>
+            </div>
+
+            <!-- New password -->
+            <div class="col-12">
+                <label for="newPassword" class="form-label">Nouveau mot de passe</label>
+                <input id="newPassword"
+                       type="password"
+                       class="form-control"
+                       th:field="*{newPassword}"
+                       autocomplete="new-password">
+
+                <div class="mt-1 text-danger small" th:if="${#fields.hasErrors('newPassword')}">
+                    <span th:errors="*{newPassword}">Erreur nouveau mot de passe</span>
+                </div>
+            </div>
+
+            <!-- Confirm a new password -->
+            <div class="col-12">
+                <label for="confirmNewPassword" class="form-label">Confirmer le nouveau mot de passe</label>
+                <input id="confirmNewPassword"
+                       type="password"
+                       class="form-control"
+                       th:field="*{confirmNewPassword}"
+                       autocomplete="new-password">
+
+                <div class="mt-1 text-danger small" th:if="${#fields.hasErrors('confirmNewPassword')}">
+                    <span th:errors="*{confirmNewPassword}">Erreur confirmation</span>
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <div class="col-12 d-grid d-sm-flex justify-content-sm-end">
+                <button type="submit" class="btn btn-primary-custom px-4">
+                    Modifier le mot de passe
+                </button>
+            </div>
+
+        </form>
+
     </div>
 
 </div>

@@ -149,6 +149,15 @@ public class GlobalExceptionHandler {
         return determineRedirectUrl(request);
     }
 
+    @ExceptionHandler(InvalidCurrentPasswordException.class)
+    public String handleInvalidCurrentPassword(InvalidCurrentPasswordException ex,
+                                               jakarta.servlet.http.HttpServletRequest request,
+                                               RedirectAttributes redirectAttributes) {
+        logger.warn("Invalid current password for path={}", request.getRequestURI());
+        redirectAttributes.addFlashAttribute("errorMessageFromGEH", "Mot de passe actuel incorrect.");
+        return determineRedirectUrl(request);
+    }
+
     /**
      * Fallback for any unhandled exceptions to prevent application crashes
      * and provide user-friendly feedback. (NPE, SQLExceptions, etc.)
