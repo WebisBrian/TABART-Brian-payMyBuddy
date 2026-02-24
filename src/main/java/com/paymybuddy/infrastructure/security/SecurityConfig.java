@@ -24,7 +24,6 @@ public class SecurityConfig {
                         .loginPage("/login")
                         .usernameParameter("email")
                         .defaultSuccessUrl("/transactions", true)
-                        .permitAll()
                 )
                 .logout(logout -> logout.logoutSuccessUrl("/login?logout"))
                 .build();

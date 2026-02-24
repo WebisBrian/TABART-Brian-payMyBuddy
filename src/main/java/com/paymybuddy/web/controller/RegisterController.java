@@ -5,6 +5,8 @@ import com.paymybuddy.web.dto.RegisterFormDto;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -29,7 +31,15 @@ public class RegisterController {
     }
 
     @GetMapping
-    public String register(Model model) {
+    public String register(Model model,
+                           Authentication authentication) {
+
+        // If already logged in, redirect to the transactions page
+        if (authentication != null && authentication.isAuthenticated()
+                && !(authentication instanceof AnonymousAuthenticationToken)) {
+            return "redirect:/transactions";
+        }
+
         logger.debug("GET /register called");
         model.addAttribute("registerForm", new RegisterFormDto());
         return "auth/register";
