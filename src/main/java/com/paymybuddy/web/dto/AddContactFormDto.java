@@ -13,8 +13,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class AddContactFormDto {
 
-    @NotNull(message = "L' adresse email du contact est requis.")
-    @NotBlank(message = "L' adresse email du contact est requis.")
+    @NotNull(message = "L' adresse email du contact est requise.")
+    @NotBlank(message = "L' adresse email du contact est requise.")
     @Email(message = "L' adresse email doit être valide.")
     @Size(max = 255, message = "L' adresse email ne peut pas dépasser 255 caractères.")
     private String email;
