@@ -5,10 +5,12 @@ import com.paymybuddy.application.service.UserService;
 import com.paymybuddy.domain.entity.User;
 import com.paymybuddy.web.dto.ChangePasswordFormDto;
 import com.paymybuddy.web.dto.ProfileFormDto;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -56,7 +58,8 @@ public class ProfileController {
                                     @Valid @ModelAttribute("profileForm") ProfileFormDto form,
                                     BindingResult bindingResult,
                                     RedirectAttributes redirectAttributes,
-                                    Model model) {
+                                    Model model,
+                                    HttpServletRequest request) {
         String currentEmail = userDetails.getUsername();
         logger.info("POST /profile/update called: userEmail={}, newEmail={}",
                 maskEmail(currentEmail), maskEmail(form.getNewEmail()));
@@ -67,7 +70,19 @@ public class ProfileController {
             return "app/profile";
         }
 
+        boolean emailChanged = !currentEmail.equalsIgnoreCase(form.getNewEmail());
+
         profileService.updateProfile(userDetails.getUsername(), form.getNewUsername(), form.getNewEmail());
+
+        if (emailChanged) {
+            // Invalidate session to force re-log in with a new email
+            request.getSession(false).invalidate();
+            SecurityContextHolder.clearContext();
+
+            redirectAttributes.addFlashAttribute("success",
+                    "Email mis à jour. Veuillez vous reconnecter.");
+            return "redirect:/login";
+        }
 
         redirectAttributes.addFlashAttribute("success", "Profil mis à jour avec succès.");
         return "redirect:/profile";

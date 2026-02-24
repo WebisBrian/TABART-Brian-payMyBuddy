@@ -82,7 +82,7 @@ class ProfileControllerTest {
                         .param("newUsername", "newUser")
                         .param("newEmail", "new@email.com"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/profile"));
+                .andExpect(redirectedUrl("/login"));
 
         verify(profileService).updateProfile(
                 eq("user@email.com"),
