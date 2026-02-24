@@ -2,6 +2,9 @@ package com.paymybuddy.domain.entity;
 
 import com.paymybuddy.domain.exception.*;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -10,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TransactionTest {
 
-    /* ---------- create() ---------- */
+    /* ---------- create() - Happy paths ---------- */
     @Test
     void create_shouldCreateTransaction_whenValid() {
         Account sender = validAccount("sender@mail.com");
@@ -32,6 +35,7 @@ class TransactionTest {
         assertEquals(description, tx.getDescription());
     }
 
+    /* ---------- create() - Validation errors ---------- */
     @Test
     void create_shouldThrow_whenSenderAccountIsNull() {
         Account receiver = validAccount("receiver@mail.com");
@@ -66,43 +70,28 @@ class TransactionTest {
         assertTrue(ex.getMessage().contains("Amount must be strictly positive."));
     }
 
-    @Test
-    void create_shouldThrow_whenAmountIsZeroOrNegative() {
-        Account sender = validAccount("sender@mail.com");
-        Account receiver = validAccount("receiver@mail.com");
-
-        // Test zero amount
-        InvalidAmountException exZero = assertThrows(InvalidAmountException.class, () ->
-                Transaction.create(sender, receiver, new BigDecimal("0.00"), BigDecimal.ZERO, LocalDateTime.now(), null)
-        );
-        assertTrue(exZero.getMessage().contains("Amount must be strictly positive."));
-
-        // Test negative amount
-        InvalidAmountException exNegative = assertThrows(InvalidAmountException.class, () ->
-                Transaction.create(sender, receiver, new BigDecimal("-1.00"), BigDecimal.ZERO, LocalDateTime.now(), null)
-        );
-        assertTrue(exNegative.getMessage().contains("Amount must be strictly positive."));
-    }
-
-    @Test
-    void create_shouldThrow_whenFeeIsNull() {
+    @ParameterizedTest
+    @ValueSource(doubles = {0.0, -1.0})
+    void create_shouldThrow_whenAmountIsZeroOrNegative(Double amount) {
         Account sender = validAccount("sender@mail.com");
         Account receiver = validAccount("receiver@mail.com");
 
         InvalidAmountException ex = assertThrows(InvalidAmountException.class, () ->
-                Transaction.create(sender, receiver, new BigDecimal("10.00"), null, LocalDateTime.now(), null)
+                Transaction.create(sender, receiver, new BigDecimal(amount), BigDecimal.ZERO, LocalDateTime.now(), null)
         );
 
-        assertTrue(ex.getMessage().contains("Fee must be zero or positive."));
+        assertTrue(ex.getMessage().contains("Amount must be strictly positive."));
     }
 
-    @Test
-    void create_shouldThrow_whenFeeIsNegative() {
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(doubles = {-1.0})
+    void create_shouldThrow_whenFeeIsNullOrNegative(Double fee) {
         Account sender = validAccount("sender@mail.com");
         Account receiver = validAccount("receiver@mail.com");
 
         InvalidAmountException ex = assertThrows(InvalidAmountException.class, () ->
-                Transaction.create(sender, receiver, new BigDecimal("10.00"), new BigDecimal("-0.01"), LocalDateTime.now(), null)
+                Transaction.create(sender, receiver, new BigDecimal("10.00"), fee == null ? null : BigDecimal.valueOf(fee), LocalDateTime.now(), null)
         );
 
         assertTrue(ex.getMessage().contains("Fee must be zero or positive."));
