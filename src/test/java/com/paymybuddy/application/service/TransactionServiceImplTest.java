@@ -11,10 +11,12 @@ import com.paymybuddy.domain.exception.InvalidAmountException;
 import com.paymybuddy.infrastructure.repository.AccountRepository;
 import com.paymybuddy.infrastructure.repository.TransactionRepository;
 import com.paymybuddy.infrastructure.repository.UserContactRepository;
+import jakarta.validation.constraints.Null;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -216,7 +218,7 @@ class TransactionServiceImplTest {
         assertThatThrownBy(() -> transactionService.transfer(
                 1L,
                 2L,
-                amount == null ? null : BigDecimal.valueOf(amount),
+                BigDecimal.valueOf(amount),
                 "Test"))
                 .isInstanceOf(InvalidAmountException.class);
 
