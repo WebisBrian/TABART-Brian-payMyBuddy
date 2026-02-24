@@ -20,7 +20,7 @@ public class RegisterFormDto {
 
     @NotNull(message = "Le mot de passe est requis.")
     @NotBlank(message = "Le mot de passe ne peut pas être vide.")
-    @Size(min = 8, max = 72, message = "Le mot de passe doit comporter entre 8 et 72 caractères.")
+    @Size(min = 8, max = 70, message = "Le mot de passe doit comporter entre 8 et 70 caractères.")
     private String password;
 
     public String getUsername() {
