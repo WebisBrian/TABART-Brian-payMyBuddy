@@ -10,14 +10,11 @@
 
 <div th:fragment="content" class="container">
 
-    <!-- Page title badge -->
-    <div class="my-4">
-        <span class="brand-badge">Ajouter une relation</span>
-    </div>
+    <h2 class="h2 text-center shadow p-2 mb-5 rounded orange-background text-light w-50 mx-auto">Ajouter une relation</h2>
 
     <div th:replace="~{fragments/alerts :: alerts}"></div>
 
-    <!-- Add contact block -->
+    <!-- Add a contact block -->
     <div class="bg-white border p-4 mb-4">
         <form th:action="@{/contacts/add(userId=${param.userId})}"
               th:object="${addContactForm}"
@@ -51,14 +48,10 @@
         </form>
     </div>
 
-    <div class="my-4">
-        <span class="brand-badge">Ma liste de contacts</span>
-    </div>
+    <h2 class="h2 text-center shadow p-2 mb-5 rounded orange-background text-light w-50 mx-auto">Ma liste de contacts</h2>
 
     <!-- Contacts list -->
     <div class="bg-white border p-4">
-        <h2 class="h5 mb-3">Mes relations</h2>
-
         <div class="table-responsive">
             <table class="table align-middle mb-0">
                 <thead>
