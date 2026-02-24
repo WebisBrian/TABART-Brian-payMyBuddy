@@ -77,7 +77,7 @@ class UserContactTest {
     }
 
     /**
-     * Test-only helper: sets the private field "id" using reflection.
+     * Test-only helper
      * Use in unit tests to simulate persisted entities.
      */
     private static void setId(User user, Long id) {

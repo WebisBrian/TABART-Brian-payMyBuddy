@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AccountTest {
 
-    /* ---------- create() ---------- */
+    /* ---------- create() - Happy paths ---------- */
     @Test
     void create_shouldCreateAccount_withZeroBalance_andUserSet() {
         User user = validUser("user@mail.com");
@@ -23,6 +23,7 @@ class AccountTest {
         assertEquals(user, account.getUser());
     }
 
+    /* ---------- create() - Validation errors ---------- */
     @Test
     void create_shouldThrow_whenUserIsNull() {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
@@ -31,7 +32,7 @@ class AccountTest {
         assertTrue(ex.getMessage().contains("Account must be associated with a user."));
     }
 
-    /* ---------- deposit() ---------- */
+    /* ---------- deposit() - Happy paths ---------- */
     @Test
     void deposit_shouldIncreaseBalance_whenAmountIsPositive() {
         Account account = newAccount("user@mail.com");
@@ -41,6 +42,7 @@ class AccountTest {
         assertEquals(new BigDecimal("10.00"), account.getBalance());
     }
 
+    /* ---------- deposit() - Validation errors ---------- */
     @Test
     void deposit_shouldThrow_whenAmountIsNull() {
         Account account = newAccount("user@mail.com");
@@ -70,7 +72,7 @@ class AccountTest {
         assertTrue(exNegative.getMessage().contains("Amount must be strictly positive."));
     }
 
-    /* ---------- withdraw() ---------- */
+    /* ---------- withdraw() - Happy paths ---------- */
     @Test
     void withdraw_shouldDecreaseBalance_whenSufficientBalance() {
         Account account = newAccount("user@mail.com");
@@ -81,6 +83,7 @@ class AccountTest {
         assertEquals(new BigDecimal("12.50"), account.getBalance());
     }
 
+    /* ---------- withdraw() - Validation errors ---------- */
     @Test
     void withdraw_shouldThrow_whenAmountIsNull() {
         Account account = newAccount("user@mail.com");

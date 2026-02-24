@@ -35,7 +35,6 @@ class RegistrationServiceImplTest {
     @InjectMocks
     private RegistrationServiceImpl registrationService;
 
-    /* ---------- constants ---------- */
     private static final String USERNAME = "user";
     private static final String EMAIL = "user@email.com";
     private static final String PASSWORD = "Password123";

@@ -37,7 +37,6 @@ class ProfileServiceImplTest {
     private static final String USERNAME = "oldUsername";
     private static final String NEW_USERNAME = "newUsername";
 
-    // Password constants for changePassword()
     private static final String CURRENT_RAW_PASSWORD = "CurrentPwd123!";
     private static final String NEW_RAW_PASSWORD = "NewPwd123!";
     private static final String ENCODED_CURRENT_PASSWORD = "$2a$10$encoded-current";
@@ -170,11 +169,10 @@ class ProfileServiceImplTest {
         assertThat(user.getUsername()).isEqualTo("trimmedUsername");
     }
 
-    /* ---------- create() - Happy paths ---------- */
+    /* ---------- changePassword() - Happy paths ---------- */
     void changePassword_shouldUpdatePassword_whenCurrentPasswordMatches_andNewPasswordValid() {
         User user = User.create(USERNAME, EMAIL, "does-not-matter-here");
-        // Ensure the user currently has an ENCODED password stored
-        ReflectionTestUtils.setField(user, "password", ENCODED_CURRENT_PASSWORD);
+        user.changePasswordHash(ENCODED_CURRENT_PASSWORD);
 
         when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(CURRENT_RAW_PASSWORD, ENCODED_CURRENT_PASSWORD)).thenReturn(true);
@@ -192,7 +190,7 @@ class ProfileServiceImplTest {
         verifyNoMoreInteractions(userRepository, passwordEncoder);
     }
 
-    /* ---------- create() - Validation errors ---------- */
+    /* ---------- changePassword() - Validation errors ---------- */
     @Test
     void changePassword_shouldThrow_whenUserNotFound() {
         when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.empty());
