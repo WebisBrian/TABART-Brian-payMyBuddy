@@ -34,6 +34,7 @@ class ContactControllerTest {
     @MockitoBean
     private UserService userService;
 
+    /* ---------- getContactsPage() ---------- */
     @Test
     @WithMockUser(username = "user@email.com")
     void getContactsPage_shouldRenderViewAndPrepareModel() throws Exception {
@@ -53,6 +54,7 @@ class ContactControllerTest {
         verify(userService).getByEmail("user@email.com");
     }
 
+    /* ---------- postAddContact() ---------- */
     @Test
     @WithMockUser(username = "user@email.com")
     void postAddContact_shouldRedirect_whenValid() throws Exception {
@@ -123,6 +125,8 @@ class ContactControllerTest {
 
         verify(userService).getByEmail("user@email.com");
     }
+
+    /* ---------- Helpers ---------- */
 
     private User userWithId(long id, String email) {
         User user = User.create("user", email, "password");

@@ -36,6 +36,7 @@ class ProfileControllerTest {
     @MockitoBean
     private ProfileService profileService;
 
+    /* ---------- getProfilePage() ---------- */
     @Test
     @WithMockUser(username = "user@email.com")
     void getProfilePage_shouldRenderViewAndPreparePrefilledForm() throws Exception {
@@ -72,6 +73,7 @@ class ProfileControllerTest {
         verifyNoInteractions(profileService);
     }
 
+    /* ---------- postUpdateProfile() ---------- */
     @Test
     @WithMockUser(username = "user@email.com")
     void postUpdateProfile_shouldRedirect_whenValid() throws Exception {
@@ -122,6 +124,7 @@ class ProfileControllerTest {
         verify(profileService).updateProfile("user@email.com", "newUser", "new@email.com");
     }
 
+    /* ---------- postChangePassword() ---------- */
     @Test
     @WithMockUser(username = "user@email.com")
     void postChangePassword_shouldRedirect_whenValid() throws Exception {
@@ -141,7 +144,6 @@ class ProfileControllerTest {
     @Test
     @WithMockUser(username = "user@email.com")
     void postChangePassword_shouldReturnView_whenValidationFails() throws Exception {
-        // Controller returns the profile page -> it must re-provide profileForm
         when(userService.getByEmail("user@email.com"))
                 .thenReturn(userWithId(1L, "existingName", "user@email.com"));
 
@@ -197,6 +199,7 @@ class ProfileControllerTest {
         verify(profileService).changePassword("user@email.com", "bad", "NewPwd123!");
     }
 
+    /* ---------- Helpers ---------- */
     private User userWithId(long id, String username, String email) {
         User user = User.create(username, email, "password");
         ReflectionTestUtils.setField(user, "id", id);

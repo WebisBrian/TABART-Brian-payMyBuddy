@@ -50,6 +50,7 @@ class TransactionControllerTest {
     @MockitoBean
     private TransactionRowMapper transactionRowMapper;
 
+    /* ---------- getTransactionsPage() ---------- */
     @Test
     @WithMockUser(username = "user@email.com")
     void getTransactionsPage_shouldRenderViewAndPrepareModel() throws Exception {
@@ -70,6 +71,7 @@ class TransactionControllerTest {
         verify(userService).getByEmail("user@email.com");
     }
 
+    /* ---------- postTransfer() ---------- */
     @Test
     @WithMockUser(username = "user@email.com")
     void postTransfer_shouldRedirectToTransactionsPage_whenValid() throws Exception {
@@ -144,6 +146,7 @@ class TransactionControllerTest {
         verify(userService).getByEmail("user@email.com");
     }
 
+    /* ---------- Helpers ---------- */
     private User userWithId(long id, String email) {
         User user = User.create("user", email, "password");
         ReflectionTestUtils.setField(user, "id", id);

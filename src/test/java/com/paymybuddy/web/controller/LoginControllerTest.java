@@ -29,6 +29,7 @@ class LoginControllerTest {
     @MockitoBean
     private UserDetailsService userDetailsService;
 
+    /* ---------- getLogin() ---------- */
     @Test
     void getLogin_shouldReturnLoginView() throws Exception {
         mockMvc.perform(get("/login"))
@@ -36,6 +37,7 @@ class LoginControllerTest {
                 .andExpect(view().name("auth/login"));
     }
 
+    /* ---------- postLogin() ---------- */
     @Test
     void loginSuccess_shouldRedirectToTransactions() throws Exception {
         String email = "user@email.com";

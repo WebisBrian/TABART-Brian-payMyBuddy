@@ -25,6 +25,7 @@ class RegisterControllerTest {
     @MockitoBean
     private RegistrationService registrationService;
 
+    /* ---------- getRegister() ---------- */
     @Test
     void getRegister_shouldReturnRegisterView() throws Exception {
         mockMvc.perform(get("/register"))
@@ -32,6 +33,7 @@ class RegisterControllerTest {
                 .andExpect(view().name("auth/register"));
     }
 
+    /* ---------- postRegister() ---------- */
     @Test
     void postRegister_shouldRedirectToLogin_whenValid_andCsrfPresent() throws Exception {
         mockMvc.perform(post("/register")
