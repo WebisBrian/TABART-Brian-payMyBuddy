@@ -6,7 +6,7 @@ body {
 /* Orange badge used for the "Pay My Buddy" title */
 .brand-badge {
     display: inline-block;
-    background-color: #f59e0b; /* orange */
+    background-color: #F69F1D; /* orange */
     color: #ffffff;
     font-weight: 600;
     padding: 8px 16px;
@@ -15,7 +15,7 @@ body {
 
 /* Blue button */
 .btn-primary-custom {
-    background-color: #2563eb;
+    background-color: #207FEE;
     color: #ffffff;
     border: none;
 }
@@ -27,5 +27,5 @@ body {
 }
 
 .orange-background {
-    background-color: #f59e0b;
+    background-color: #F69F1D;
 }
