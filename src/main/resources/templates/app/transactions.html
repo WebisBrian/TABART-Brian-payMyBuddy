@@ -13,7 +13,7 @@
     <!-- Flash alerts -->
     <div th:replace="~{fragments/alerts :: alerts}"></div>
 
-    <h2 class="h2 text-center shadow p-2 mb-5 rounded orange-background text-light w-50 mx-auto">Transfert à un contact</h2>
+    <h1 class="h3 text-center shadow p-2 mb-5 rounded orange-background text-light w-50 mx-auto">Transfert à un contact</h1>
 
     <!-- Balance -->
     <div class="mb-3">
@@ -27,7 +27,7 @@
               th:object="${transferForm}"
               method="post"
               class="row g-3 align-items-start"
-              novalidate>
+              >
 
             <!-- Contact selection -->
             <div class="col-12 col-md-5">
@@ -35,6 +35,9 @@
                 <select id="receiverId"
                         class="form-select"
                         th:field="*{receiverId}"
+                        th:attr="aria-invalid=${#fields.hasErrors('receiverId')} ? 'true' : 'false'"
+                        th:attrappend="aria-describedby=${#fields.hasErrors('receiverId') ? 'receiverId-error' : null}"
+                        th:classappend="${#fields.hasErrors('receiverId')} ? 'is-invalid' : ''"
                         required>
                     <option value="" selected disabled>Sélectionner une relation</option>
                     <option th:each="c : ${contacts}"
@@ -43,8 +46,10 @@
                     </option>
                 </select>
 
-                <div class="mt-1 text-danger small" th:if="${#fields.hasErrors('receiverId')}">
-                    <span th:errors="*{receiverId}">Erreur destinataire</span>
+                <div id="receiverId-error"
+                     class="mt-1 text-danger small"
+                     th:if="${#fields.hasErrors('receiverId')}"
+                     th:errors="*{receiverId}">
                 </div>
             </div>
 
@@ -55,10 +60,15 @@
                        type="text"
                        class="form-control"
                        th:field="*{description}"
+                       th:attr="aria-invalid=${#fields.hasErrors('description')} ? 'true' : 'false'"
+                       th:attrappend="aria-describedby=${#fields.hasErrors('description') ? 'description-error' : null}"
+                       th:classappend="${#fields.hasErrors('description')} ? 'is-invalid' : ''"
                        placeholder="Description"
                        maxlength="140">
-                <div class="mt-1 text-danger small" th:if="${#fields.hasErrors('description')}">
-                    <span th:errors="*{description}">Erreur description</span>
+                <div id="description-error"
+                     class="mt-1 text-danger small"
+                     th:if="${#fields.hasErrors('description')}"
+                     th:errors="*{description}">
                 </div>
             </div>
 
@@ -72,10 +82,15 @@
                        class="form-control"
                        placeholder="0.00"
                        th:field="*{amount}"
+                       th:attr="aria-invalid=${#fields.hasErrors('amount')} ? 'true' : 'false'"
+                       th:attrappend="aria-describedby=${#fields.hasErrors('amount') ? 'amount-error' : null}"
+                       th:classappend="${#fields.hasErrors('amount')} ? 'is-invalid' : ''"
                        required>
 
-                <div class="mt-1 text-danger small" th:if="${#fields.hasErrors('amount')}">
-                    <span th:errors="*{amount}">Erreur montant</span>
+                <div id="amount-error"
+                     class="mt-1 text-danger small"
+                     th:if="${#fields.hasErrors('amount')}"
+                     th:errors="*{amount}">
                 </div>
             </div>
 
@@ -89,7 +104,7 @@
         </form>
     </div>
 
-    <h2 class="h2 text-center shadow p-2 mb-5 rounded orange-background text-light w-50 mx-auto">Historique des transactions</h2>
+    <h2 class="h3 text-center shadow p-2 mb-5 rounded orange-background text-light w-50 mx-auto">Historique des transactions</h2>
 
     <!-- Transactions' table -->
     <div class="bg-white border p-4">
@@ -99,7 +114,6 @@
                 <tr>
                     <th scope="col">Date</th>
                     <th scope="col">Relation</th>
-                    <th scope="col">Type</th>
                     <th scope="col">Description</th>
                     <th scope="col" class="text-end">Montant</th>
                     <th scope="col" class="text-end">Frais</th>
@@ -116,7 +130,7 @@
 
                 <!-- Rows -->
                 <tr th:each="row : ${transactionRows.content}">
-                    <td th:text="${#temporals.format(row.date, 'dd//MM/yyyy')}"></td>
+                    <td th:text="${#temporals.format(row.date, 'dd/MM/yyyy')}"></td>
                     <td th:text="${row.counterpartyLabel}">Alice (alice@mail.com)</td>
                     <td th:text="${row.description}">Description</td>
 
