@@ -55,7 +55,7 @@ class UserTest {
                 .hasMessageContaining("Password must not be null or blank");
     }
 
-    /* ---------- changeUsername() ---------- */
+    /* ---------- changeUsername() - Happy paths ---------- */
     @Test
     void changeUsername_shouldUpdateAndTrim() {
         User user = User.create("User 1", "user@email.com", "hash");
@@ -65,6 +65,7 @@ class UserTest {
         assertThat(user.getUsername()).isEqualTo("New Name");
     }
 
+    /* ---------- changeUsername() - Validation errors ---------- */
     @ParameterizedTest
     @NullSource
     @ValueSource(strings = {"", "   "})
@@ -76,7 +77,7 @@ class UserTest {
                 .hasMessageContaining("Username must not be null or blank");
     }
 
-    /* ---------- changeEmail() ---------- */
+    /* ---------- changeEmail() - Happy paths ---------- */
     @Test
     void changeEmail_shouldNormalizeAndTrim() {
         User user = User.create("User 1", "user@email.com", "hash");
@@ -86,6 +87,7 @@ class UserTest {
         assertThat(user.getEmail()).isEqualTo("new@email.com");
     }
 
+    /* ---------- changeEmail() - Validation errors ---------- */
     @ParameterizedTest
     @NullSource
     @ValueSource(strings = {"", "   "})
@@ -96,7 +98,7 @@ class UserTest {
                 .hasMessageContaining("must not be null or blank");
     }
 
-    /* ---------- changePasswordHash() ---------- */
+    /* ---------- changePasswordHash() - Happy paths ---------- */
     @Test
     void changePasswordHash_shouldUpdatePassword() {
         User user = User.create("User 1", "user@email.com", "oldHash");
@@ -104,6 +106,7 @@ class UserTest {
         user.changePasswordHash("  newHash  ");
     }
 
+    /* ---------- changePasswordHash() - Validation errors ---------- */
     @ParameterizedTest
     @NullSource
     @ValueSource(strings = {"", "   "})

@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserContactTest {
 
-    /* ---------- create() ---------- */
+    /* ---------- create() - Happy paths ---------- */
     @Test
     void create_shouldCreateUserContact_whenValid() {
         User user = validUser("user@mail.com");
@@ -22,6 +22,7 @@ class UserContactTest {
         assertEquals(contact, userContact.getContact());
     }
 
+    /* ---------- create() - Validation errors ---------- */
     @Test
     void create_shouldThrow_whenUserIsNull() {
         User contact = validUser("contact@mail.com");
