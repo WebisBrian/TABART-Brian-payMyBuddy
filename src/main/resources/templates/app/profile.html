@@ -13,7 +13,7 @@
     <!-- Flash alerts -->
     <div th:replace="~{fragments/alerts :: alerts}"></div>
 
-    <h2 class="h2 text-center shadow p-2 mb-5 rounded orange-background text-light w-50 mx-auto">Mon profil</h2>
+    <h1 class="h3 text-center shadow p-2 mb-5 rounded orange-background text-light w-50 mx-auto">Mon profil</h1>
 
     <div class="bg-white border p-4">
 
@@ -21,7 +21,7 @@
               th:object="${profileForm}"
               method="post"
               class="row g-3"
-              novalidate>
+              >
 
             <!-- Username -->
             <div class="col-12">
@@ -30,11 +30,17 @@
                        type="text"
                        class="form-control"
                        th:field="*{newUsername}"
+                       th:attr="aria-invalid=${#fields.hasErrors('newUsername')} ? 'true' : 'false'"
+                       th:attrappend="aria-describedby=${#fields.hasErrors('newUsername') ? 'newUsername-error' : null}"
+                       th:classappend="${#fields.hasErrors('newUsername')} ? 'is-invalid' : ''"
                        placeholder="Nom d’utilisateur"
-                       autocomplete="username">
+                       autocomplete="username"
+                       required>
 
-                <div class="mt-1 text-danger small" th:if="${#fields.hasErrors('newUsername')}">
-                    <span th:errors="*{newUsername}">Erreur nom</span>
+                <div id="newUsername-error"
+                     class="mt-1 text-danger small"
+                     th:if="${#fields.hasErrors('newUsername')}"
+                     th:errors="*{newUsername}">
                 </div>
             </div>
 
@@ -45,18 +51,24 @@
                        type="email"
                        class="form-control"
                        th:field="*{newEmail}"
+                       th:attr="aria-invalid=${#fields.hasErrors('newEmail')} ? 'true' : 'false'"
+                       th:attrappend="aria-describedby=${#fields.hasErrors('newEmail') ? 'newEmail-error' : null}"
+                       th:classappend="${#fields.hasErrors('newEmail')} ? 'is-invalid' : ''"
                        placeholder="email@example.com"
-                       autocomplete="email">
+                       autocomplete="email"
+                       required>
 
-                <div class="mt-1 text-danger small" th:if="${#fields.hasErrors('newEmail')}">
-                    <span th:errors="*{newEmail}">Erreur email</span>
+                <div id="newEmail-error"
+                     class="mt-1 text-danger small"
+                     th:if="${#fields.hasErrors('newEmail')}"
+                     th:errors="*{newEmail}">
                 </div>
             </div>
 
             <!-- Submit -->
             <div class="col-12 d-grid d-sm-flex justify-content-sm-end">
                 <button type="submit" class="btn btn-primary-custom px-4">
-                    Mettre à jour
+                    Mettre à jour le profil
                 </button>
             </div>
 
@@ -68,7 +80,7 @@
               th:object="${changePasswordForm}"
               method="post"
               class="row g-3"
-              novalidate>
+              >
 
             <!-- Current password -->
             <div class="col-12">
@@ -77,10 +89,16 @@
                        type="password"
                        class="form-control"
                        th:field="*{currentPassword}"
-                       autocomplete="current-password">
+                       th:attr="aria-invalid=${#fields.hasErrors('currentPassword')} ? 'true' : 'false'"
+                       th:attrappend="aria-describedby=${#fields.hasErrors('currentPassword') ? 'currentPassword-error' : null}"
+                       th:classappend="${#fields.hasErrors('currentPassword')} ? 'is-invalid' : ''"
+                       autocomplete="current-password"
+                       required>
 
-                <div class="mt-1 text-danger small" th:if="${#fields.hasErrors('currentPassword')}">
-                    <span th:errors="*{currentPassword}">Erreur mot de passe actuel</span>
+                <div id="currentPassword-error"
+                     class="mt-1 text-danger small"
+                     th:if="${#fields.hasErrors('currentPassword')}"
+                     th:errors="*{currentPassword}">
                 </div>
             </div>
 
@@ -91,10 +109,16 @@
                        type="password"
                        class="form-control"
                        th:field="*{newPassword}"
-                       autocomplete="new-password">
+                       th:attr="aria-invalid=${#fields.hasErrors('newPassword')} ? 'true' : 'false'"
+                       th:attrappend="aria-describedby=${#fields.hasErrors('newPassword') ? 'newPassword-error' : null}"
+                       th:classappend="${#fields.hasErrors('newPassword')} ? 'is-invalid' : ''"
+                       autocomplete="new-password"
+                       required>
 
-                <div class="mt-1 text-danger small" th:if="${#fields.hasErrors('newPassword')}">
-                    <span th:errors="*{newPassword}">Erreur nouveau mot de passe</span>
+                <div id="newPassword-error"
+                     class="mt-1 text-danger small"
+                     th:if="${#fields.hasErrors('newPassword')}"
+                     th:errors="*{newPassword}">
                 </div>
             </div>
 
@@ -105,10 +129,16 @@
                        type="password"
                        class="form-control"
                        th:field="*{confirmNewPassword}"
-                       autocomplete="new-password">
+                       th:attr="aria-invalid=${#fields.hasErrors('confirmNewPassword')} ? 'true' : 'false'"
+                       th:attrappend="aria-describedby=${#fields.hasErrors('confirmNewPassword') ? 'confirmNewPassword-error' : null}"
+                       th:classappend="${#fields.hasErrors('confirmNewPassword')} ? 'is-invalid' : ''"
+                       autocomplete="new-password"
+                       required>
 
-                <div class="mt-1 text-danger small" th:if="${#fields.hasErrors('confirmNewPassword')}">
-                    <span th:errors="*{confirmNewPassword}">Erreur confirmation</span>
+                <div id="confirmNewPassword-error"
+                     class="mt-1 text-danger small"
+                     th:if="${#fields.hasErrors('confirmNewPassword')}"
+                     th:errors="*{confirmNewPassword}">
                 </div>
             </div>
 

@@ -13,7 +13,7 @@
     <!-- Flash alerts -->
     <div th:replace="~{fragments/alerts :: alerts}"></div>
 
-    <h1 class="h2 text-center shadow p-2 mb-5 rounded orange-background text-light w-50 mx-auto">Ajouter une
+    <h1 class="h3 text-center shadow p-2 mb-5 rounded orange-background text-light w-50 mx-auto">Ajouter une
         relation</h1>
 
     <!-- Add a contact block -->
@@ -31,7 +31,7 @@
                        type="email"
                        class="form-control"
                        th:field="*{email}"
-                       th:attr="aria-invalid=${#fields.hasErrors('email')}"
+                       th:attr="aria-invalid=${#fields.hasErrors('email')} ? 'true' : 'false'"
                        th:attrappend="aria-describedby=${#fields.hasErrors('email') ? 'email-error' : null}"
                        th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''"
                        placeholder="Saisir une adresse mail"
@@ -42,7 +42,6 @@
                      class="mt-1 text-danger small"
                      th:if="${#fields.hasErrors('email')}"
                      th:errors="*{email}">
-                    Erreur email
                 </div>
             </div>
 
@@ -56,7 +55,7 @@
         </form>
     </div>
 
-    <h2 class="h2 text-center shadow p-2 mb-5 rounded orange-background text-light w-50 mx-auto">Ma liste de
+    <h2 class="h3 text-center shadow p-2 mb-5 rounded orange-background text-light w-50 mx-auto">Ma liste de
         contacts</h2>
 
     <!-- Contacts list -->
