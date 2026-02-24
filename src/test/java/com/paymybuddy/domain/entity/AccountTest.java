@@ -2,8 +2,10 @@ package com.paymybuddy.domain.entity;
 
 import com.paymybuddy.domain.exception.InsufficientBalanceException;
 import com.paymybuddy.domain.exception.InvalidAmountException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
 
@@ -43,33 +45,17 @@ class AccountTest {
     }
 
     /* ---------- deposit() - Validation errors ---------- */
-    @Test
-    void deposit_shouldThrow_whenAmountIsNull() {
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(doubles = {0.0, -1.0})
+    void deposit_shouldThrow_whenAmountIsInvalid(Double amount) {
         Account account = newAccount("user@mail.com");
 
         InvalidAmountException ex = assertThrows(InvalidAmountException.class, () ->
-                account.deposit(null)
+                account.deposit(amount == null ? null : BigDecimal.valueOf(amount))
         );
 
         assertTrue(ex.getMessage().contains("Amount must be strictly positive."));
-    }
-
-    @Test
-    void deposit_shouldThrow_whenAmountIsZeroOrNegative() {
-        Account account = newAccount("user@mail.com");
-
-        // Test zero amount
-        InvalidAmountException exZero = assertThrows(InvalidAmountException.class, () ->
-                account.deposit(BigDecimal.ZERO)
-        );
-        InvalidAmountException exNegative;
-        assertTrue(exZero.getMessage().contains("Amount must be strictly positive."));
-
-        // Test negative amount
-        exNegative = Assertions.assertThrows(InvalidAmountException.class, () ->
-                account.deposit(new BigDecimal("-1.00"))
-        );
-        assertTrue(exNegative.getMessage().contains("Amount must be strictly positive."));
     }
 
     /* ---------- withdraw() - Happy paths ---------- */
@@ -84,34 +70,17 @@ class AccountTest {
     }
 
     /* ---------- withdraw() - Validation errors ---------- */
-    @Test
-    void withdraw_shouldThrow_whenAmountIsNull() {
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(doubles = {0.0, -1.0})
+    void withdraw_shouldThrow_whenAmountIsInvalid(Double amount) {
         Account account = newAccount("user@mail.com");
         account.deposit(new BigDecimal("10.00"));
 
         InvalidAmountException ex = assertThrows(InvalidAmountException.class, () ->
-                account.withdraw(null)
-        );
+                account.withdraw(amount == null ? null : BigDecimal.valueOf(amount)));
 
         assertTrue(ex.getMessage().contains("Amount must be strictly positive."));
-    }
-
-    @Test
-    void withdraw_shouldThrow_whenAmountIsZeroOrNegative() {
-        Account account = newAccount("user@mail.com");
-        account.deposit(new BigDecimal("10.00"));
-
-        // Test zero amount
-        InvalidAmountException exZero = assertThrows(InvalidAmountException.class, () ->
-                account.withdraw(BigDecimal.ZERO)
-        );
-        assertTrue(exZero.getMessage().contains("Amount must be strictly positive."));
-
-        // Test negative amount
-        InvalidAmountException exNegative = assertThrows(InvalidAmountException.class, () ->
-                account.withdraw(new BigDecimal("-1.00"))
-        );
-        assertTrue(exNegative.getMessage().contains("Amount must be strictly positive."));
     }
 
     @Test
