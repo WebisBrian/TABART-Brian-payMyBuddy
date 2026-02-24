@@ -38,7 +38,6 @@ public class TransactionServiceImpl implements TransactionService {
         this.clock = clock;
     }
 
-    /* ---------- transfer() ---------- */
     @Override
     @Transactional
     public void transfer(Long senderId, Long receiverId, BigDecimal amount, String description) {
@@ -70,7 +69,6 @@ public class TransactionServiceImpl implements TransactionService {
         transactionRepository.save(transaction);
     }
 
-    /* ---------- getTransaction() ---------- */
     @Override
     @Transactional(readOnly = true)
     public Page<Transaction> getTransactionHistory(Long userId, Pageable pageable) {

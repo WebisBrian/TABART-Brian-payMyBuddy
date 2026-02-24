@@ -13,7 +13,7 @@ public class LoginController {
     @GetMapping
     public String getLogin(Authentication authentication) {
 
-        // If already logged in, redirect to the transactions page
+        // If already logged in, redirect to the transaction page
         if (authentication != null && authentication.isAuthenticated()
                 && !(authentication instanceof AnonymousAuthenticationToken)) {
             return "redirect:/transactions";

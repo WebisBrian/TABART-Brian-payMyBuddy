@@ -60,7 +60,7 @@ public class TransactionController {
 
         model.addAttribute("transferForm", new TransferFormDto());
         model.addAttribute("contacts", contacts);
-        // Indique à la vue quelle page est active pour la navbar
+        // Tell the template which menu item should be active
         model.addAttribute("activePage", "transactions");
         model.addAttribute("balance", balance);
 

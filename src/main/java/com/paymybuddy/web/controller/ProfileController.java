@@ -101,6 +101,7 @@ public class ProfileController {
         return "redirect:/profile";
     }
 
+    /* Helpers */
     private void repopulateProfileForm(String email, Model model) {
         User user = userService.getByEmail(email);
         model.addAttribute("profileForm", new ProfileFormDto(user.getUsername(), user.getEmail()));

@@ -205,8 +205,7 @@ public class GlobalExceptionHandler {
             return "redirect:/login";
         }
 
-        // Redirect authenticated users to /transactions by default to avoid
-        // having the root path ("/") processed as a static resource request.
+        // Redirect authenticated users to /transactions by default
         return "redirect:/transactions";
     }
 }

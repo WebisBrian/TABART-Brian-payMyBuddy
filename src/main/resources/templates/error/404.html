@@ -10,15 +10,13 @@
 
 <div th:fragment="content" class="container">
 
-    <!-- Page title badge (same style as your authenticated pages) -->
     <h2 class="h2 text-center shadow p-2 mb-5 rounded orange-background text-light w-50 mx-auto">
         Page introuvable
     </h2>
 
-    <!-- Alerts (if you use them globally) -->
+    <!-- Flash alerts -->
     <div th:replace="~{fragments/alerts :: alerts}"></div>
 
-    <!-- Main block -->
     <div class="bg-white border p-4 text-center">
         <p class="text-muted mb-3"
            th:text="${errorMessage != null ? errorMessage : 'La page demandée est introuvable.'}">

@@ -10,7 +10,9 @@
 
 <div th:fragment="content" class="container">
 
-    <!-- Page title badge -->
+    <!-- Flash alerts -->
+    <div th:replace="~{fragments/alerts :: alerts}"></div>
+
     <h2 class="h2 text-center shadow p-2 mb-5 rounded orange-background text-light w-50 mx-auto">Transfert à un contact</h2>
 
     <!-- Balance -->
@@ -18,8 +20,6 @@
         <span class="text-muted">Solde du compte :</span>
         <span class="fw-semibold ms-2" th:text="${balance} + ' €'">0.00 €</span>
     </div>
-
-    <div th:replace="~{fragments/alerts :: alerts}"></div>
 
     <!-- Send money block -->
     <div class="bg-white border p-4 mb-4">
@@ -29,7 +29,7 @@
               class="row g-3 align-items-start"
               novalidate>
 
-            <!-- Contact select -->
+            <!-- Contact selection -->
             <div class="col-12 col-md-5">
                 <label for="receiverId" class="form-label visually-hidden">Sélectionner une relation</label>
                 <select id="receiverId"

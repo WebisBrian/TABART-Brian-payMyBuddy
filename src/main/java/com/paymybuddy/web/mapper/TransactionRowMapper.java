@@ -22,8 +22,7 @@ public interface TransactionRowMapper {
             expression = "java(signedAmountOf(transaction, userId))")
     TransactionRowDto toRowDto(Transaction transaction, Long userId);
 
-    /* Helpers methods */
-
+    /* Helpers */
     default TransactionRowDto.Direction directionOf(Transaction transaction, Long userId) {
         Long senderUserId = userIdOf(transaction.getSenderAccount());
         return senderUserId.equals(userId)

@@ -30,7 +30,6 @@ public class UserServiceImpl implements UserService {
         this.userContactRepository = userContactRepository;
     }
 
-    /* ---------- getByEmail() ---------- */
     @Override
     @Transactional (readOnly = true)
     public User getByEmail(String email) {
@@ -45,7 +44,6 @@ public class UserServiceImpl implements UserService {
                 });
     }
 
-    /* ---------- addContact() ---------- */
     @Override
     @Transactional
     public void addContact(Long userId, Long contactId) {
@@ -68,7 +66,6 @@ public class UserServiceImpl implements UserService {
         logger.info("Contact added: userId={}, contactId={}", userId, contactId);
     }
 
-    /* ---------- addContactByEmail() ---------- */
     @Override
     @Transactional
     public void addContactByEmail(Long userId, String contactEmail) {
@@ -99,7 +96,6 @@ public class UserServiceImpl implements UserService {
                 userId, contact.getId(), maskEmail(normalizedEmail));
     }
 
-    /* ---------- removeContact() ---------- */
     @Override
     @Transactional
     public void removeContact(Long userId, Long contactId) {
@@ -118,7 +114,6 @@ public class UserServiceImpl implements UserService {
         logger.info("Contact removed: userId={}, contactId={}", userId, contactId);
     }
 
-    /* ---------- listContacts() ---------- */
     @Override
     @Transactional(readOnly = true)
     public List<User> listContacts(Long userId) {
