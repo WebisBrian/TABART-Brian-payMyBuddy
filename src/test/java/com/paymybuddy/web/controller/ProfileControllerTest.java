@@ -3,6 +3,7 @@ package com.paymybuddy.web.controller;
 import com.paymybuddy.application.service.ProfileService;
 import com.paymybuddy.application.service.UserService;
 import com.paymybuddy.application.service.exception.EmailAlreadyUsedException;
+import com.paymybuddy.application.service.exception.InvalidCurrentPasswordException;
 import com.paymybuddy.domain.entity.User;
 import com.paymybuddy.infrastructure.security.SecurityConfig;
 import org.junit.jupiter.api.Test;
@@ -57,6 +58,22 @@ class ProfileControllerTest {
 
     @Test
     @WithMockUser(username = "user@email.com")
+    void getProfilePage_shouldPrepareChangePasswordForm() throws Exception {
+        when(userService.getByEmail("user@email.com"))
+                .thenReturn(userWithId(1L, "existingName", "user@email.com"));
+
+        mockMvc.perform(get("/profile"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("app/profile"))
+                .andExpect(model().attributeExists("profileForm"))
+                .andExpect(model().attributeExists("changePasswordForm"));
+
+        verify(userService).getByEmail("user@email.com");
+        verifyNoInteractions(profileService);
+    }
+
+    @Test
+    @WithMockUser(username = "user@email.com")
     void postUpdateProfile_shouldRedirect_whenValid() throws Exception {
         mockMvc.perform(post("/profile/update")
                         .with(csrf())
@@ -103,6 +120,81 @@ class ProfileControllerTest {
                 .andExpect(flash().attribute("errorMessageFromGEH", "Cette adresse email est déjà utilisée."));
 
         verify(profileService).updateProfile("user@email.com", "newUser", "new@email.com");
+    }
+
+    @Test
+    @WithMockUser(username = "user@email.com")
+    void postChangePassword_shouldRedirect_whenValid() throws Exception {
+        mockMvc.perform(post("/profile/password")
+                        .with(csrf())
+                        .param("currentPassword", "CurrentPwd123!")
+                        .param("newPassword", "NewPwd123!")
+                        .param("confirmNewPassword", "NewPwd123!"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/profile"))
+                .andExpect(flash().attribute("success", "Mot de passe mis à jour avec succès."));
+
+        verify(profileService).changePassword("user@email.com", "CurrentPwd123!", "NewPwd123!");
+        verifyNoInteractions(userService);
+    }
+
+    @Test
+    @WithMockUser(username = "user@email.com")
+    void postChangePassword_shouldReturnView_whenValidationFails() throws Exception {
+        // Controller returns the profile page -> it must re-provide profileForm
+        when(userService.getByEmail("user@email.com"))
+                .thenReturn(userWithId(1L, "existingName", "user@email.com"));
+
+        mockMvc.perform(post("/profile/password")
+                        .with(csrf())
+                        // currentPassword missing
+                        .param("newPassword", "NewPwd123!")
+                        .param("confirmNewPassword", "NewPwd123!"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("app/profile"))
+                .andExpect(model().attributeHasFieldErrors("changePasswordForm", "currentPassword"))
+                .andExpect(model().attributeExists("profileForm"))
+                .andExpect(model().attributeExists("activePage"));
+
+        verifyNoInteractions(profileService);
+        verify(userService).getByEmail("user@email.com");
+    }
+
+    @Test
+    @WithMockUser(username = "user@email.com")
+    void postChangePassword_shouldReturnView_whenConfirmDoesNotMatch() throws Exception {
+        when(userService.getByEmail("user@email.com"))
+                .thenReturn(userWithId(1L, "existingName", "user@email.com"));
+
+        mockMvc.perform(post("/profile/password")
+                        .with(csrf())
+                        .param("currentPassword", "CurrentPwd123!")
+                        .param("newPassword", "NewPwd123!")
+                        .param("confirmNewPassword", "DifferentPwd123!"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("app/profile"))
+                .andExpect(model().attributeHasFieldErrors("changePasswordForm", "confirmNewPassword"));
+
+        verifyNoInteractions(profileService);
+        verify(userService).getByEmail("user@email.com");
+    }
+
+    @Test
+    @WithMockUser(username = "user@email.com")
+    void postChangePassword_shouldRedirectWithErrorMessage_whenServiceThrowsInvalidCurrentPassword() throws Exception {
+        doThrow(new InvalidCurrentPasswordException())
+                .when(profileService).changePassword("user@email.com", "bad", "NewPwd123!");
+
+        mockMvc.perform(post("/profile/password")
+                        .with(csrf())
+                        .param("currentPassword", "bad")
+                        .param("newPassword", "NewPwd123!")
+                        .param("confirmNewPassword", "NewPwd123!"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/profile"))
+                .andExpect(flash().attribute("errorMessageFromGEH", "Mot de passe actuel incorrect."));
+
+        verify(profileService).changePassword("user@email.com", "bad", "NewPwd123!");
     }
 
     private User userWithId(long id, String username, String email) {
