@@ -5,16 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="${pageTitle} ?: 'Pay My Buddy'">Pay My Buddy</title>
 
-    <!-- Bootstrap 5.3 (CDN) -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet"
-          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-          crossorigin="anonymous">
-
+    <!-- Bootstrap local -->
+    <link rel="stylesheet" th:href="@{/vendor/bootstrap/css/bootstrap.min.css}">
     <!-- Custom CSS -->
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <!-- Prevent browser requesting -->
-    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=">
+    <link rel="icon" type="image/png"
+          href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=">
 </head>
 
 <body>
@@ -26,9 +23,7 @@
     <div th:replace="${content}">Page content</div>
 </main>
 
-<!-- Bootstrap JS bundle -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
+<!-- Bootstrap JS bundle local -->
+<script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
 </body>
 </html>
