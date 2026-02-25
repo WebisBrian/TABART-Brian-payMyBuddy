@@ -3,14 +3,18 @@
     <!-- GlobalExceptionHandler error -->
     <div th:if="${errorMessageFromGEH}"
          class="alert alert-danger"
-         role="alert">
+         role="alert"
+         aria-live="assertive"
+         aria-atomic="true">
         <span th:text="${errorMessageFromGEH}">Erreur</span>
     </div>
 
     <!-- Generic success message -->
     <div th:if="${success}"
          class="alert alert-success"
-         role="alert">
+         role="alert"
+         aria-live="polite"
+         aria-atomic="true">
         <span th:text="${success}">Succès</span>
     </div>
 

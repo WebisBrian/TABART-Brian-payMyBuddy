@@ -13,14 +13,12 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" th:href="@{/css/style.css}">
-    <!-- Prevent browser requesting /favicon.ico by providing an inline tiny favicon -->
+    <!-- Prevent browser requesting -->
     <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=">
 </head>
 
 <body>
-<!-- Optional navbar slot:
-     - Pages that need it will provide a fragment named 'navbar'
-     - Auth pages can omit it by not defining the fragment -->
+<!-- Optional navbar -->
 <header th:replace="${navbar} ?: ~{}"></header>
 
 <main class="py-4">

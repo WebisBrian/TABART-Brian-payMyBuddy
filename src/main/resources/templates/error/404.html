@@ -10,17 +10,18 @@
 
 <div th:fragment="content" class="container">
 
-    <h2 class="h2 text-center shadow p-2 mb-5 rounded orange-background text-light w-50 mx-auto">
+    <h1 class="h3 text-center shadow p-2 mb-5 rounded orange-background text-light w-50 mx-auto">
         Page introuvable
-    </h2>
+    </h1>
 
     <!-- Flash alerts -->
     <div th:replace="~{fragments/alerts :: alerts}"></div>
 
     <div class="bg-white border p-4 text-center">
         <p class="text-muted mb-3"
+           role="alert"
+           aria-live="polite"
            th:text="${errorMessage != null ? errorMessage : 'La page demandée est introuvable.'}">
-            La page demandée est introuvable.
         </p>
 
         <div class="d-flex justify-content-center gap-2">
