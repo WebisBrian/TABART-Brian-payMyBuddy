@@ -146,6 +146,7 @@ Vous pouvez lancer les tests en utilisant la commande suivante :
 ```bash
 mvn verify
 ```
+Vous trouverez ci-après, [le rapport de tests Jacoco](/.readme/rapport_tests.png).
 
 ---
 
