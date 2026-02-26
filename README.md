@@ -9,7 +9,6 @@ Le projet est développé avec **Spring Boot**, selon une approche **DB-first** 
 
 Ce document explique **pas à pas** comment démarrer le projet **Pay My Buddy** et intégrer les données nécessaires à son fonctionnement.
 
-
 ---
 
 ## Stack technique
@@ -19,9 +18,10 @@ Ce document explique **pas à pas** comment démarrer le projet **Pay My Buddy**
 * Spring Security
 * Spring Data JPA (Hibernate)
 * Thymeleaf
+* MySQL
 * Maven
 
-Assurez-vous également d'avoir :
+**Assurez-vous également d'avoir** :
 * MySQL installé et démarré
 * Un client SQL (MySQL Workbench, DBeaver, DataGrip, phpMyAdmin, etc.)
 
@@ -29,11 +29,15 @@ Assurez-vous également d'avoir :
 
 ## 1. Initialisation de la base de données (obligatoire)
 
+La base de données et les fichiers sql qui suivent se basent sur le diagramme de classe et le modèle physique de données suivant:
+* [Voir le Diagramme de Classe](/.readme/class_diagram.png)
+* [Voir le Modèle Physique de Données](/.readme/implementation_diagram.png)
+
 Le fichier `schema.sql` est **indispensable** au fonctionnement de l’application. Il crée :
 
 * la base de données `pay_my_buddy`
 * les tables
-* les contraintes (clés étrangères, unicité, checks)
+* les contraintes (clés étrangères, unicité)
 
 ### Étapes
 
@@ -52,13 +56,6 @@ Le fichier `schema.sql` est **indispensable** au fonctionnement de l’applicati
 ## 2. Chargement des données de démonstration (optionnel)
 
 Un jeu de données est fourni pour faciliter l’évaluation et les tests fonctionnels.
-
-### Contenu
-
-* utilisateurs
-* comptes
-* relations (contacts)
-* historique de transactions
 
 ### Étapes
 
@@ -104,6 +101,7 @@ Pour lancer le projet en local :
 1. Copier le fichier d'exemple
 2. Le renommer en ```application-dev.properties```
 3. Adapter les valeurs si nécessaire
+4. L'application devra être lancée avec le profil `dev`
 
 
 ### Valeurs par défaut
@@ -114,46 +112,9 @@ Pour lancer le projet en local :
 
 ---
 
-### Surcharge possible (si nécessaire)
-
-##### Linux / macOS
-
-```bash
-export SPRING_PROFILES_ACTIVE=dev
-export DB_USERNAME=myuser
-export DB_PASSWORD=mypassword
-export DB_HOST=localhost
-export DB_PORT=3306
-export DB_NAME=pay_my_buddy
-
-./mvnw spring-boot:run
-```
-
-##### Windows (PowerShell)
-
-```powershell
-$env:SPRING_PROFILES_ACTIVE="dev"
-$env:DB_USERNAME="myuser"
-$env:DB_PASSWORD="mypassword"
-$env:DB_HOST="localhost"
-$env:DB_PORT="3306"
-$env:DB_NAME="pay_my_buddy"
-
-./mvnw spring-boot:run
-```
-
----
-
 ## 4. Lancement de l’application
 
-⚠️ **Important** : l’application doit être lancée avec le profil `dev`.
-
-Le fichier `application.properties` ne contient volontairement **aucune configuration de base de données**.
-Sans le profil `dev`, l’application ne peut donc pas se connecter à MySQL et ne démarrera pas correctement.
-
----
-
-### Lancement avec le profil `dev`
+### ⚠️ Lancement avec le profil `dev`
 
 L'idéal est de lancer l'application à l'aide d'une variable d’environnement :
 
@@ -183,7 +144,7 @@ http://localhost:8080
 
 * Le projet est **DB-first** : Hibernate ne crée ni ne modifie les tables
 * `spring.jpa.hibernate.ddl-auto=validate` est utilisé pour vérifier la cohérence entités / schéma
-* Les scripts SQL ne sont jamais exécutés automatiquement au démarrage
+* Les scripts SQL ne sont pas exécutés automatiquement au démarrage
 * Cette approche évite toute réinitialisation involontaire des données
 
 ---
