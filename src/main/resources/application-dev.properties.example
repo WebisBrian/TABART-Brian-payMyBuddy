@@ -27,4 +27,4 @@ spring.sql.init.mode=never
 # -------------------------
 # Logging (default)
 # -------------------------
-logging.level.org.springframework.web=debug
+logging.level.org.springframework.web=INFO
