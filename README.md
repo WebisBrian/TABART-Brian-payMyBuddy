@@ -29,7 +29,7 @@ Ce document explique **pas à pas** comment démarrer le projet **Pay My Buddy**
 
 ## 1. Initialisation de la base de données (obligatoire)
 
-La base de données et les fichiers sql qui suivent se basent sur le diagramme de classe et le modèle physique de données suivant:
+La base de données s'appuie sur le **Diagramme de Classes** et le **Modèle Physique de Données** suivants :
 * [Voir le Diagramme de Classe](/.readme/class_diagram.png)
 * [Voir le Modèle Physique de Données](/.readme/implementation_diagram.png)
 
@@ -137,10 +137,19 @@ L’application démarre sur :
 ```
 http://localhost:8080
 ```
+---
+
+## 5. Lancement des tests
+
+Vous pouvez lancer les tests en utilisant la commande suivante :
+
+```bash
+mvn verify
+```
 
 ---
 
-## 5. Notes techniques importantes
+## Notes techniques importantes
 
 * Le projet est **DB-first** : Hibernate ne crée ni ne modifie les tables
 * `spring.jpa.hibernate.ddl-auto=validate` est utilisé pour vérifier la cohérence entités / schéma
