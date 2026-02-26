@@ -1,5 +1,6 @@
 # Pay My Buddy – Guide de démarrage
 
+![PayMyBuddy](./.readme/presentation.png)
 
 ## Description
 
@@ -8,7 +9,6 @@ Pay My Buddy est une application web Java permettant aux utilisateurs de transf�
 Le projet est développé avec **Spring Boot**, selon une approche **DB-first** : la base de données est la source de vérité et les entités JPA doivent correspondre au schéma SQL existant.
 
 Ce document explique **pas à pas** comment démarrer le projet **Pay My Buddy** et intégrer les données nécessaires à son fonctionnement.
-
 ---
 
 ## Stack technique
